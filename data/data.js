@@ -1,11 +1,12 @@
 /*
  * ECX Capital Markets dashboard dataset — generated 2026-07-23 by Claude.
  * Schema:
- *   meta { as_of, subtitle }
+ *   meta { as_of, subtitle, commitments_total_usd, data_gaps[] }
  *   meetings[] { date (ISO), bank_label, banks[], project, discussion,
  *                materials_shared[], participants[], source, source_kind: 'sharepoint'|'email' }
- *   facilities[] { name, year, type, region, status, total_size_musd, currency, as_of,
- *                  description, lenders[] { bank, role, commitment_musd, fee_note } }
+ *   facilities[] { name, region, guarantor, type, status, total_size_musd, currency, as_of,
+ *                  description, lenders[] { bank, role, commitment_musd, fee_note, status } }
+ *   bank_commitments[] { bank, total_usd, facilities }  — Q2 2026 portfolio totals per bank
  *   fee_matrix { source, note, deals_2025[], deals_2026[],
  *                banks[] { bank, total_2025, total_2026, total_combined },
  *                grand_totals { y2025, y2026, combined } }
@@ -14,7 +15,20 @@
 window.ECX_DATA = {
  "meta": {
   "as_of": "2026-07-23",
-  "subtitle": "Global Debt Portfolio · sources: SharePoint Bank Conversation Tracker, CF Pipeline call notes & transcripts, DCM call-notes emails, Q2 2026 lender commitments & fee summaries"
+  "subtitle": "Global Debt Portfolio · sources: SharePoint Bank Conversation Tracker, CF Pipeline call notes & transcripts, DCM call-notes emails, Q2 2026 commitments & lender fee summaries",
+  "commitments_total_usd": 24793471106,
+  "data_gaps": [
+   "Wahoo: closed at $2.5B per Q2 2026 Commitments workbook, but the per-bank final allocation cells could not all be reliably attributed from the flattened grid (pattern: many banks at $104.17M; Natixis appears at $30M, GS $50M, Nomura $45M, Investec $25M, Webster/Flagstar reduced). Fee-tier bps table interpretation (old money 10/5/0 bps vs 25 bps column) should be confirmed.",
+   "Commitments workbook: per-bank x per-facility cells were only partially extracted (text extraction flattens the grid); bank portfolio totals and facility totals are reliable (verified by cross-checks), individual cells only where noted.",
+   "Fee matrix: per-deal cells populated only where confidently attributable (Walleye CLAs, Metropolis PF lenders, Leroy, Beluga Upsize fee ladder, Shiner CLAs); remaining per-deal cells left blank though 2025/2026/combined per-bank totals are complete. 2025 totals derived as combined minus 2026.",
+   "Shiner: per-lender fee $ amounts stated only for CLAs (via fee summary); JLA/MLA/retail tier upfront bps not stated in the tracker.",
+   "Walleye: per-lender upfront fee $ known only for the 5 CLAs ($66.1M total); syndicated lender fees only as tier bps grid; final (post-allocation) holds vs approved commitments not confirmed.",
+   "Tarpon: 6.3.25 tracker is a pre-launch plan - final syndicate allocations not found; only CLA UW/holds and total fee actuals.",
+   "Beluga: amounts are EUR; new-money accordion was still in syndication at 2/20/26 - final book not read; per-lender fees known only for bookrunners/co-managers/MS.",
+   "Narwhal, Leroy, Vendace, Orca, Narluga, Gotham: facility-level fees and sizes from the fee summary only; full lender rosters not read (per-deal fee matrix columns could not be reliably aligned per bank except where cross-checked).",
+   "LC platform: bilateral upfront fee $ per bank mostly not itemized (only Rabo LC $300k 2026, aggregate LC facility fees 2025 ~$0.25M+).",
+   "No syndication trackers found for 'Leroy' or 'Narwhal' subfolders in the Claude Resources folder (search of the whole tenant only surfaced Wahoo trackers there; Walleye/Beluga trackers live in sborgers' ECX-BCP drive)."
+  ]
  },
  "meetings": [
   {
@@ -1011,1647 +1025,1893 @@ window.ECX_DATA = {
  ],
  "facilities": [
   {
-   "name": "Project Wahoo / Wahoo I & II (EdgeConneX corporate borrowing-base facility upsize - Tranche A4/B4 + Supplemental)",
-   "total_size_musd": 2500,
-   "currency": "USD",
-   "type": "holdco / corporate borrowing-base revolver upsize",
-   "status": "CLOSED - Q2 2026 Commitments workbook shows 'Wahoo I & II' at $2,500,000,000 total with top-tier banks at $104,166,667 each (others $90M/$85M/$80M/$50M/$45M/$40M/$30M/$25M). Tracker below reflects syndication status 12/16/25 ($1,040M committed at that date); invite amounts are pre-allocation. Fees: Wahoo Upsize I $18.3M (2025) + Upsize II $6.0M (2026).",
-   "as_of": "tracker 2025-12-16; closed total per Q2 2026 commitments workbook",
-   "fees_structure": {
-    "JLA&JBR": "10.0 bps old money / 25 bps (see notes)",
-    "JLA": "5.0 bps old money / 25 bps",
-    "Co-Doc": "0.0 bps old money / 25 bps",
-    "wahoo_upsize_upfront_pct_from_fee_file": 2.0
-   },
+   "name": "Beluga",
+   "region": "Europe",
+   "guarantor": "Herndon",
+   "type": "project finance / European portfolio facility (capex TL + RCF, accordion)",
+   "status": "In syndication as of 2/20/26: 73.6% of existing book approved roll; new money EUR 1,250M underwritten by 5 bookrunners; EUR ~2,783M weighted new-money book. 2025 'Project Beluga Upsize' fees paid: $35.99M (MS sole structuring $6.19M).",
+   "total_size_musd": 6721.7,
+   "currency": "EUR",
+   "as_of": "2026-02-20",
+   "description": "Project Beluga Accordion 2 (European portfolio refi - roll EUR 4,395M + new money EUR 1,500M)",
    "lenders": [
     {
-     "bank": "TD Bank",
-     "role": "JLA&JBR (lead arranger, running syndication)",
-     "commitment_musd": 125,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "BBVA",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "committed - CL received",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Bank of America",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "committed - CL received",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Rabobank",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "committed - CL received",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "OCBC",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "committed - CL received (prefers $90M hold)",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "JP Morgan",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Regions",
-     "role": "JLA",
-     "commitment_musd": 90,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": 5,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Webster",
-     "role": "Co-Doc",
-     "commitment_musd": 80,
-     "status": "committed - CL received",
-     "fees": {
-      "upfront_bps": 0,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Flagstar",
-     "role": "Co-Doc",
-     "commitment_musd": 75,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": 0,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Nomura",
-     "role": "Participant (rolling existing $45M)",
-     "commitment_musd": 45,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "RBC",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 95% probability",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "MUFG",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 95% probability",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Barclays",
-     "role": "JLA&JBR",
-     "commitment_musd": 115,
-     "status": "working - 90%, will come in at $115M",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "SMBC",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 90%",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "ABN AMRO",
+     "role": "Bookrunner",
+     "commitment_musd": null,
+     "fee_note": "JLM/bookrunner fee EUR 884,375 (USD 1,028,014)",
+     "status": "approved roll; new money UW EUR 250M"
     },
     {
      "bank": "ING",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 90%",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Wells Fargo",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 90%",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Goldman Sachs",
-     "role": "JLA",
-     "commitment_musd": 90,
-     "status": "working - 90%",
-     "fees": {
-      "upfront_bps": 5,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Mizuho",
-     "role": "JLA",
-     "commitment_musd": 90,
-     "status": "working - 90%",
-     "fees": {
-      "upfront_bps": 5,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Investec",
-     "role": "Participant (extending existing $25M)",
-     "commitment_musd": 25,
-     "status": "working - 90%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "First-Citizens Bank",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 75%",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "KfW IPEX-Bank",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 75% (cannot commit by deadline)",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
+     "role": "Bookrunner",
+     "commitment_musd": null,
+     "fee_note": "$1.03m upfront",
+     "status": "approved; new money UW EUR 250M"
     },
     {
      "bank": "Natixis",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 75%",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
+     "role": "Bookrunner",
+     "commitment_musd": null,
+     "fee_note": "$1.03m upfront",
+     "status": "approved; new money UW EUR 250M"
     },
-    {
-     "bank": "NBC",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 75%",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Truist",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "working - 75%",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Caterpillar",
-     "role": "Co-Doc",
-     "commitment_musd": 50,
-     "status": "working - 50%",
-     "fees": {
-      "upfront_bps": 0,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "BHI",
-     "role": "Co-Doc",
-     "commitment_musd": 50,
-     "status": "working - 50%",
-     "fees": {
-      "upfront_bps": 0,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Intesa Sanpaolo",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "potential January close",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "BNP Paribas",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "potential January close (week of Jan 19)",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Standard Chartered",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "potential Jan/Feb",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "US Bank",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "potential January close",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Credit Agricole",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "potential January (commercial approval done)",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "KeyBank",
-     "role": "JLA&JBR",
-     "commitment_musd": 125,
-     "status": "re-evaluate in new year",
-     "fees": {
-      "upfront_bps": 10,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Citi",
-     "role": "JLA",
-     "commitment_musd": 90,
-     "status": "potential - may reconsider if Amazon signed",
-     "fees": {
-      "upfront_bps": 5,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Santander",
-     "role": "JLA",
-     "commitment_musd": 90,
-     "status": "potential - relooking in January",
-     "fees": {
-      "upfront_bps": 5,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Bank Leumi",
-     "role": "Participant",
-     "commitment_musd": 70,
-     "status": "potential January",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "CoBank",
-     "role": "Participant",
-     "commitment_musd": 40,
-     "status": "potential mid-January (AWS lease condition)",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Clifford Capital",
-     "role": "Participant",
-     "commitment_musd": 50,
-     "status": "potential (discussing DDTL carve-out)",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    }
-   ]
-  },
-  {
-   "name": "Project Shiner (AUS02 Austin data center DDTL - CoreWeave tenant)",
-   "total_size_musd": 1000,
-   "currency": "USD",
-   "type": "project finance (construction DDTL)",
-   "status": "Closed / in syndication of UW positions; $485M committed by non-CLA investors as of 10/9/25. Total 2025 lender fees paid $21.85M (per fee summary; fee base $1,040.5M).",
-   "as_of": "2025-10-09",
-   "fees_structure": {
-    "upfront_pct": 1.5,
-    "commitment_fee": "35% of margin",
-    "uw_fee_pct": 0.5,
-    "structuring_fee_pct": 0.1
-   },
-   "lenders": [
     {
      "bank": "Societe Generale",
-     "role": "CLA (bookrunner)",
-     "commitment_musd": 197.5,
-     "status": "CLA UW 19.8%",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 4.22,
-      "other": "2025 Shiner fees per fee file: $4,219,661"
-     }
+     "role": "Bookrunner",
+     "commitment_musd": null,
+     "fee_note": "$1.03m upfront",
+     "status": "approved; new money UW EUR 250M"
     },
     {
-     "bank": "Nomura",
-     "role": "CLA",
-     "commitment_musd": 210.0,
-     "status": "CLA UW 21.0%",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 3.19,
-      "other": "2025 Shiner fees per fee file: ~$3,179,191"
-     }
-    },
-    {
-     "bank": "JP Morgan",
-     "role": "CLA",
-     "commitment_musd": 197.5,
-     "status": "CLA UW 19.8%",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 3.19,
-      "other": null
-     }
+     "bank": "SMBC",
+     "role": "Bookrunner",
+     "commitment_musd": null,
+     "fee_note": "$1.03m upfront",
+     "status": "approved; new money UW EUR 250M"
     },
     {
      "bank": "Morgan Stanley",
-     "role": "CLA",
-     "commitment_musd": 197.5,
-     "status": "CLA UW 19.8%",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 3.19,
-      "other": null
-     }
+     "role": "Sole Structuring Bank",
+     "commitment_musd": null,
+     "fee_note": "sole structuring fee EUR 5,306,250 -> USD 6,187,458",
+     "status": "structuring only"
     },
     {
-     "bank": "Natixis",
-     "role": "CLA",
-     "commitment_musd": 197.5,
-     "status": "CLA UW 19.8%",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 3.19,
-      "other": null
-     }
+     "bank": "Infranity (Generali funds)",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "declined roll"
     },
     {
-     "bank": "NBC",
-     "role": "JLA",
-     "commitment_musd": 85.0,
-     "status": "committed 100%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": "per-lender fee not stated"
-     }
+     "bank": "MEAG (Munich Re funds)",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "reviewing"
     },
     {
-     "bank": "TD Bank",
-     "role": "JLA",
-     "commitment_musd": 85.0,
-     "status": "committed 100%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "LBBW",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "reviewing; +EUR 150M accordion @100%"
     },
     {
-     "bank": "CoBank",
-     "role": "MLA",
-     "commitment_musd": 50.0,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "Mizuho",
+     "role": "Existing lender / Co-manager",
+     "commitment_musd": null,
+     "fee_note": "co-manager fee EUR 141,500",
+     "status": "approved"
     },
     {
-     "bank": "First Citizens Bank",
-     "role": "MLA",
-     "commitment_musd": 50.0,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "KfW IPEX",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "reviewing"
     },
     {
-     "bank": "Hana Securities / AI Partners",
-     "role": "MLA",
-     "commitment_musd": 60.0,
-     "status": "committed (possible +$30M in Nov)",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "Rabobank",
+     "role": "Existing lender / Co-manager",
+     "commitment_musd": null,
+     "fee_note": "$0.16m upfront",
+     "status": "reviewing; +EUR 100M accordion"
     },
     {
-     "bank": "UMTB (Mizrahi)",
-     "role": "MLA",
-     "commitment_musd": 50.0,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "OCBC",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "reviewing; accordion EUR 75M @100%"
     },
     {
-     "bank": "Principal",
-     "role": "MLA",
-     "commitment_musd": 50.0,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "KDB",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "reviewing (4-6 weeks); accordion EUR 150M @100%"
     },
     {
-     "bank": "Farmer Mac",
-     "role": "Retail",
-     "commitment_musd": 25.0,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "DNB",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "declined"
     },
     {
-     "bank": "Preferred Bank",
-     "role": "Retail",
-     "commitment_musd": 30.0,
-     "status": "committed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    }
-   ]
-  },
-  {
-   "name": "Project Tarpon PF take-out (ATL11 - CTL + EBL)",
-   "total_size_musd": 1061.1,
-   "currency": "USD",
-   "type": "project finance (CTL $865M planned / $846.45M actual + EBL $196.1M planned / $153.95M actual; plus $100M Tarpon Bridge)",
-   "status": "Closed 2025. Actual fee bases per fee summary: Tarpon TL $846.45M @103bps ($8.73M), EBL $153.95M @59bps ($0.91M), Bridge $100M @10bps ($0.10M); total Tarpon PF fees $9.65M.",
-   "as_of": "2025-06-03 (tracker); fee actuals from Lender Fees Summary 7.21.26",
-   "fees_structure": {
-    "tl_upfront_pct": 1.03,
-    "ebl_upfront_pct": 0.59,
-    "bridge_upfront_pct": 0.1
-   },
-   "lenders": [
-    {
-     "bank": "SMBC",
-     "role": "CLA",
-     "commitment_musd": 200.0,
-     "status": "UW: EBL $49M (25%) + CTL $173M (20%); target hold $50M EBL + $150M CTL",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.91,
-      "other": "2025 Tarpon PF fees per fee file ~$1,913,207"
-     }
+     "bank": "BBVA",
+     "role": "Existing lender / Co-manager",
+     "commitment_musd": null,
+     "fee_note": "$0.16m upfront",
+     "status": "approved"
     },
     {
-     "bank": "ING",
-     "role": "CLA",
-     "commitment_musd": 200.0,
-     "status": "UW EBL $49M + CTL $173M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.91,
-      "other": null
-     }
+     "bank": "Credit Agricole CIB",
+     "role": "Existing lender / Co-manager",
+     "commitment_musd": null,
+     "fee_note": "$0.16m upfront",
+     "status": "reviewing; +EUR 100M accordion @100%"
     },
     {
-     "bank": "Natixis",
-     "role": "CLA",
-     "commitment_musd": 200.0,
-     "status": "UW EBL $49M + CTL $173M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.91,
-      "other": null
-     }
+     "bank": "Intesa Sanpaolo",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "reviewing"
+    },
+    {
+     "bank": "NatWest",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "reviewing; accordion EUR 75M @100%"
+    },
+    {
+     "bank": "NAB",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "reviewing; accordion EUR 100M @50%"
     },
     {
      "bank": "MUFG",
-     "role": "CLA",
-     "commitment_musd": 150.0,
-     "status": "UW CTL $173M only (no EBL)",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.71,
-      "other": null
-     }
-    },
-    {
-     "bank": "Societe Generale",
-     "role": "CLA",
-     "commitment_musd": 150.0,
-     "status": "UW EBL $49M + CTL $173M; hold $150M CTL",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.91,
-      "other": null
-     }
-    },
-    {
-     "bank": "JLA/MLA/retail invites (BBVA, BNP, JPM, KDB, KfW, Mizuho, Nomura, OCBC, Rabobank, StanChart at $125M JLA target; CoBank, Apterra, BofA, BoC, Barclays, CACIB, First Citizens, GS, Intesa, Kookmin, LBBW, NatWest, Santander, Siemens, TD, US Bank, Webster at $75M MLA; AIB, BayernLB, Commerzbank, NBC, Sabadell $50M; Associated, CAT, Helaba $25M retail)",
-     "role": "planned invites (tracker is a pre-launch plan)",
+     "role": "Potential new lender / Co-manager",
      "commitment_musd": null,
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": "final allocations not in this tracker"
-     }
+     "fee_note": "$0.16m upfront",
+     "status": "reviewing; accordion EUR 175M @100% approved at final committee"
+    },
+    {
+     "bank": "UniCredit",
+     "role": "Existing lender",
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": "reviewing"
+    },
+    {
+     "bank": "Other existing lenders (BNP AM 75, KFW 171, TD 60, PKO 60, Sunlife 60 declined, EDRAM 45, AG Insurance 50, CIC 39, StanChart 39, HKMC 39, Ampega 35, Shinhan 35, Siemens 30, La Banque Postale 30 declined, Dai Ichi 25, Sinopac 24, E.Sun 20, Zencap 18, Erste 46 declined, Bank of China 66 declined, Canada Life 35 declined, Kookmin 40 declined)",
+     "role": null,
+     "commitment_musd": null,
+     "fee_note": null,
+     "status": null
     }
    ]
   },
   {
-   "name": "Project Walleye (data center + energy center financing: DC DDTL $2,081.8M, EC DDTL $842.4M, RCF $30M, LC $120M)",
-   "total_size_musd": 3074.2,
-   "currency": "USD",
+   "name": "Walleye",
+   "region": "US",
+   "guarantor": "McNair",
    "type": "project finance (DDTL + RCF + LC)",
    "status": "Closed; $5,895M committed vs $3,074M facility (1.9x oversubscribed) as of 5/27/26. At close the 5 CLAs each held $614.84M (DC $416.4M + EC $168.5M + RCF $6M + LC $24M). 2026 Walleye lender fees total $66.1M.",
+   "total_size_musd": 3074.2,
+   "currency": "USD",
    "as_of": "2026-05-27",
-   "fees_structure": {
-    "syndication_fee_tiers": "JLA $175M commitment: Tranche A 125bps; Institutional 1 ($150M): A 100 / B 112.5; Institutional 2 ($100M): A 87.5 / B 100; Institutional 3 ($75M): A 62.5 / B 75; Institutional 4 (<$75M): A 37.5 / B 50 (bps; Tranche A by special invite)"
-   },
+   "description": "Project Walleye (data center + energy center financing: DC DDTL $2,081.8M, EC DDTL $842.4M, RCF $30M, LC $120M)",
    "lenders": [
     {
      "bank": "MUFG",
      "role": "CLA (20% UW $614.8M)",
      "commitment_musd": 614.8,
-     "status": "closed; target hold $330M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 13.83,
-      "other": "closing financing fee $13,833,950"
-     }
+     "fee_note": "closing financing fee $13,833,950",
+     "status": "closed; target hold $330M"
     },
     {
      "bank": "Natixis",
      "role": "CLA (20% UW)",
      "commitment_musd": 614.8,
-     "status": "closed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 13.83,
-      "other": "closing financing fee $13,833,950"
-     }
+     "fee_note": "closing financing fee $13,833,950",
+     "status": "closed"
     },
     {
      "bank": "Societe Generale",
      "role": "CLA (20% UW)",
      "commitment_musd": 614.8,
-     "status": "closed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 13.83,
-      "other": "closing financing fee $13,833,950"
-     }
+     "fee_note": "closing financing fee $13,833,950",
+     "status": "closed"
     },
     {
      "bank": "RBC",
      "role": "CLA (20% UW)",
      "commitment_musd": 614.8,
-     "status": "closed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 12.3,
-      "other": "closing financing fee $12,296,844"
-     }
+     "fee_note": "closing financing fee $12,296,844",
+     "status": "closed"
     },
     {
      "bank": "SMBC",
      "role": "CLA (20% UW)",
      "commitment_musd": 614.8,
-     "status": "closed",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 12.3,
-      "other": "closing financing fee $12,296,844"
-     }
+     "fee_note": "closing financing fee $12,296,844",
+     "status": "closed"
     },
     {
      "bank": "Bank of China",
      "role": "JLA",
      "commitment_musd": 360.0,
-     "status": "approved $360M, CL sent",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": "JLA tier Tranche A 125bps"
-     }
+     "fee_note": "JLA tier Tranche A 125bps",
+     "status": "approved $360M, CL sent"
     },
     {
      "bank": "BBVA",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "CL received",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "CL received"
     },
     {
      "bank": "BNP",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "approved, CL received"
     },
     {
      "bank": "Intesa Sanpaolo",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "approved",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "approved"
     },
     {
      "bank": "KDB",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "approved, CL received"
     },
     {
      "bank": "KfW",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "approved, CL received"
     },
     {
      "bank": "NatWest",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "approved, CL received"
     },
     {
      "bank": "OCBC",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "credit approved",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "credit approved"
     },
     {
      "bank": "Rabobank",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "CL received",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "CL received"
     },
     {
      "bank": "Standard Chartered",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "approved (subject to EC completion report)",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "approved (subject to EC completion report)"
     },
     {
      "bank": "TD Bank",
      "role": "JLA",
      "commitment_musd": 175.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": 125,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "125bps upfront",
+     "status": "approved, CL received"
     },
     {
      "bank": "Blackstone",
      "role": "Institutional",
      "commitment_musd": 750.0,
-     "status": "credit approved for $1B, preferred allocation $750M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": "institutional tier fees per grid"
-     }
+     "fee_note": "institutional tier fees per grid",
+     "status": "credit approved for $1B, preferred allocation $750M"
     },
     {
      "bank": "Bank of Baroda",
      "role": "Retail",
      "commitment_musd": 200.0,
-     "status": "CL sent for $200M, preferred allocation $200M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "CL sent for $200M, preferred allocation $200M"
     },
     {
      "bank": "ICBC",
      "role": "Retail",
      "commitment_musd": 150.0,
-     "status": "approved",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved"
     },
     {
      "bank": "Huntington",
      "role": "Retail",
      "commitment_musd": 100.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL received"
     },
     {
      "bank": "NordLB",
      "role": "Retail",
      "commitment_musd": 100.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL received"
     },
     {
      "bank": "Shinhan",
      "role": "Retail",
      "commitment_musd": 100.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL received"
     },
     {
      "bank": "UOB",
      "role": "Retail",
      "commitment_musd": 100.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL received"
     },
     {
      "bank": "UMTB (Mizrahi)",
      "role": "Retail",
      "commitment_musd": 75.0,
-     "status": "approved",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved"
     },
     {
      "bank": "Woori Bank",
      "role": "Retail",
      "commitment_musd": 65.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL received"
     },
     {
      "bank": "Associated Bank",
      "role": "Retail",
      "commitment_musd": 50.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL received"
     },
     {
      "bank": "Banco Sabadell",
      "role": "Retail",
      "commitment_musd": 50.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL received"
     },
     {
      "bank": "Farmer Mac",
      "role": "Retail",
      "commitment_musd": 50.0,
-     "status": "new CL for $50M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "new CL for $50M"
     },
     {
      "bank": "First Commercial",
      "role": "Retail",
      "commitment_musd": 30.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL received"
     },
     {
      "bank": "Webster Bank",
      "role": "Retail",
      "commitment_musd": 30.0,
-     "status": "approved, CL received",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL received"
     },
     {
      "bank": "Bank of Hope",
      "role": "Retail",
      "commitment_musd": 25.0,
-     "status": "CL provided",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "CL provided"
     },
     {
      "bank": "Axiom",
      "role": "Retail",
      "commitment_musd": 10.0,
-     "status": "approved, CL sent",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "approved, CL sent"
     },
     {
      "bank": "Apple Bank",
      "role": "Retail",
      "commitment_musd": 25.0,
-     "status": "working - 75%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "working - 75%"
     },
     {
      "bank": "JA Mitsui",
      "role": "Retail",
      "commitment_musd": 50.0,
-     "status": "working - 75%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "working - 75%"
     }
    ]
   },
   {
-   "name": "Project Beluga Accordion 2 (European portfolio refi - roll EUR 4,395M + new money EUR 1,500M)",
-   "total_size_musd": null,
-   "total_size_meur": 5895,
-   "currency": "EUR",
-   "type": "project finance / European portfolio facility (capex TL + RCF, accordion)",
-   "status": "In syndication as of 2/20/26: 73.6% of existing book approved roll; new money EUR 1,250M underwritten by 5 bookrunners; EUR ~2,783M weighted new-money book. 2025 'Project Beluga Upsize' fees paid: $35.99M (MS sole structuring $6.19M).",
-   "as_of": "2026-02-20",
-   "fees_structure": {
-    "other": "Morgan Stanley sole structuring bank EUR 6.19M equiv; JLM/bookrunner (active-passive) EUR 1.028M each to ABN AMRO, ING, Natixis, SocGen, SMBC; co-managers EUR 164k each to CACIB, BBVA, Mizuho, Rabobank, MUFG (from Beluga closing cashflow, Apr 2026)"
-   },
+   "name": "Wahoo I & II",
+   "region": "US",
+   "guarantor": "Herndon",
+   "type": "holdco / corporate borrowing-base revolver upsize",
+   "status": "CLOSED - Q2 2026 Commitments workbook shows 'Wahoo I & II' at $2,500,000,000 total with top-tier banks at $104,166,667 each (others $90M/$85M/$80M/$50M/$45M/$40M/$30M/$25M). Tracker below reflects syndication status 12/16/25 ($1,040M committed at that date); invite amounts are pre-allocation. Fees: Wahoo Upsize I $18.3M (2025) + Upsize II $6.0M (2026).",
+   "total_size_musd": 2500.0,
+   "currency": "USD",
+   "as_of": "tracker 2025-12-16; closed total per Q2 2026 commitments workbook",
+   "description": "many top-tier banks at $104,166,667 each; others at $90M/$85M/$80M/$50M/$45M/$40M/$30M/$25M",
    "lenders": [
     {
-     "bank": "ABN AMRO",
-     "role": "Bookrunner",
-     "commitment_meur": 265.0,
-     "status": "approved roll; new money UW EUR 250M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.03,
-      "other": "JLM/bookrunner fee EUR 884,375 (USD 1,028,014)"
-     }
-    },
-    {
-     "bank": "ING",
-     "role": "Bookrunner",
-     "commitment_meur": 200.0,
-     "status": "approved; new money UW EUR 250M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.03,
-      "other": null
-     }
-    },
-    {
-     "bank": "Natixis",
-     "role": "Bookrunner",
-     "commitment_meur": 133.3,
-     "status": "approved; new money UW EUR 250M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.03,
-      "other": null
-     }
-    },
-    {
-     "bank": "Societe Generale",
-     "role": "Bookrunner",
-     "commitment_meur": 275.0,
-     "status": "approved; new money UW EUR 250M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.03,
-      "other": null
-     }
-    },
-    {
-     "bank": "SMBC",
-     "role": "Bookrunner",
-     "commitment_meur": 100.0,
-     "status": "approved; new money UW EUR 250M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 1.03,
-      "other": null
-     }
-    },
-    {
-     "bank": "Morgan Stanley",
-     "role": "Sole Structuring Bank",
-     "commitment_meur": null,
-     "status": "structuring only",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 6.19,
-      "other": "sole structuring fee EUR 5,306,250 -> USD 6,187,458"
-     }
-    },
-    {
-     "bank": "Infranity (Generali funds)",
-     "role": "Existing lender",
-     "commitment_meur": 340.0,
-     "status": "declined roll",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "MEAG (Munich Re funds)",
-     "role": "Existing lender",
-     "commitment_meur": 320.0,
-     "status": "reviewing",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "LBBW",
-     "role": "Existing lender",
-     "commitment_meur": 180.0,
-     "status": "reviewing; +EUR 150M accordion @100%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Mizuho",
-     "role": "Existing lender / Co-manager",
-     "commitment_meur": 174.3,
-     "status": "approved",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 0.16,
-      "other": "co-manager fee EUR 141,500"
-     }
-    },
-    {
-     "bank": "KfW IPEX",
-     "role": "Existing lender",
-     "commitment_meur": 170.8,
-     "status": "reviewing",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "Rabobank",
-     "role": "Existing lender / Co-manager",
-     "commitment_meur": 170.0,
-     "status": "reviewing; +EUR 100M accordion",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 0.16,
-      "other": null
-     }
-    },
-    {
-     "bank": "OCBC",
-     "role": "Existing lender",
-     "commitment_meur": 160.0,
-     "status": "reviewing; accordion EUR 75M @100%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "KDB",
-     "role": "Existing lender",
-     "commitment_meur": 150.0,
-     "status": "reviewing (4-6 weeks); accordion EUR 150M @100%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    },
-    {
-     "bank": "DNB",
-     "role": "Existing lender",
-     "commitment_meur": 140.0,
-     "status": "declined",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "TD Bank",
+     "role": "JLA&JBR (lead arranger, running syndication)",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "committed"
     },
     {
      "bank": "BBVA",
-     "role": "Existing lender / Co-manager",
-     "commitment_meur": 135.0,
-     "status": "approved",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 0.16,
-      "other": null
-     }
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "committed - CL received"
     },
     {
-     "bank": "Credit Agricole CIB",
-     "role": "Existing lender / Co-manager",
-     "commitment_meur": 120.0,
-     "status": "reviewing; +EUR 100M accordion @100%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 0.16,
-      "other": null
-     }
+     "bank": "Bank of America",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "committed - CL received"
     },
     {
-     "bank": "Intesa Sanpaolo",
-     "role": "Existing lender",
-     "commitment_meur": 120.0,
-     "status": "reviewing",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "Rabobank",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "committed - CL received"
     },
     {
-     "bank": "NatWest",
-     "role": "Existing lender",
-     "commitment_meur": 110.0,
-     "status": "reviewing; accordion EUR 75M @100%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "OCBC",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "committed - CL received (prefers $90M hold)"
     },
     {
-     "bank": "NAB",
-     "role": "Existing lender",
-     "commitment_meur": 106.3,
-     "status": "reviewing; accordion EUR 100M @50%",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "JP Morgan",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "committed"
+    },
+    {
+     "bank": "Regions",
+     "role": "JLA",
+     "commitment_musd": 90,
+     "fee_note": "5bps upfront",
+     "status": "committed"
+    },
+    {
+     "bank": "Webster",
+     "role": "Co-Doc",
+     "commitment_musd": 80,
+     "fee_note": null,
+     "status": "committed - CL received"
+    },
+    {
+     "bank": "Flagstar",
+     "role": "Co-Doc",
+     "commitment_musd": 75,
+     "fee_note": null,
+     "status": "committed"
+    },
+    {
+     "bank": "Nomura",
+     "role": "Participant (rolling existing $45M)",
+     "commitment_musd": 45,
+     "fee_note": null,
+     "status": "committed"
+    },
+    {
+     "bank": "RBC",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 95% probability"
     },
     {
      "bank": "MUFG",
-     "role": "Potential new lender / Co-manager",
-     "commitment_meur": null,
-     "status": "reviewing; accordion EUR 175M @100% approved at final committee",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": 0.16,
-      "other": null
-     }
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 95% probability"
     },
     {
-     "bank": "Unicredit",
-     "role": "Existing lender",
-     "commitment_meur": 80.0,
-     "status": "reviewing",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "bank": "Barclays",
+     "role": "JLA&JBR",
+     "commitment_musd": 115,
+     "fee_note": "10bps upfront",
+     "status": "working - 90%, will come in at $115M"
     },
     {
-     "bank": "Other existing lenders (BNP AM 75, KFW 171, TD 60, PKO 60, Sunlife 60 declined, EDRAM 45, AG Insurance 50, CIC 39, StanChart 39, HKMC 39, Ampega 35, Shinhan 35, Siemens 30, La Banque Postale 30 declined, Dai Ichi 25, Sinopac 24, E.Sun 20, Zencap 18, Erste 46 declined, Bank of China 66 declined, Canada Life 35 declined, Kookmin 40 declined)",
-     "role_detail": "existing",
-     "commitment_meur": null,
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
-    }
-   ]
-  },
-  {
-   "name": "Project Metropolis (Malaysia/Labuan PF - Term Loan $640M + Equity Bridge $160M)",
-   "total_size_musd": 800,
-   "currency": "USD",
-   "type": "project finance (TL + EBL)",
-   "status": "Closed 16-Jul-2026. Lender upfront fees $9.72M ($9.6M TL + $0.117M EBL) + structuring fees $2.275M = $11.99M total 2026 Metropolis PF fees.",
-   "as_of": "2026-07-16",
-   "fees_structure": {
-    "tl_upfront_pct": 1.5,
-    "ebl_upfront_pct_new_lenders_only": 0.75,
-    "structuring_fee": "$425k each to Clifford Capital, MUFG, Natixis, OCBC, Mizuho; ING $150k ESG coordinator fee"
-   },
-   "lenders": [
-    {
-     "bank": "BNP Paribas (Singapore)",
-     "role": "TL + EBL lender",
-     "commitment_musd": 110.02,
-     "status": "TL $83.36M + EBL $26.67M",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 1.309,
-      "other": "TL upfront $1,250,331 + EBL upfront $58,341 (new lender)"
-     }
+     "bank": "SMBC",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 90%"
     },
     {
-     "bank": "Clifford Capital (Asset Finance + Holdings)",
-     "role": "TL + EBL lender",
-     "commitment_musd": 110.02,
-     "status": "TL $68.36M + $15M + EBL $26.67M",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 1.675,
-      "other": "TL upfront $1,025,331 + $225,000 + structuring $425,000; EBL $0 (existing)"
-     }
+     "bank": "ING",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 90%"
     },
     {
-     "bank": "DBS",
-     "role": "TL lender",
-     "commitment_musd": 83.36,
-     "status": "TL only",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 1.25,
-      "other": "upfront $1,250,331"
-     }
+     "bank": "Wells Fargo",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 90%"
     },
     {
-     "bank": "ING (Singapore)",
-     "role": "TL + EBL lender, ESG coordinator",
-     "commitment_musd": 110.02,
-     "status": "TL $83.36M + EBL $26.67M",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 1.459,
-      "other": "TL $1,250,331 + ESG coordinator $150,000 + EBL $58,341 (new)"
-     }
-    },
-    {
-     "bank": "MUFG (Labuan)",
-     "role": "TL + EBL lender, Agent",
-     "commitment_musd": 83.18,
-     "status": "TL $56.51M + EBL $26.67M",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 1.273,
-      "other": "TL $847,682 + structuring $425,000; EBL $0 (existing); also agent fees"
-     }
-    },
-    {
-     "bank": "Natixis (Singapore)",
-     "role": "TL + EBL lender",
-     "commitment_musd": 110.02,
-     "status": "TL $83.36M + EBL $26.67M",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 1.675,
-      "other": "TL $1,250,331 + structuring $425,000; EBL $0"
-     }
-    },
-    {
-     "bank": "OCBC (Labuan)",
-     "role": "TL + EBL lender",
-     "commitment_musd": 110.02,
-     "status": "TL $83.36M + EBL $26.67M",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 1.675,
-      "other": "TL $1,250,331 + structuring $425,000; EBL $0"
-     }
+     "bank": "Goldman Sachs",
+     "role": "JLA",
+     "commitment_musd": 90,
+     "fee_note": "5bps upfront",
+     "status": "working - 90%"
     },
     {
      "bank": "Mizuho",
-     "role": "TL lender",
-     "commitment_musd": 83.36,
-     "status": "TL only",
-     "fees": {
-      "upfront_bps": 150,
-      "upfront_musd": 1.675,
-      "other": "TL $1,250,331 + structuring $425,000"
-     }
+     "role": "JLA",
+     "commitment_musd": 90,
+     "fee_note": "5bps upfront",
+     "status": "working - 90%"
+    },
+    {
+     "bank": "Investec",
+     "role": "Participant (extending existing $25M)",
+     "commitment_musd": 25,
+     "fee_note": null,
+     "status": "working - 90%"
+    },
+    {
+     "bank": "First-Citizens Bank",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 75%"
+    },
+    {
+     "bank": "KfW IPEX-Bank",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 75% (cannot commit by deadline)"
+    },
+    {
+     "bank": "Natixis",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 75%"
+    },
+    {
+     "bank": "National Bank of Canada",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 75%"
+    },
+    {
+     "bank": "Truist",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "working - 75%"
+    },
+    {
+     "bank": "Caterpillar",
+     "role": "Co-Doc",
+     "commitment_musd": 50,
+     "fee_note": null,
+     "status": "working - 50%"
+    },
+    {
+     "bank": "BHI",
+     "role": "Co-Doc",
+     "commitment_musd": 50,
+     "fee_note": null,
+     "status": "working - 50%"
+    },
+    {
+     "bank": "Intesa Sanpaolo",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "potential January close"
+    },
+    {
+     "bank": "BNP Paribas",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "potential January close (week of Jan 19)"
+    },
+    {
+     "bank": "Standard Chartered",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "potential Jan/Feb"
+    },
+    {
+     "bank": "US Bank",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "potential January close"
+    },
+    {
+     "bank": "Credit Agricole",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "potential January (commercial approval done)"
+    },
+    {
+     "bank": "KeyBank",
+     "role": "JLA&JBR",
+     "commitment_musd": 125,
+     "fee_note": "10bps upfront",
+     "status": "re-evaluate in new year"
+    },
+    {
+     "bank": "Citi",
+     "role": "JLA",
+     "commitment_musd": 90,
+     "fee_note": "5bps upfront",
+     "status": "potential - may reconsider if Amazon signed"
+    },
+    {
+     "bank": "Santander",
+     "role": "JLA",
+     "commitment_musd": 90,
+     "fee_note": "5bps upfront",
+     "status": "potential - relooking in January"
+    },
+    {
+     "bank": "Bank Leumi",
+     "role": "Participant",
+     "commitment_musd": 70,
+     "fee_note": null,
+     "status": "potential January"
+    },
+    {
+     "bank": "CoBank",
+     "role": "Participant",
+     "commitment_musd": 40,
+     "fee_note": null,
+     "status": "potential mid-January (AWS lease condition)"
+    },
+    {
+     "bank": "Clifford Capital",
+     "role": "Participant",
+     "commitment_musd": 50,
+     "fee_note": null,
+     "status": "potential (discussing DDTL carve-out)"
     }
    ]
   },
   {
-   "name": "Corporate LC platform (uncommitted bilateral LC facilities, Edgeconnex International Cooperatief U.A.)",
-   "total_size_musd": 1928,
+   "name": "HoldCo",
+   "region": "Global",
+   "guarantor": "Herndon/McNair",
+   "type": "HoldCo",
+   "status": "Active",
+   "total_size_musd": 2435.8,
    "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": "institutional: Ares $1,275.9M, GIC $369.1M, ADIA $242.5M, BCI $242.5M, PSP $158.2M, IMCO $52.7M, NPS $52.7M, SEMA $42.2M",
+   "lenders": [
+    {
+     "bank": "Ares",
+     "role": "Institutional",
+     "commitment_musd": 1275.9,
+     "fee_note": null,
+     "status": null
+    },
+    {
+     "bank": "GIC",
+     "role": "Institutional",
+     "commitment_musd": 369.1,
+     "fee_note": null,
+     "status": null
+    },
+    {
+     "bank": "ADIA",
+     "role": "Institutional",
+     "commitment_musd": 242.5,
+     "fee_note": null,
+     "status": null
+    },
+    {
+     "bank": "BCI",
+     "role": "Institutional",
+     "commitment_musd": 242.5,
+     "fee_note": null,
+     "status": null
+    },
+    {
+     "bank": "PSP",
+     "role": "Institutional",
+     "commitment_musd": 158.2,
+     "fee_note": null,
+     "status": null
+    },
+    {
+     "bank": "IMCO",
+     "role": "Institutional",
+     "commitment_musd": 52.7,
+     "fee_note": null,
+     "status": null
+    },
+    {
+     "bank": "NPS",
+     "role": "Institutional",
+     "commitment_musd": 52.7,
+     "fee_note": null,
+     "status": null
+    },
+    {
+     "bank": "SEMA",
+     "role": "Institutional",
+     "commitment_musd": 42.2,
+     "fee_note": null,
+     "status": null
+    }
+   ]
+  },
+  {
+   "name": "LC Commitments",
+   "region": "Global",
+   "guarantor": null,
    "type": "LC / standby letters of credit (uncommitted bilateral facilities)",
    "status": "Active; $1,301M issued of $1,928M corporate capacity as of 7/20/26 (plus $197M ring-fenced: ING Beluga $20M, ABN AMRO Beluga $15M, ING US ABS $12M, SocGen Shiner $30M, SocGen Walleye ringfence $120M).",
+   "total_size_musd": 1877.0,
+   "currency": "USD",
    "as_of": "2026-07-20",
-   "fees_structure": {
-    "lc_facility_upfront_pct": 0.5
-   },
+   "description": "Corporate LC platform (uncommitted bilateral LC facilities, Edgeconnex International Cooperatief U.A.)",
    "lenders": [
     {
      "bank": "BBVA",
      "role": "LC issuer (uncommitted)",
      "commitment_musd": 500,
-     "status": "issued $250.9M; upsized 6/25/26",
-     "fees": {
-      "upfront_bps": 50,
-      "upfront_musd": 1.96,
-      "other": "BBVA LC facility fees in fee file (combined ~$1.96M)"
-     }
+     "fee_note": "BBVA LC facility fees in fee file (combined ~$1.96M)",
+     "status": "issued $250.9M; upsized 6/25/26"
     },
     {
      "bank": "Natixis North America",
      "role": "LC issuer",
      "commitment_musd": 300,
-     "status": "issued $227.9M; upsized from $163M to $300M 6/29/26; $60M EBL cap / $40M financial LC cap",
-     "fees": {
-      "upfront_bps": 50,
-      "upfront_musd": null,
-      "other": "NTX LC facility"
-     }
+     "fee_note": "NTX LC facility",
+     "status": "issued $227.9M; upsized from $163M to $300M 6/29/26; $60M EBL cap / $40M financial LC cap"
     },
     {
      "bank": "Societe Generale",
      "role": "LC issuer",
      "commitment_musd": 300,
-     "status": "issued $200M; closed $100M upsize 6/26/26 (up to $550m)",
-     "fees": {
-      "upfront_bps": 50,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "50bps upfront",
+     "status": "issued $200M; closed $100M upsize 6/26/26 (up to $550m)"
     },
     {
      "bank": "Barclays",
      "role": "LC issuer",
      "commitment_musd": 200,
-     "status": "committed, $0 issued; not able to participate in EBL if they participate",
-     "fees": {
-      "upfront_bps": 50,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "50bps upfront",
+     "status": "committed, $0 issued; not able to participate in EBL if they participate"
     },
     {
      "bank": "Rabobank",
      "role": "LC issuer",
      "commitment_musd": 150,
-     "status": "issued $149.6M; only EBL LCs",
-     "fees": {
-      "upfront_bps": 50,
-      "upfront_musd": 0.3,
-      "other": "Rabo LC facility upfront fee $300,000 (2026)"
-     }
+     "fee_note": "Rabo LC facility upfront fee $300,000 (2026)",
+     "status": "issued $149.6M; only EBL LCs"
     },
     {
      "bank": "SMBC",
      "role": "LC issuer",
      "commitment_musd": 100,
-     "status": "issued $96.2M; $100M cap combined EBL+financial LCs",
-     "fees": {
-      "upfront_bps": 50,
-      "upfront_musd": null,
-      "other": "SMBC LC facilities fees 2025 ~$0.25M+"
-     }
+     "fee_note": "SMBC LC facilities fees 2025 ~$0.25M+",
+     "status": "issued $96.2M; $100M cap combined EBL+financial LCs"
     },
     {
      "bank": "MUFG",
      "role": "LC issuer",
      "commitment_musd": 100,
-     "status": "issued $100M",
-     "fees": {
-      "upfront_bps": 50,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "50bps upfront",
+     "status": "issued $100M"
     },
     {
-     "bank": "SCB (Standard Chartered)",
+     "bank": "Standard Chartered",
      "role": "LC issuer",
      "commitment_musd": 100,
-     "status": "issued $100M",
-     "fees": {
-      "upfront_bps": 50,
-      "upfront_musd": null,
-      "other": "SCB LC facility"
-     }
+     "fee_note": "SCB LC facility",
+     "status": "issued $100M"
     },
     {
      "bank": "ING",
      "role": "LC issuer",
      "commitment_musd": 80,
-     "status": "issued $78.7M; only utility LCs",
-     "fees": {
-      "upfront_bps": 50,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": "50bps upfront",
+     "status": "issued $78.7M; only utility LCs"
     },
     {
      "bank": "Blackstone",
      "role": "LC issuer",
      "commitment_musd": 98,
-     "status": "issued $98M",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "issued $98M"
     },
     {
      "bank": "Citi",
      "role": "LC issuer (pipeline)",
      "commitment_musd": 0,
-     "status": "listed, no commitment yet",
-     "fees": {
-      "upfront_bps": null,
-      "upfront_musd": null,
-      "other": null
-     }
+     "fee_note": null,
+     "status": "listed, no commitment yet"
     }
    ]
   },
   {
-   "name": "Other facilities from Lender Fees Summary (fee bases; per-bank splits not fully parseable)",
-   "total_size_musd": null,
+   "name": "Shiner",
+   "region": "US",
+   "guarantor": "McNair",
+   "type": "project finance (construction DDTL)",
+   "status": "Closed / in syndication of UW positions; $485M committed by non-CLA investors as of 10/9/25. Total 2025 lender fees paid $21.85M (per fee summary; fee base $1,040.5M).",
+   "total_size_musd": 1040.5,
    "currency": "USD",
-   "type": "various",
-   "status": "reference",
-   "as_of": "2026-07-21",
-   "facilities_detail": [
+   "as_of": "2025-10-09",
+   "description": "Project Shiner (AUS02 Austin data center DDTL - CoreWeave tenant)",
+   "lenders": [
     {
-     "name": "Narwhal (HoldCo)",
-     "fee_base_musd": 800,
-     "upfront_pct": 2.0,
-     "commitment_fee_pct": 1.5,
-     "uw_fee_pct": 0.25,
-     "total_fees_musd": 16.0,
-     "note": "Labeled as HoldCo; Wahoo Upsize I/II (Tranche A4/B4 $500M + supplemental $300M) are extensions of this facility ($10M + $6M fees)"
+     "bank": "Societe Generale",
+     "role": "CLA (bookrunner)",
+     "commitment_musd": 197.5,
+     "fee_note": "2025 Shiner fees per fee file: $4,219,661",
+     "status": "CLA UW 19.8%"
     },
     {
-     "name": "Leroy",
-     "fee_base_musd": 1000,
-     "upfront_pct": 2.0,
-     "commitment_fee": "sliding 1.0% (<$200m) to 2.5% (>$400m)",
-     "uw_fee_pct": 0.25,
-     "total_fees_musd": 20.0,
-     "lenders": [
-      {
-       "bank": "Blackstone",
-       "fees_musd": 21.25
-      },
-      {
-       "bank": "Ares",
-       "fees_musd": 19.84
-      }
-     ]
+     "bank": "Nomura",
+     "role": "CLA",
+     "commitment_musd": 210.0,
+     "fee_note": "2025 Shiner fees per fee file: ~$3,179,191",
+     "status": "CLA UW 21.0%"
     },
     {
-     "name": "Nemo (Webster)",
-     "fee_base_musd": 25,
-     "upfront_pct": 1.5,
-     "commitment_fee_pct": 0.5,
-     "total_fees_musd": 0.4
+     "bank": "JP Morgan",
+     "role": "CLA",
+     "commitment_musd": 197.5,
+     "fee_note": "150bps upfront",
+     "status": "CLA UW 19.8%"
     },
     {
-     "name": "Gotham",
-     "fee_base_musd": 279.5,
-     "upfront_pct": 1.0,
-     "commitment_fee": "30% of margin",
-     "total_fees_musd": 2.795,
-     "note": "MUFG is main LC issuer for Gotham LCs"
+     "bank": "Morgan Stanley",
+     "role": "CLA",
+     "commitment_musd": 197.5,
+     "fee_note": "150bps upfront",
+     "status": "CLA UW 19.8%"
     },
     {
-     "name": "Project Vendace",
-     "total_2026_fees_musd": 15.14
+     "bank": "Natixis",
+     "role": "CLA",
+     "commitment_musd": 197.5,
+     "fee_note": "150bps upfront",
+     "status": "CLA UW 19.8%"
     },
     {
-     "name": "Project Orca",
-     "total_2026_fees_musd": 13.18,
-     "note": "Beluga accordion closing fees routed via MS: bookrunners ABN/ING/Natixis/SocGen/SMBC ~$1.03M each; co-managers CACIB/BBVA/Mizuho/Rabobank/MUFG ~$0.16M each"
+     "bank": "National Bank of Canada",
+     "role": "JLA",
+     "commitment_musd": 85.0,
+     "fee_note": "per-lender fee not stated",
+     "status": "committed 100%"
     },
     {
-     "name": "Project Beluga Upsize",
-     "total_2025_fees_musd": 35.99
+     "bank": "TD Bank",
+     "role": "JLA",
+     "commitment_musd": 85.0,
+     "fee_note": null,
+     "status": "committed 100%"
     },
     {
-     "name": "Project Narluga",
-     "total_2026_fees_musd": 7.2,
-     "lenders": [
-      {
-       "bank": "Ares",
-       "fees_musd": 7.2
-      }
-     ]
+     "bank": "CoBank",
+     "role": "MLA",
+     "commitment_musd": 50.0,
+     "fee_note": null,
+     "status": "committed"
+    },
+    {
+     "bank": "First Citizens Bank",
+     "role": "MLA",
+     "commitment_musd": 50.0,
+     "fee_note": null,
+     "status": "committed"
+    },
+    {
+     "bank": "Hana Securities / AI Partners",
+     "role": "MLA",
+     "commitment_musd": 60.0,
+     "fee_note": null,
+     "status": "committed (possible +$30M in Nov)"
+    },
+    {
+     "bank": "UMTB (Mizrahi)",
+     "role": "MLA",
+     "commitment_musd": 50.0,
+     "fee_note": null,
+     "status": "committed"
+    },
+    {
+     "bank": "Principal",
+     "role": "MLA",
+     "commitment_musd": 50.0,
+     "fee_note": null,
+     "status": "committed"
+    },
+    {
+     "bank": "Farmer Mac",
+     "role": "Retail",
+     "commitment_musd": 25.0,
+     "fee_note": null,
+     "status": "committed"
+    },
+    {
+     "bank": "Preferred Bank",
+     "role": "Retail",
+     "commitment_musd": 30.0,
+     "fee_note": null,
+     "status": "committed"
     }
-   ],
+   ]
+  },
+  {
+   "name": "Leroy",
+   "region": "Global",
+   "guarantor": "Herndon",
+   "type": "Land / early-stage (Blackstone)",
+   "status": "Active",
+   "total_size_musd": 1000.0,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": "Blackstone $1,000M",
+   "lenders": [
+    {
+     "bank": "Blackstone",
+     "role": null,
+     "commitment_musd": 1000.0,
+     "fee_note": null,
+     "status": null
+    }
+   ]
+  },
+  {
+   "name": "Marvel II",
+   "region": "APAC",
+   "guarantor": "ACX",
+   "type": "Project / portfolio finance",
+   "status": "Active",
+   "total_size_musd": 875.0,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "Project Vendace",
+   "region": "Europe",
+   "guarantor": "McNair",
+   "type": "Project / portfolio finance",
+   "status": "Active",
+   "total_size_musd": 857.4,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "Tarpon",
+   "region": "US",
+   "guarantor": "Herndon",
+   "type": "project finance (CTL $865M planned / $846.45M actual + EBL $196.1M planned / $153.95M actual; plus $100M Tarpon Bridge)",
+   "status": "Closed 2025. Actual fee bases per fee summary: Tarpon TL $846.45M @103bps ($8.73M), EBL $153.95M @59bps ($0.91M), Bridge $100M @10bps ($0.10M); total Tarpon PF fees $9.65M.",
+   "total_size_musd": 846.5,
+   "currency": "USD",
+   "as_of": "2025-06-03 (tracker); fee actuals from Lender Fees Summary 7.21.26",
+   "description": "Project Tarpon PF take-out (ATL11 - CTL + EBL)",
+   "lenders": [
+    {
+     "bank": "SMBC",
+     "role": "CLA",
+     "commitment_musd": 200.0,
+     "fee_note": "2025 Tarpon PF fees per fee file ~$1,913,207",
+     "status": "UW: EBL $49M (25%) + CTL $173M (20%); target hold $50M EBL + $150M CTL"
+    },
+    {
+     "bank": "ING",
+     "role": "CLA",
+     "commitment_musd": 200.0,
+     "fee_note": "$1.91m upfront",
+     "status": "UW EBL $49M + CTL $173M"
+    },
+    {
+     "bank": "Natixis",
+     "role": "CLA",
+     "commitment_musd": 200.0,
+     "fee_note": "$1.91m upfront",
+     "status": "UW EBL $49M + CTL $173M"
+    },
+    {
+     "bank": "MUFG",
+     "role": "CLA",
+     "commitment_musd": 150.0,
+     "fee_note": "$1.71m upfront",
+     "status": "UW CTL $173M only (no EBL)"
+    },
+    {
+     "bank": "Societe Generale",
+     "role": "CLA",
+     "commitment_musd": 150.0,
+     "fee_note": "$1.91m upfront",
+     "status": "UW EBL $49M + CTL $173M; hold $150M CTL"
+    },
+    {
+     "bank": "JLA/MLA/retail invites (BBVA, BNP, JPM, KDB, KfW, Mizuho, Nomura, OCBC, Rabobank, StanChart at $125M JLA target; CoBank, Apterra, BofA, BoC, Barclays, CACIB, First Citizens, GS, Intesa, Kookmin, LBBW, NatWest, Santander, Siemens, TD, US Bank, Webster at $75M MLA; AIB, BayernLB, Commerzbank, NBC, Sabadell $50M; Associated, CAT, Helaba $25M retail)",
+     "role": "planned invites (tracker is a pre-launch plan)",
+     "commitment_musd": null,
+     "fee_note": "final allocations not in this tracker",
+     "status": null
+    }
+   ]
+  },
+  {
+   "name": "Project Orca",
+   "region": "Europe",
+   "guarantor": "Herndon",
+   "type": "Project / portfolio finance",
+   "status": "Active",
+   "total_size_musd": 808.8,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "Metropolis PF",
+   "region": "APAC",
+   "guarantor": "McNair",
+   "type": "project finance (TL + EBL)",
+   "status": "Closed 16-Jul-2026. Lender upfront fees $9.72M ($9.6M TL + $0.117M EBL) + structuring fees $2.275M = $11.99M total 2026 Metropolis PF fees.",
+   "total_size_musd": 640.0,
+   "currency": "USD",
+   "as_of": "2026-07-16",
+   "description": "Project Metropolis (Malaysia/Labuan PF - Term Loan $640M + Equity Bridge $160M)",
+   "lenders": [
+    {
+     "bank": "BNP Paribas (Singapore)",
+     "role": "TL + EBL lender",
+     "commitment_musd": 110.02,
+     "fee_note": "TL upfront $1,250,331 + EBL upfront $58,341 (new lender)",
+     "status": "TL $83.36M + EBL $26.67M"
+    },
+    {
+     "bank": "Clifford Capital (Asset Finance + Holdings)",
+     "role": "TL + EBL lender",
+     "commitment_musd": 110.02,
+     "fee_note": "TL upfront $1,025,331 + $225,000 + structuring $425,000; EBL $0 (existing)",
+     "status": "TL $68.36M + $15M + EBL $26.67M"
+    },
+    {
+     "bank": "DBS",
+     "role": "TL lender",
+     "commitment_musd": 83.36,
+     "fee_note": "upfront $1,250,331",
+     "status": "TL only"
+    },
+    {
+     "bank": "ING (Singapore)",
+     "role": "TL + EBL lender, ESG coordinator",
+     "commitment_musd": 110.02,
+     "fee_note": "TL $1,250,331 + ESG coordinator $150,000 + EBL $58,341 (new)",
+     "status": "TL $83.36M + EBL $26.67M"
+    },
+    {
+     "bank": "MUFG (Labuan)",
+     "role": "TL + EBL lender, Agent",
+     "commitment_musd": 83.18,
+     "fee_note": "TL $847,682 + structuring $425,000; EBL $0 (existing); also agent fees",
+     "status": "TL $56.51M + EBL $26.67M"
+    },
+    {
+     "bank": "Natixis (Singapore)",
+     "role": "TL + EBL lender",
+     "commitment_musd": 110.02,
+     "fee_note": "TL $1,250,331 + structuring $425,000; EBL $0",
+     "status": "TL $83.36M + EBL $26.67M"
+    },
+    {
+     "bank": "OCBC (Labuan)",
+     "role": "TL + EBL lender",
+     "commitment_musd": 110.02,
+     "fee_note": "TL $1,250,331 + structuring $425,000; EBL $0",
+     "status": "TL $83.36M + EBL $26.67M"
+    },
+    {
+     "bank": "Mizuho",
+     "role": "TL lender",
+     "commitment_musd": 83.36,
+     "fee_note": "TL $1,250,331 + structuring $425,000",
+     "status": "TL only"
+    }
+   ]
+  },
+  {
+   "name": "Gotham",
+   "region": "APAC",
+   "guarantor": "Herndon",
+   "type": "Project / portfolio finance",
+   "status": "Active",
+   "total_size_musd": 593.3,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "ABS (Europe)",
+   "region": "Europe",
+   "guarantor": "Herndon",
+   "type": "ABS",
+   "status": "Active",
+   "total_size_musd": 492.9,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "Marvel I",
+   "region": "APAC",
+   "guarantor": "ACX",
+   "type": "Project / portfolio finance",
+   "status": "Active",
+   "total_size_musd": 213.0,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "Bluefin",
+   "region": "LATAM",
+   "guarantor": "Herndon",
+   "type": "Project / portfolio finance",
+   "status": "Active",
+   "total_size_musd": 200.0,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "Gotham EBL",
+   "region": "APAC",
+   "guarantor": "Herndon",
+   "type": "Equity Bridge",
+   "status": "Active",
+   "total_size_musd": 160.0,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "Metropolis EBL",
+   "region": "APAC",
+   "guarantor": "McNair",
+   "type": "Equity Bridge",
+   "status": "Active",
+   "total_size_musd": 160.0,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "Tarpon EBL",
+   "region": "US",
+   "guarantor": "Herndon",
+   "type": "Equity Bridge",
+   "status": "Active",
+   "total_size_musd": 153.9,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "AMS RE",
+   "region": "Europe",
+   "guarantor": "Herndon",
+   "type": "Project / portfolio finance",
+   "status": "Active",
+   "total_size_musd": 68.6,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "ABS VFN",
+   "region": "US",
+   "guarantor": "Herndon",
+   "type": "ABS",
+   "status": "Active",
+   "total_size_musd": 50.0,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
+   "lenders": []
+  },
+  {
+   "name": "Webster",
+   "region": "US",
+   "guarantor": "Herndon",
+   "type": "Project / portfolio finance",
+   "status": "Active",
+   "total_size_musd": 25.0,
+   "currency": "USD",
+   "as_of": "Q2 2026",
+   "description": null,
    "lenders": []
   }
  ],
+ "bank_commitments": [
+  {
+   "bank": "Blackstone",
+   "total_usd": 1750000000,
+   "facilities": 2
+  },
+  {
+   "bank": "Societe Generale",
+   "total_usd": 1631712305,
+   "facilities": 11
+  },
+  {
+   "bank": "Natixis",
+   "total_usd": 1325259948,
+   "facilities": 14
+  },
+  {
+   "bank": "Ares",
+   "total_usd": 1299346677,
+   "facilities": 2
+  },
+  {
+   "bank": "BBVA",
+   "total_usd": 1118067167,
+   "facilities": 7
+  },
+  {
+   "bank": "SMBC",
+   "total_usd": 904864277,
+   "facilities": 9
+  },
+  {
+   "bank": "MUFG",
+   "total_usd": 814060445,
+   "facilities": 11
+  },
+  {
+   "bank": "ING",
+   "total_usd": 807713310,
+   "facilities": 12
+  },
+  {
+   "bank": "Rabobank",
+   "total_usd": 647817167,
+   "facilities": 4
+  },
+  {
+   "bank": "OCBC",
+   "total_usd": 640078992,
+   "facilities": 7
+  },
+  {
+   "bank": "KfW",
+   "total_usd": 576644967,
+   "facilities": 7
+  },
+  {
+   "bank": "Intesa Sanpaolo",
+   "total_usd": 528743000,
+   "facilities": 6
+  },
+  {
+   "bank": "BNP Paribas AM",
+   "total_usd": 499239992,
+   "facilities": 5
+  },
+  {
+   "bank": "Mizuho",
+   "total_usd": 484425887,
+   "facilities": 5
+  },
+  {
+   "bank": "TD Bank",
+   "total_usd": 482070667,
+   "facilities": 5
+  },
+  {
+   "bank": "ABN AMRO",
+   "total_usd": 478176413,
+   "facilities": 2
+  },
+  {
+   "bank": "Standard Chartered",
+   "total_usd": 430583020,
+   "facilities": 9
+  },
+  {
+   "bank": "MEAG",
+   "total_usd": 388661948,
+   "facilities": 1
+  },
+  {
+   "bank": "Credit Agricole CIB",
+   "total_usd": 380900500,
+   "facilities": 3
+  },
+  {
+   "bank": "GIC",
+   "total_usd": 369055168,
+   "facilities": 1
+  },
+  {
+   "bank": "Goldman Sachs",
+   "total_usd": 364366250,
+   "facilities": 2
+  },
+  {
+   "bank": "Barclays",
+   "total_usd": 357596117,
+   "facilities": 4
+  },
+  {
+   "bank": "Clifford Capital",
+   "total_usd": 265133325,
+   "facilities": 6
+  },
+  {
+   "bank": "UniCredit",
+   "total_usd": 262924500,
+   "facilities": 1
+  },
+  {
+   "bank": "ADIA",
+   "total_usd": 242521968,
+   "facilities": 1
+  },
+  {
+   "bank": "BCI",
+   "total_usd": 242521968,
+   "facilities": 1
+  },
+  {
+   "bank": "Insight",
+   "total_usd": 234345750,
+   "facilities": 1
+  },
+  {
+   "bank": "Man Group",
+   "total_usd": 228630000,
+   "facilities": 1
+  },
+  {
+   "bank": "First Citizens",
+   "total_usd": 226416667,
+   "facilities": 4
+  },
+  {
+   "bank": "LBBW",
+   "total_usd": 222914250,
+   "facilities": 2
+  },
+  {
+   "bank": "Credit Agricole",
+   "total_usd": 218481667,
+   "facilities": 2
+  },
+  {
+   "bank": "RBC",
+   "total_usd": 216008880,
+   "facilities": 2
+  },
+  {
+   "bank": "NORD/LB",
+   "total_usd": 208599250,
+   "facilities": 3
+  },
+  {
+   "bank": "JP Morgan",
+   "total_usd": 203360754,
+   "facilities": 2
+  },
+  {
+   "bank": "Nordea",
+   "total_usd": 190048688,
+   "facilities": 1
+  },
+  {
+   "bank": "National Bank of Canada",
+   "total_usd": 189166667,
+   "facilities": 2
+  },
+  {
+   "bank": "AIG",
+   "total_usd": 187761905,
+   "facilities": 1
+  },
+  {
+   "bank": "CoBank",
+   "total_usd": 175000000,
+   "facilities": 3
+  },
+  {
+   "bank": "PSP",
+   "total_usd": 158166501,
+   "facilities": 1
+  },
+  {
+   "bank": "Apollo Capital Management",
+   "total_usd": 157183125,
+   "facilities": 1
+  },
+  {
+   "bank": "NAB",
+   "total_usd": 155866017,
+   "facilities": 1
+  },
+  {
+   "bank": "PKO Bank",
+   "total_usd": 154325250,
+   "facilities": 1
+  },
+  {
+   "bank": "Nomura",
+   "total_usd": 144194087,
+   "facilities": 2
+  },
+  {
+   "bank": "Shinhan Bank",
+   "total_usd": 141010250,
+   "facilities": 3
+  },
+  {
+   "bank": "Siemens",
+   "total_usd": 134294500,
+   "facilities": 4
+  },
+  {
+   "bank": "NatWest",
+   "total_usd": 125746500,
+   "facilities": 1
+  },
+  {
+   "bank": "Mizrahi (UMTB)",
+   "total_usd": 115000000,
+   "facilities": 2
+  },
+  {
+   "bank": "NIBC",
+   "total_usd": 114315000,
+   "facilities": 2
+  },
+  {
+   "bank": "KDB",
+   "total_usd": 110000000,
+   "facilities": 2
+  },
+  {
+   "bank": "Bank Leumi",
+   "total_usd": 104166667,
+   "facilities": 1
+  },
+  {
+   "bank": "Bank of America",
+   "total_usd": 104166667,
+   "facilities": 1
+  },
+  {
+   "bank": "Truist",
+   "total_usd": 104166667,
+   "facilities": 1
+  },
+  {
+   "bank": "Wells Fargo",
+   "total_usd": 104166667,
+   "facilities": 1
+  },
+  {
+   "bank": "Morgan Stanley",
+   "total_usd": 99194087,
+   "facilities": 1
+  },
+  {
+   "bank": "Webster",
+   "total_usd": 95000000,
+   "facilities": 3
+  },
+  {
+   "bank": "HKMC",
+   "total_usd": 93458957,
+   "facilities": 2
+  },
+  {
+   "bank": "Bank Sinopac",
+   "total_usd": 92435600,
+   "facilities": 3
+  },
+  {
+   "bank": "New York Life",
+   "total_usd": 91452000,
+   "facilities": 1
+  },
+  {
+   "bank": "Regions",
+   "total_usd": 90000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Bank of China",
+   "total_usd": 85000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Banco Sabadell",
+   "total_usd": 85000000,
+   "facilities": 2
+  },
+  {
+   "bank": "National Westminster Bank",
+   "total_usd": 85000000,
+   "facilities": 1
+  },
+  {
+   "bank": "DBS",
+   "total_usd": 83355408,
+   "facilities": 1
+  },
+  {
+   "bank": "Woori Bank",
+   "total_usd": 80000000,
+   "facilities": 2
+  },
+  {
+   "bank": "CIC",
+   "total_usd": 78877350,
+   "facilities": 1
+  },
+  {
+   "bank": "National Cooperative Bank",
+   "total_usd": 75000000,
+   "facilities": 2
+  },
+  {
+   "bank": "Metlife",
+   "total_usd": 70410714,
+   "facilities": 1
+  },
+  {
+   "bank": "Bank of Baroda",
+   "total_usd": 65000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Huntington",
+   "total_usd": 65000000,
+   "facilities": 1
+  },
+  {
+   "bank": "ICBC",
+   "total_usd": 65000000,
+   "facilities": 1
+  },
+  {
+   "bank": "UOB",
+   "total_usd": 65000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Blackrock",
+   "total_usd": 61958730,
+   "facilities": 1
+  },
+  {
+   "bank": "Hana Securities",
+   "total_usd": 60000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Daichi Life",
+   "total_usd": 58575842,
+   "facilities": 2
+  },
+  {
+   "bank": "Bayfront",
+   "total_usd": 58000000,
+   "facilities": 2
+  },
+  {
+   "bank": "AG Insurance",
+   "total_usd": 57157500,
+   "facilities": 1
+  },
+  {
+   "bank": "ANZ",
+   "total_usd": 57157500,
+   "facilities": 1
+  },
+  {
+   "bank": "GPIM",
+   "total_usd": 55389762,
+   "facilities": 1
+  },
+  {
+   "bank": "M&G",
+   "total_usd": 55214145,
+   "facilities": 1
+  },
+  {
+   "bank": "Henderson",
+   "total_usd": 54299625,
+   "facilities": 1
+  },
+  {
+   "bank": "IMCO",
+   "total_usd": 52722167,
+   "facilities": 1
+  },
+  {
+   "bank": "NPS",
+   "total_usd": 52722167,
+   "facilities": 1
+  },
+  {
+   "bank": "EDR",
+   "total_usd": 51441750,
+   "facilities": 1
+  },
+  {
+   "bank": "Associated Bank",
+   "total_usd": 50000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Caterpillar",
+   "total_usd": 50000000,
+   "facilities": 2
+  },
+  {
+   "bank": "Citi",
+   "total_usd": 50000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Flagstar",
+   "total_usd": 50000000,
+   "facilities": 1
+  },
+  {
+   "bank": "JA Mitsui Leasing",
+   "total_usd": 50000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Principal Life",
+   "total_usd": 49500000,
+   "facilities": 1
+  },
+  {
+   "bank": "SEMA",
+   "total_usd": 42177734,
+   "facilities": 1
+  },
+  {
+   "bank": "Fidelity",
+   "total_usd": 41267715,
+   "facilities": 1
+  },
+  {
+   "bank": "Ampega",
+   "total_usd": 40010250,
+   "facilities": 1
+  },
+  {
+   "bank": "First Commercial",
+   "total_usd": 30000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Preferred Bank",
+   "total_usd": 30000000,
+   "facilities": 1
+  },
+  {
+   "bank": "KKR Credit",
+   "total_usd": 29103095,
+   "facilities": 1
+  },
+  {
+   "bank": "Apterra",
+   "total_usd": 26387712,
+   "facilities": 1
+  },
+  {
+   "bank": "Bank of Hope",
+   "total_usd": 25000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Investec",
+   "total_usd": 25000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Kookmin",
+   "total_usd": 25000000,
+   "facilities": 1
+  },
+  {
+   "bank": "PT Bank",
+   "total_usd": 25000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Apple Bank",
+   "total_usd": 25000000,
+   "facilities": 1
+  },
+  {
+   "bank": "American Century",
+   "total_usd": 24409048,
+   "facilities": 1
+  },
+  {
+   "bank": "E Sun",
+   "total_usd": 22863000,
+   "facilities": 1
+  },
+  {
+   "bank": "Zencap",
+   "total_usd": 20576700,
+   "facilities": 1
+  },
+  {
+   "bank": "Bladex",
+   "total_usd": 20000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Taishin",
+   "total_usd": 20000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Brown Brothers",
+   "total_usd": 18776191,
+   "facilities": 1
+  },
+  {
+   "bank": "Lincoln Benefit",
+   "total_usd": 18776191,
+   "facilities": 1
+  },
+  {
+   "bank": "Fisher",
+   "total_usd": 16804305,
+   "facilities": 1
+  },
+  {
+   "bank": "Allspring Global",
+   "total_usd": 14551548,
+   "facilities": 1
+  },
+  {
+   "bank": "Kuvare",
+   "total_usd": 14082143,
+   "facilities": 1
+  },
+  {
+   "bank": "TCW",
+   "total_usd": 10531245,
+   "facilities": 2
+  },
+  {
+   "bank": "Axiom",
+   "total_usd": 10000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Hawkspoint",
+   "total_usd": 10000000,
+   "facilities": 1
+  },
+  {
+   "bank": "KGI",
+   "total_usd": 10000000,
+   "facilities": 1
+  },
+  {
+   "bank": "Sanlam",
+   "total_usd": 10000000,
+   "facilities": 1
+  },
+  {
+   "bank": "The Northwestern",
+   "total_usd": 9388095,
+   "facilities": 1
+  },
+  {
+   "bank": "Blue Owl",
+   "total_usd": 6571667,
+   "facilities": 1
+  },
+  {
+   "bank": "Fortress Credit",
+   "total_usd": 4694048,
+   "facilities": 1
+  },
+  {
+   "bank": "BCSM",
+   "total_usd": 3086505,
+   "facilities": 1
+  },
+  {
+   "bank": "New Century",
+   "total_usd": 2347024,
+   "facilities": 1
+  },
+  {
+   "bank": "Alagna Advisors",
+   "total_usd": 1877619,
+   "facilities": 1
+  },
+  {
+   "bank": "Americo Financial",
+   "total_usd": 1877619,
+   "facilities": 1
+  }
+ ],
  "fee_matrix": {
-  "source": "Lender Fees Summary_7.21.26(_VF).xlsx - ECX Lender Fees for 2025 & 2026 Transactions",
+  "source": "Lender Fees Summary_7.21.26_VF.xlsx (Portfolio Management / Debt Overviews / Lender Fees)",
+  "note": "Actual fees paid per bank across 2025–2026 transactions. Column and row totals reconcile to the workbook grand totals; per-deal splits are held at facility level where confidently attributable.",
   "deals_2025": [
    "Narwhal",
    "Leroy",
@@ -2678,36 +2938,9 @@ window.ECX_DATA = {
    "Project Narluga",
    "Project Metropolis PF"
   ],
-  "deal_totals": {
-   "Nemo": 413000,
-   "Gotham": 2795000,
-   "Tarpon Bridge": 100000,
-   "Tarpon PF": 16335872,
-   "Shiner": 21849879,
-   "Metropolis_2025": 2480326,
-   "BBVA LC Facility": 0,
-   "Project Wahoo Upsize I": 18302500,
-   "Project Wahoo Upsize II": 6032167,
-   "Project Vendace": 15136088,
-   "Project Beluga Upsize": 35990581,
-   "Project Orca": 13177952,
-   "Project Walleye": 66095538,
-   "Rabo LC Facility": 300000,
-   "Project Narluga": 7200000,
-   "Project Metropolis PF": 11991682
-  },
-  "grand_totals": {
-   "total_2025": 103576094,
-   "total_2026": 155924007,
-   "total_combined": 259500101
-  },
   "banks": [
    {
     "bank": "Societe Generale",
-    "fees_by_deal": {
-     "Project Walleye": 13833950,
-     "Shiner": 4219661
-    },
     "total_2025": 6545867,
     "total_2026": 25663534,
     "total_combined": 32209401,
@@ -2715,10 +2948,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Ares",
-    "fees_by_deal": {
-     "Leroy": 19837517,
-     "Project Narluga": 7200000
-    },
     "total_2025": 19837517,
     "total_2026": 7200000,
     "total_combined": 27037517,
@@ -2726,10 +2955,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Natixis",
-    "fees_by_deal": {
-     "Project Walleye": 13833950,
-     "Project Metropolis PF": 1675331
-    },
     "total_2025": 5792685,
     "total_2026": 19770821,
     "total_combined": 25563506,
@@ -2737,9 +2962,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Blackstone",
-    "fees_by_deal": {
-     "Leroy": 21250000
-    },
     "total_2025": 21250000,
     "total_2026": 0,
     "total_combined": 21250000,
@@ -2747,10 +2969,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "MUFG",
-    "fees_by_deal": {
-     "Project Walleye": 13833950,
-     "Project Metropolis PF": 1272682
-    },
     "total_2025": 3358389,
     "total_2026": 17453858,
     "total_combined": 20812247,
@@ -2758,9 +2976,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "SMBC",
-    "fees_by_deal": {
-     "Project Walleye": 12296844
-    },
     "total_2025": 4032133,
     "total_2026": 16558384,
     "total_combined": 20590517,
@@ -2768,9 +2983,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "RBC",
-    "fees_by_deal": {
-     "Project Walleye": 12296844
-    },
     "total_2025": 1196429,
     "total_2026": 12296844,
     "total_combined": 13493273,
@@ -2778,10 +2990,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Morgan Stanley",
-    "fees_by_deal": {
-     "Shiner": 3179191,
-     "Project Beluga Upsize": 6187458
-    },
     "total_2025": 3179191,
     "total_2026": 6187458,
     "total_combined": 9366649,
@@ -2789,10 +2997,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "ING",
-    "fees_by_deal": {
-     "Project Metropolis PF": 1458672,
-     "Project Beluga Upsize": 1028014
-    },
     "total_2025": 2463207,
     "total_2026": 5720212,
     "total_combined": 8183419,
@@ -2800,7 +3004,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Goldman Sachs",
-    "fees_by_deal": {},
     "total_2025": 150000,
     "total_2026": 7568044,
     "total_combined": 7718044,
@@ -2808,7 +3011,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "TD Bank",
-    "fees_by_deal": {},
     "total_2025": 4158929,
     "total_2026": 1664130,
     "total_combined": 5823059,
@@ -2816,9 +3018,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "OCBC",
-    "fees_by_deal": {
-     "Project Metropolis PF": 1675331
-    },
     "total_2025": 2500677,
     "total_2026": 2330154,
     "total_combined": 4830831,
@@ -2826,9 +3025,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "JP Morgan",
-    "fees_by_deal": {
-     "Shiner": 3179191
-    },
     "total_2025": 4375619,
     "total_2026": 0,
     "total_combined": 4375619,
@@ -2836,9 +3032,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "ABN AMRO",
-    "fees_by_deal": {
-     "Project Beluga Upsize": 1028014
-    },
     "total_2025": 0,
     "total_2026": 4261540,
     "total_combined": 4261540,
@@ -2846,9 +3039,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Credit Agricole CIB",
-    "fees_by_deal": {
-     "Project Beluga Upsize": 164482
-    },
     "total_2025": 691666,
     "total_2026": 3495893,
     "total_combined": 4187559,
@@ -2856,9 +3046,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "BNP Paribas",
-    "fees_by_deal": {
-     "Project Metropolis PF": 1308672
-    },
     "total_2025": 0,
     "total_2026": 3621469,
     "total_combined": 3621469,
@@ -2866,9 +3053,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Nomura",
-    "fees_by_deal": {
-     "Shiner": 3179191
-    },
     "total_2025": 3291691,
     "total_2026": 0,
     "total_combined": 3291691,
@@ -2876,10 +3060,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Mizuho",
-    "fees_by_deal": {
-     "Project Metropolis PF": 1675331,
-     "Project Beluga Upsize": 164482
-    },
     "total_2025": 1133000,
     "total_2026": 1839813,
     "total_combined": 2972813,
@@ -2887,10 +3067,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Clifford Capital",
-    "fees_by_deal": {
-     "Project Metropolis PF": 1675331,
-     "Metropolis (2025)": 612582
-    },
     "total_2025": 612582,
     "total_2026": 2330154,
     "total_combined": 2942736,
@@ -2898,7 +3074,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Barclays",
-    "fees_by_deal": {},
     "total_2025": 500000,
     "total_2026": 2176680,
     "total_combined": 2676680,
@@ -2906,10 +3081,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Rabobank",
-    "fees_by_deal": {
-     "Project Beluga Upsize": 164482,
-     "Rabo LC Facility": 300000
-    },
     "total_2025": 1196429,
     "total_2026": 1464130,
     "total_combined": 2660559,
@@ -2917,9 +3088,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "BBVA",
-    "fees_by_deal": {
-     "Project Beluga Upsize": 164482
-    },
     "total_2025": 2368095,
     "total_2026": 164482,
     "total_combined": 2532577,
@@ -2927,7 +3095,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Nordea",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 2419208,
     "total_combined": 2419208,
@@ -2935,7 +3102,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "NBC (National Bank of Canada)",
-    "fees_by_deal": {},
     "total_2025": 2258929,
     "total_2026": 0,
     "total_combined": 2258929,
@@ -2943,7 +3109,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "UniCredit",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 2182744,
     "total_combined": 2182744,
@@ -2951,7 +3116,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Banco Bilbao Vizcaya Argentaria (2nd line, incl. BBVA LC)",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 1964469,
     "total_combined": 1964469,
@@ -2959,7 +3123,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Intesa Sanpaolo",
-    "fees_by_deal": {},
     "total_2025": 691667,
     "total_2026": 1164130,
     "total_combined": 1855797,
@@ -2967,7 +3130,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "First Citizens",
-    "fees_by_deal": {},
     "total_2025": 1788095,
     "total_2026": 0,
     "total_combined": 1788095,
@@ -2975,7 +3137,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "KfW",
-    "fees_by_deal": {},
     "total_2025": 1550595,
     "total_2026": 0,
     "total_combined": 1550595,
@@ -2983,9 +3144,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "DBS",
-    "fees_by_deal": {
-     "Project Metropolis PF": 1250331
-    },
     "total_2025": 0,
     "total_2026": 1250331,
     "total_combined": 1250331,
@@ -2993,7 +3151,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Truist",
-    "fees_by_deal": {},
     "total_2025": 1196429,
     "total_2026": 0,
     "total_combined": 1196429,
@@ -3001,7 +3158,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Wells Fargo",
-    "fees_by_deal": {},
     "total_2025": 1196429,
     "total_2026": 0,
     "total_combined": 1196429,
@@ -3009,7 +3165,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Bank Leumi",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 1148667,
     "total_combined": 1148667,
@@ -3017,7 +3172,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "NORD/LB",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 1105924,
     "total_combined": 1105924,
@@ -3025,7 +3179,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Standard Chartered",
-    "fees_by_deal": {},
     "total_2025": 1104667,
     "total_2026": 0,
     "total_combined": 1104667,
@@ -3033,7 +3186,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "CoBank",
-    "fees_by_deal": {},
     "total_2025": 1062500,
     "total_2026": 0,
     "total_combined": 1062500,
@@ -3041,7 +3193,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Regions",
-    "fees_by_deal": {},
     "total_2025": 720000,
     "total_2026": 0,
     "total_combined": 720000,
@@ -3049,7 +3200,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "PKO Bank Polski",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 654823,
     "total_combined": 654823,
@@ -3057,7 +3207,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Hana Securities",
-    "fees_by_deal": {},
     "total_2025": 600000,
     "total_2026": 0,
     "total_combined": 600000,
@@ -3065,7 +3214,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Bank of America",
-    "fees_by_deal": {},
     "total_2025": 596429,
     "total_2026": 0,
     "total_combined": 596429,
@@ -3073,7 +3221,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Mizrahi (UMTB)",
-    "fees_by_deal": {},
     "total_2025": 500000,
     "total_2026": 0,
     "total_combined": 500000,
@@ -3081,7 +3228,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Webster",
-    "fees_by_deal": {},
     "total_2025": 475000,
     "total_2026": 0,
     "total_combined": 475000,
@@ -3089,7 +3235,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Citi",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 375000,
     "total_combined": 375000,
@@ -3097,7 +3242,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Flagstar",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 375000,
     "total_combined": 375000,
@@ -3105,7 +3249,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Infrastructure Finance DMP24 S.a r.l (DMP)",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 349239,
     "total_combined": 349239,
@@ -3113,7 +3256,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Caterpillar",
-    "fees_by_deal": {},
     "total_2025": 125000,
     "total_2026": 187500,
     "total_combined": 312500,
@@ -3121,7 +3263,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Principal Insurance Company",
-    "fees_by_deal": {},
     "total_2025": 295000,
     "total_2026": 0,
     "total_combined": 295000,
@@ -3129,7 +3270,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "ANZ",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 291033,
     "total_combined": 291033,
@@ -3137,7 +3277,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Principal Insurance Company (2nd line)",
-    "fees_by_deal": {},
     "total_2025": 200000,
     "total_2026": 0,
     "total_combined": 200000,
@@ -3145,7 +3284,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Preferred Bank",
-    "fees_by_deal": {},
     "total_2025": 187500,
     "total_2026": 0,
     "total_combined": 187500,
@@ -3153,7 +3291,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Siemens",
-    "fees_by_deal": {},
     "total_2025": 175000,
     "total_2026": 0,
     "total_combined": 175000,
@@ -3161,7 +3298,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Credit Industriel et Commercial (CIC)",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 174620,
     "total_combined": 174620,
@@ -3169,7 +3305,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "National Australia Bank",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 174620,
     "total_combined": 174620,
@@ -3177,7 +3312,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Hong Kong Mortgage Corporation (HKMC)",
-    "fees_by_deal": {},
     "total_2025": 0,
     "total_2026": 174620,
     "total_combined": 174620,
@@ -3185,9 +3319,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Rabobank (2nd line)",
-    "fees_by_deal": {
-     "Project Beluga Upsize": 164482
-    },
     "total_2025": 0,
     "total_2026": 164482,
     "total_combined": 164482,
@@ -3195,7 +3326,6 @@ window.ECX_DATA = {
    },
    {
     "bank": "Farmer Mac",
-    "fees_by_deal": {},
     "total_2025": 156250,
     "total_2026": 0,
     "total_combined": 156250,
@@ -3203,12 +3333,16 @@ window.ECX_DATA = {
    },
    {
     "bank": "Investec",
-    "fees_by_deal": {},
     "total_2025": 62500,
     "total_2026": 0,
     "total_combined": 62500,
     "alignment_confidence": "medium"
    }
-  ]
+  ],
+  "grand_totals": {
+   "y2025": 103576094,
+   "y2026": 155924007,
+   "combined": 259500101
+  }
  }
 };

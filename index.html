@@ -119,6 +119,7 @@
   .filters input[type="search"], .filters select {
     background: var(--surface-1); color: var(--text-primary);
     border: 1px solid var(--grid); border-radius: 8px; padding: 7px 10px; font-size: 13px;
+    max-width: 280px;
   }
   .filters input[type="search"] { width: 260px; }
   .filters .count { color: var(--muted); font-size: 12.5px; margin-left: auto; }
@@ -254,16 +255,17 @@ const feeBanks = D.fee_matrix ? D.fee_matrix.banks : [];
 
 function bankRollups() {
   const map = new Map();
-  const get = n => { if (!map.has(n)) map.set(n, {name:n, meetings:[], fees:null, commitments:[], commitmentTotal:0}); return map.get(n); };
+  const get = n => { if (!map.has(n)) map.set(n, {name:n, meetings:[], fees:null, commitments:[], portfolio:null}); return map.get(n); };
   meetings.forEach(m => m.banks.forEach(b => get(b).meetings.push(m)));
   feeBanks.forEach(f => { get(f.bank).fees = f; });
+  (D.bank_commitments||[]).forEach(bc => { get(bc.bank).portfolio = bc; });
   (D.facilities||[]).forEach(f => (f.lenders||[]).forEach(l => {
-    const r = get(l.bank);
-    r.commitments.push({facility:f.name, role:l.role, amount:l.commitment_musd, year:f.year, status:f.status});
-    if (l.commitment_musd) r.commitmentTotal += l.commitment_musd;
+    get(l.bank).commitments.push({facility:f.name, role:l.role, amount:l.commitment_musd, fee_note:l.fee_note, status:l.status || f.status});
   }));
   return [...map.values()].sort((a,b) =>
-    ((b.fees?b.fees.total_combined:0) + b.commitmentTotal*1000) - ((a.fees?a.fees.total_combined:0) + a.commitmentTotal*1000));
+    ((b.portfolio?b.portfolio.total_usd:0) - (a.portfolio?a.portfolio.total_usd:0)) ||
+    ((b.fees?b.fees.total_combined:0) - (a.fees?a.fees.total_combined:0)) ||
+    (b.meetings.length - a.meetings.length));
 }
 const ROLLUPS = bankRollups();
 
@@ -271,12 +273,13 @@ const ROLLUPS = bankRollups();
 (function(){
   $("#subtitle").textContent = D.meta.subtitle;
   const totalFees = D.fee_matrix ? D.fee_matrix.grand_totals.combined : null;
-  const totalCommit = (D.facilities||[]).reduce((s,f) => s + (f.total_size_musd||0), 0);
+  const totalCommit = D.meta.commitments_total_usd;
+  const lenderCount = new Set([...allBanks, ...(D.bank_commitments||[]).map(b=>b.bank), ...feeBanks.map(f=>f.bank)]).size;
   const kpis = [
-    [allBanks.length + feeBanks.filter(f => !allBanks.includes(f.bank)).length, "Lenders tracked"],
+    [lenderCount, "Lenders tracked"],
     [meetings.length, "Meetings logged"],
     [(D.facilities||[]).length, "Facilities"],
-    [fmtM(totalCommit), "Facility volume"],
+    [totalCommit ? fmtC(totalCommit) : "—", "Commitments (Q2 26)"],
     [totalFees ? fmtC(totalFees) : "—", "Fees paid 25–26"],
   ];
   const box = $("#kpis");
@@ -494,6 +497,15 @@ function viewOverview(v) {
   c2.append(hBarChart({rows: [...byCount.entries()].map(([label,value])=>({label,value})).sort((a,b)=>b.value-a.value), valueFmt: v=>v, maxBars: 10}));
   g.append(c2);
 
+  if (D.bank_commitments && D.bank_commitments.length) {
+    const c5 = el("div","card");
+    c5.append(el("h3",null,"Total lender commitments by bank"));
+    c5.append(el("div","sub","Top 12 · Q2 2026 portfolio commitments across all facilities"));
+    c5.append(hBarChart({rows: D.bank_commitments.map(b => ({label:b.bank, value:b.total_usd, sub:b.facilities + " facilities"})), valueFmt: fmtC}));
+    c5.append(el("div","note","Per-bank rollups on the Banks tab."));
+    g.append(c5);
+  }
+
   if (D.fee_matrix) {
     const c3 = el("div","card");
     c3.append(el("h3",null,"Fees paid by bank — 2025 & 2026 combined"));
@@ -540,16 +552,16 @@ function viewBanks(v) {
     left.append(el("h3",null,r.name));
     const stats = el("div","stats");
     stats.append(el("span",null, r.meetings.length + " meeting" + (r.meetings.length===1?"":"s")));
-    if (r.commitmentTotal) stats.append(el("span",null,"Commitments " + fmtM(r.commitmentTotal)));
+    if (r.portfolio) stats.append(el("span",null,"Commitments " + fmtC(r.portfolio.total_usd) + " · " + r.portfolio.facilities + " fac."));
     if (r.fees) stats.append(el("span",null,"Fees " + fmtC(r.fees.total_combined)));
     if (r.meetings.length) stats.append(el("span",null,"Last contact " + r.meetings[0].date));
     head.append(left, stats);
     c.append(head);
     const body = el("div","bank-body");
     if (r.commitments.length) {
-      body.append(el("h3",null,"Facilities & commitments"));
-      body.append(makeTable(["Facility","Role","Commitment","Status"],
-        r.commitments.sort((a,b)=>(b.amount||0)-(a.amount||0)).map(cm => ({cells:[cm.facility, cm.role||"—", cm.amount?fmtM(cm.amount):"—", cm.status||"—"]})),
+      body.append(el("h3",null,"Facility participations (where lender-level detail is extracted)"));
+      body.append(makeTable(["Facility","Role","Commitment","Fees","Status"],
+        r.commitments.sort((a,b)=>(b.amount||0)-(a.amount||0)).map(cm => ({cells:[cm.facility, cm.role||"—", cm.amount?fmtM(cm.amount):"—", cm.fee_note||"—", cm.status||"—"]})),
         new Set([2])));
     }
     if (r.fees) {
@@ -577,7 +589,7 @@ function viewFacilities(v) {
     sub.append(el("span","pill region-" + (f.region||"Global"), f.region || "Global"));
     sub.append(el("span","tag",f.type||""));
     if (f.status) sub.append(el("span","tag",f.status));
-    if (f.year) sub.append(el("span","tag",String(f.year)));
+    if (f.guarantor) sub.append(el("span","tag","Guarantor: " + f.guarantor));
     left.append(sub);
     const stats = el("div","stats");
     if (f.total_size_musd) stats.append(el("span",null,"Total " + fmtM(f.total_size_musd) + (f.currency && f.currency!=="USD" ? " ("+f.currency+")" : "")));
@@ -597,6 +609,14 @@ function viewFacilities(v) {
     v.append(c);
   });
   if (!(D.facilities||[]).length) v.append(el("div","note","No facility data loaded."));
+  if ((D.meta.data_gaps||[]).length) {
+    const c = el("div","card");
+    c.append(el("h3",null,"Data caveats"));
+    const ul = el("ul"); ul.style.paddingLeft = "18px"; ul.style.color = "var(--text-secondary)"; ul.style.fontSize = "12.5px";
+    D.meta.data_gaps.forEach(gp => ul.append(el("li",null,gp)));
+    c.append(ul);
+    v.append(c);
+  }
 }
 
 function viewFees(v) {
