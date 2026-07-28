@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ECX Capital Markets — Bank Conversation Dashboard</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface-1: #fcfcfb;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --seq-250: #86b6ef;
+    --seq-400: #3987e5;
+    --seq-450: #2a78d6;
+    --seq-550: #1c5cab;
+    --navy-1: #0F2444;
+    --navy-2: #1E3A5F;
+    --navy-3: #1D4ED8;
+    --eyebrow: #93C5FD;
+    --accent: #FCD34D;
+    --pill-bg: #EFF6FF;
+    --pill-text: #1D4ED8;
+    --pill-border: #2563EB;
+    --region-us: #2563EB;
+    --region-eu: #059669;
+    --region-apac: #D97706;
+    --region-global: #7C3AED;
+    --good: #0ca30c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface-1: #1a1a19;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255,255,255,0.10);
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+      --pill-bg: #16233d;
+      --pill-text: #93C5FD;
+      --pill-border: #2a4a8a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface-1: #1a1a19;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255,255,255,0.10);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --pill-bg: #16233d;
+    --pill-text: #93C5FD;
+    --pill-border: #2a4a8a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--page);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* ---------- header ---------- */
+  header {
+    background: linear-gradient(135deg, #0F2444 0%, #1E3A5F 55%, #1D4ED8 100%);
+    color: #fff; padding: 28px 0 24px;
+  }
+  header .wrap { padding-bottom: 0; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between; }
+  .eyebrow { color: var(--eyebrow); text-transform: uppercase; letter-spacing: .12em; font-size: 11px; font-weight: 700; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 600; font-size: 30px; margin-top: 4px; }
+  .subtitle { color: #c7d7f0; font-size: 12.5px; margin-top: 6px; }
+  .kpis { display: flex; gap: 10px; flex-wrap: wrap; }
+  .kpi {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px; padding: 10px 16px; min-width: 108px;
+  }
+  .kpi .v { font-size: 22px; font-weight: 650; }
+  .kpi .l { font-size: 11px; color: #b9cbe8; margin-top: 1px; }
+  #themeToggle {
+    position: absolute; top: 14px; right: 18px;
+    background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer;
+  }
+  header { position: relative; }
+
+  /* ---------- tabs ---------- */
+  nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin: 18px 0 14px; border-bottom: 1px solid var(--grid); }
+  nav.tabs button {
+    background: none; border: none; border-bottom: 2.5px solid transparent;
+    color: var(--text-secondary); padding: 8px 14px 9px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  }
+  nav.tabs button.active { color: var(--text-primary); border-bottom-color: var(--navy-3); }
+  nav.tabs button:hover { color: var(--text-primary); }
+
+  /* ---------- filters ---------- */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .filters input[type="search"], .filters select {
+    background: var(--surface-1); color: var(--text-primary);
+    border: 1px solid var(--grid); border-radius: 8px; padding: 7px 10px; font-size: 13px;
+    max-width: 280px;
+  }
+  .filters input[type="search"] { width: 260px; }
+  .filters .count { color: var(--muted); font-size: 12.5px; margin-left: auto; }
+
+  /* ---------- cards & layout ---------- */
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 14px;
+  }
+  .card h3 { font-size: 15px; margin-bottom: 2px; }
+  .card .sub { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ---------- pills ---------- */
+  .pill {
+    display: inline-block; font-size: 11px; font-weight: 600; border-radius: 20px;
+    padding: 2px 9px; background: var(--pill-bg); color: var(--pill-text);
+    border: 1px solid var(--pill-border); margin: 2px 3px 2px 0; white-space: nowrap;
+  }
+  .pill.region-US { border-color: var(--region-us); }
+  .pill.region-Europe { border-color: var(--region-eu); }
+  .pill.region-APAC { border-color: var(--region-apac); }
+  .pill.region-Global { border-color: var(--region-global); }
+  .tag { display: inline-block; font-size: 11px; border-radius: 6px; padding: 1px 7px;
+         border: 1px solid var(--grid); color: var(--text-secondary); margin-right: 5px; }
+
+  /* ---------- tables ---------- */
+  .tblwrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; font-size: 11.5px;
+       text-transform: uppercase; letter-spacing: .04em; padding: 7px 10px; border-bottom: 1px solid var(--baseline); }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.total td { font-weight: 700; border-top: 2px solid var(--baseline); }
+
+  /* ---------- meetings list ---------- */
+  .meeting { border-left: 3px solid var(--series-1); padding: 10px 14px; margin-bottom: 10px;
+             background: var(--surface-1); border-radius: 0 12px 12px 0; border-top: 1px solid var(--border);
+             border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .meeting.email { border-left-color: var(--series-2); }
+  .meeting .head { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; cursor: pointer; }
+  .meeting .date { font-variant-numeric: tabular-nums; color: var(--text-secondary); font-size: 12.5px; min-width: 86px; }
+  .meeting .bank { font-weight: 700; font-size: 13.5px; }
+  .meeting .proj { color: var(--text-secondary); font-size: 12.5px; }
+  .meeting .body { margin-top: 8px; color: var(--text-primary); font-size: 13px; display: none; }
+  .meeting.open .body { display: block; }
+  .meeting .meta { margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .meeting .mats { margin-top: 6px; }
+  .meeting .src { font-size: 11.5px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .legendrow { display: flex; gap: 16px; align-items: center; margin-bottom: 10px; font-size: 12px; color: var(--text-secondary); }
+  .legendrow .key { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+
+  /* ---------- charts ---------- */
+  .chart { position: relative; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .tooltip {
+    position: fixed; pointer-events: none; z-index: 50; display: none;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px;
+    padding: 8px 12px; font-size: 12.5px; box-shadow: 0 4px 18px rgba(0,0,0,.18); max-width: 320px;
+  }
+  .tooltip .tv { font-weight: 700; font-size: 13.5px; }
+  .tooltip .tl { color: var(--text-secondary); }
+
+  details.tableview { margin-top: 10px; }
+  details.tableview summary { cursor: pointer; color: var(--text-secondary); font-size: 12.5px; }
+
+  .note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  .bank-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; cursor: pointer; }
+  .bank-head .stats { display: flex; gap: 18px; font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .bank-body { display: none; margin-top: 12px; }
+  .card.open .bank-body { display: block; }
+  .lastnote { color: var(--text-secondary); font-size: 12.5px; margin-top: 6px; }
+  a { color: var(--series-1); }
+</style>
+</head>
+<body>
+<header>
+  <button id="themeToggle" title="Toggle dark mode">◐ Theme</button>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">EdgeConneX Capital Markets</div>
+      <h1>Bank Conversation Dashboard</h1>
+      <div class="subtitle" id="subtitle"></div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="tabs" id="tabs"></nav>
+  <div class="filters" id="filters" style="display:none">
+    <input type="search" id="fSearch" placeholder="Search banks, projects, notes…">
+    <select id="fBank"><option value="">All banks</option></select>
+    <select id="fProject"><option value="">All projects</option></select>
+    <select id="fSource"><option value="">All sources</option></select>
+    <select id="fRange">
+      <option value="">All dates</option>
+      <option value="30">Last 30 days</option>
+      <option value="90">Last 90 days</option>
+      <option value="180">Last 180 days</option>
+    </select>
+    <span class="count" id="fCount"></span>
+  </div>
+  <main id="view"></main>
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script src="data/data.js"></script>
+<script>
+"use strict";
+const D = window.ECX_DATA;
+const $ = (s, el=document) => el.querySelector(s);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const fmtM = v => v == null ? "—" : (v >= 1000 ? "$" + (v/1000).toFixed(2).replace(/\.?0+$/,"") + "bn" : "$" + Math.round(v).toLocaleString() + "m");
+const fmt$ = v => v == null ? "—" : "$" + Math.round(v).toLocaleString();
+const fmtC = v => v == null ? "—" : (v >= 1e9 ? "$" + (v/1e9).toFixed(1) + "B" : v >= 1e6 ? "$" + (v/1e6).toFixed(1) + "M" : "$" + Math.round(v/1e3) + "K");
+const parseD = s => new Date(s + "T12:00:00");
+
+/* ---------- theme ---------- */
+$("#themeToggle").onclick = () => {
+  const r = document.documentElement;
+  const dark = r.dataset.theme === "dark" || (!r.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+  r.dataset.theme = dark ? "light" : "dark";
+  render();
+};
+
+/* ---------- derived data ---------- */
+const meetings = D.meetings.slice().sort((a,b) => b.date.localeCompare(a.date));
+const allBanks = [...new Set(meetings.flatMap(m => m.banks))].sort();
+const allProjects = [...new Set(meetings.map(m => m.project))].sort();
+const feeBanks = D.fee_matrix ? D.fee_matrix.banks : [];
+
+function bankRollups() {
+  const map = new Map();
+  const get = n => { if (!map.has(n)) map.set(n, {name:n, meetings:[], fees:null, commitments:[], portfolio:null}); return map.get(n); };
+  meetings.forEach(m => m.banks.forEach(b => get(b).meetings.push(m)));
+  feeBanks.forEach(f => { get(f.bank).fees = f; });
+  (D.bank_commitments||[]).forEach(bc => { get(bc.bank).portfolio = bc; });
+  (D.facilities||[]).forEach(f => (f.lenders||[]).forEach(l => {
+    get(l.bank).commitments.push({facility:f.name, role:l.role, amount:l.commitment_musd, fee_note:l.fee_note, status:l.status || f.status});
+  }));
+  return [...map.values()].sort((a,b) =>
+    ((b.portfolio?b.portfolio.total_usd:0) - (a.portfolio?a.portfolio.total_usd:0)) ||
+    ((b.fees?b.fees.total_combined:0) - (a.fees?a.fees.total_combined:0)) ||
+    (b.meetings.length - a.meetings.length));
+}
+const ROLLUPS = bankRollups();
+
+/* ---------- header KPIs ---------- */
+(function(){
+  $("#subtitle").textContent = D.meta.subtitle;
+  const totalFees = D.fee_matrix ? D.fee_matrix.grand_totals.combined : null;
+  const totalCommit = D.meta.commitments_total_usd;
+  const lenderCount = new Set([...allBanks, ...(D.bank_commitments||[]).map(b=>b.bank), ...feeBanks.map(f=>f.bank)]).size;
+  const kpis = [
+    [lenderCount, "Lenders tracked"],
+    [meetings.length, "Meetings logged"],
+    [(D.facilities||[]).length, "Facilities"],
+    [totalCommit ? fmtC(totalCommit) : "—", "Commitments (Q2 26)"],
+    [totalFees ? fmtC(totalFees) : "—", "Fees paid 25–26"],
+  ];
+  const box = $("#kpis");
+  kpis.forEach(([v,l]) => { const k = el("div","kpi"); k.append(el("div","v",String(v)), el("div","l",l)); box.append(k); });
+})();
+
+/* ---------- tabs ---------- */
+const TABS = [
+  ["overview","Overview"],
+  ["meetings","Bank Meetings"],
+  ["banks","Banks"],
+  ["facilities","Facilities & Commitments"],
+  ["fees","Fees"],
+  ["materials","Materials Shared"],
+];
+let tab = "overview";
+const tabsNav = $("#tabs");
+TABS.forEach(([id,label]) => {
+  const b = el("button",null,label); b.dataset.tab = id;
+  b.onclick = () => { tab = id; render(); };
+  tabsNav.append(b);
+});
+
+/* ---------- filters ---------- */
+allBanks.forEach(b => $("#fBank").append(new Option(b,b)));
+allProjects.forEach(p => $("#fProject").append(new Option(p,p)));
+[["sharepoint","SharePoint call notes"],["email","Email call notes"]].forEach(([v,l]) => $("#fSource").append(new Option(l,v)));
+["fSearch","fBank","fProject","fSource","fRange"].forEach(id => $("#"+id).addEventListener("input", render));
+
+function filteredMeetings() {
+  const q = $("#fSearch").value.trim().toLowerCase();
+  const bank = $("#fBank").value, proj = $("#fProject").value, src = $("#fSource").value, range = $("#fRange").value;
+  const cutoff = range ? new Date(parseD(D.meta.as_of) - range*864e5) : null;
+  return meetings.filter(m => {
+    if (bank && !m.banks.includes(bank)) return false;
+    if (proj && m.project !== proj) return false;
+    if (src && m.source_kind !== src) return false;
+    if (cutoff && parseD(m.date) < cutoff) return false;
+    if (q) {
+      const hay = (m.bank_label + " " + m.project + " " + m.discussion + " " +
+        (m.materials_shared||[]).join(" ") + " " + (m.participants||[]).join(" ")).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+/* ---------- tooltip ---------- */
+const tip = $("#tooltip");
+function showTip(evt, rows) {
+  tip.replaceChildren();
+  rows.forEach(([v,l]) => { tip.append(el("div","tv",v)); if (l) tip.append(el("div","tl",l)); });
+  tip.style.display = "block";
+  const pad = 14, w = tip.offsetWidth || 200;
+  let x = evt.clientX + pad; if (x + w > innerWidth - 8) x = evt.clientX - w - pad;
+  tip.style.left = x + "px"; tip.style.top = Math.min(evt.clientY + pad, innerHeight - 80) + "px";
+}
+function hideTip(){ tip.style.display = "none"; }
+
+/* ---------- chart: horizontal bars ---------- */
+function hBarChart({rows, valueFmt, color, maxBars=12}) {
+  const data = rows.slice(0, maxBars);
+  const w = 560, rowH = 30, mL = 190, mR = 86, h = data.length * rowH + 8;
+  const max = Math.max(...data.map(r => r.value), 1);
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  svg.style.width = "100%"; svg.style.height = "auto";
+  const css = getComputedStyle(document.documentElement);
+  const barC = color || css.getPropertyValue("--series-1").trim();
+  const ink = css.getPropertyValue("--text-primary").trim();
+  const mut = css.getPropertyValue("--text-secondary").trim();
+  data.forEach((r,i) => {
+    const y = i*rowH + 6, bw = Math.max((w - mL - mR) * r.value / max, 2);
+    const lbl = document.createElementNS(svg.namespaceURI,"text");
+    lbl.setAttribute("x", mL - 8); lbl.setAttribute("y", y + 15); lbl.setAttribute("text-anchor","end");
+    lbl.setAttribute("font-size","12"); lbl.setAttribute("fill", ink);
+    lbl.textContent = r.label.length > 26 ? r.label.slice(0,25) + "…" : r.label;
+    svg.append(lbl);
+    const rect = document.createElementNS(svg.namespaceURI,"rect");
+    rect.setAttribute("x", mL); rect.setAttribute("y", y); rect.setAttribute("width", bw);
+    rect.setAttribute("height", 20); rect.setAttribute("rx", 4);
+    rect.setAttribute("fill", barC);
+    svg.append(rect);
+    const sq = document.createElementNS(svg.namespaceURI,"rect"); /* square the baseline end */
+    sq.setAttribute("x", mL); sq.setAttribute("y", y); sq.setAttribute("width", Math.min(4,bw)); sq.setAttribute("height", 20); sq.setAttribute("fill", barC);
+    svg.append(sq);
+    const val = document.createElementNS(svg.namespaceURI,"text");
+    val.setAttribute("x", mL + bw + 6); val.setAttribute("y", y + 15);
+    val.setAttribute("font-size","12"); val.setAttribute("fill", mut);
+    val.setAttribute("font-variant","tabular-nums");
+    val.textContent = valueFmt(r.value);
+    svg.append(val);
+    const hit = document.createElementNS(svg.namespaceURI,"rect");
+    hit.setAttribute("x", 0); hit.setAttribute("y", i*rowH); hit.setAttribute("width", w); hit.setAttribute("height", rowH);
+    hit.setAttribute("fill","transparent");
+    hit.addEventListener("pointermove", e => { rect.setAttribute("opacity","0.82"); showTip(e, [[valueFmt(r.value), r.label + (r.sub ? " · " + r.sub : "")]]); });
+    hit.addEventListener("pointerleave", () => { rect.removeAttribute("opacity"); hideTip(); });
+    svg.append(hit);
+  });
+  return svg;
+}
+
+/* ---------- chart: monthly columns ---------- */
+function monthChart(items) {
+  const counts = new Map();
+  items.forEach(m => { const k = m.date.slice(0,7); counts.set(k, (counts.get(k)||0)+1); });
+  const keys = [...counts.keys()].sort();
+  if (!keys.length) return el("div","note","No data");
+  const first = keys[0], last = keys[keys.length-1];
+  const months = []; let [y,mo] = first.split("-").map(Number);
+  while (true) { const k = y + "-" + String(mo).padStart(2,"0"); months.push(k); if (k === last) break; mo++; if (mo>12){mo=1;y++;} }
+  const w = 560, h = 190, mB = 26, mL = 30, mT = 10;
+  const max = Math.max(...months.map(k => counts.get(k)||0), 1);
+  const yMax = Math.ceil(max/5)*5 || 5;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`); svg.style.width="100%"; svg.style.height="auto";
+  const css = getComputedStyle(document.documentElement);
+  const barC = css.getPropertyValue("--series-1").trim();
+  const mut = css.getPropertyValue("--muted").trim();
+  const gridC = css.getPropertyValue("--grid").trim();
+  for (let g=0; g<=yMax; g+=5) {
+    const gy = mT + (h-mB-mT) * (1 - g/yMax);
+    const ln = document.createElementNS(svg.namespaceURI,"line");
+    ln.setAttribute("x1", mL); ln.setAttribute("x2", w-6); ln.setAttribute("y1", gy); ln.setAttribute("y2", gy);
+    ln.setAttribute("stroke", gridC); ln.setAttribute("stroke-width","1"); svg.append(ln);
+    const t = document.createElementNS(svg.namespaceURI,"text");
+    t.setAttribute("x", mL-6); t.setAttribute("y", gy+4); t.setAttribute("text-anchor","end");
+    t.setAttribute("font-size","10.5"); t.setAttribute("fill", mut); t.textContent = g; svg.append(t);
+  }
+  const slot = (w - mL - 10) / months.length, bw = Math.min(24, slot - 4);
+  months.forEach((k,i) => {
+    const v = counts.get(k)||0;
+    const bh = (h-mB-mT) * v/yMax;
+    const x = mL + i*slot + (slot-bw)/2, ybar = h - mB - bh;
+    if (v > 0) {
+      const rect = document.createElementNS(svg.namespaceURI,"rect");
+      rect.setAttribute("x",x); rect.setAttribute("y",ybar); rect.setAttribute("width",bw); rect.setAttribute("height",bh);
+      rect.setAttribute("rx",4); rect.setAttribute("fill",barC); svg.append(rect);
+      const sq = document.createElementNS(svg.namespaceURI,"rect");
+      sq.setAttribute("x",x); sq.setAttribute("y",h-mB-Math.min(4,bh)); sq.setAttribute("width",bw); sq.setAttribute("height",Math.min(4,bh)); sq.setAttribute("fill",barC); svg.append(sq);
+    }
+    const t = document.createElementNS(svg.namespaceURI,"text");
+    t.setAttribute("x", x+bw/2); t.setAttribute("y", h-8); t.setAttribute("text-anchor","middle");
+    t.setAttribute("font-size","10"); t.setAttribute("fill", mut);
+    const [yy,mm] = k.split("-");
+    t.textContent = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][mm-1] + (mm==="01"||i===0 ? " ’"+yy.slice(2) : "");
+    svg.append(t);
+    const hit = document.createElementNS(svg.namespaceURI,"rect");
+    hit.setAttribute("x", mL + i*slot); hit.setAttribute("y", 0); hit.setAttribute("width", slot); hit.setAttribute("height", h);
+    hit.setAttribute("fill","transparent");
+    hit.addEventListener("pointermove", e => showTip(e, [[v + (v===1?" meeting":" meetings"), t.textContent.replace("’","20")]]));
+    hit.addEventListener("pointerleave", hideTip);
+    svg.append(hit);
+  });
+  const base = document.createElementNS(svg.namespaceURI,"line");
+  base.setAttribute("x1",mL); base.setAttribute("x2",w-6); base.setAttribute("y1",h-mB); base.setAttribute("y2",h-mB);
+  base.setAttribute("stroke", css.getPropertyValue("--baseline").trim()); svg.append(base);
+  return svg;
+}
+
+/* ---------- shared renderers ---------- */
+function meetingCard(m) {
+  const box = el("div","meeting " + (m.source_kind === "email" ? "email" : "sharepoint"));
+  const head = el("div","head");
+  head.append(el("span","date", m.date));
+  head.append(el("span","bank", m.bank_label));
+  head.append(el("span","proj", m.project));
+  box.append(head);
+  const body = el("div","body");
+  body.append(el("div",null,m.discussion));
+  if (m.materials_shared && m.materials_shared.length) {
+    const mats = el("div","mats");
+    mats.append(el("strong",null,"Materials: "));
+    m.materials_shared.forEach(x => mats.append(el("span","tag",x)));
+    body.append(mats);
+  }
+  if (m.participants && m.participants.length)
+    body.append(el("div","meta","Participants / leads: " + m.participants.join("; ")));
+  body.append(el("div","src","Source: " + m.source));
+  box.append(body);
+  head.onclick = () => box.classList.toggle("open");
+  return box;
+}
+
+function makeTable(headers, rows, numericCols=new Set()) {
+  const wrap = el("div","tblwrap"), t = el("table"), thead = el("thead"), tr = el("tr");
+  headers.forEach((h,i) => { const th = el("th",numericCols.has(i)?"num":null,h); tr.append(th); });
+  thead.append(tr); t.append(thead);
+  const tb = el("tbody");
+  rows.forEach(r => {
+    const tr2 = el("tr", r.total ? "total" : null);
+    r.cells.forEach((c,i) => tr2.append(el("td", numericCols.has(i)?"num":null, c)));
+    tb.append(tr2);
+  });
+  t.append(tb); wrap.append(t);
+  return wrap;
+}
+
+/* ---------- views ---------- */
+function viewOverview(v) {
+  const ms = filteredMeetings();
+  const g = el("div","grid2");
+
+  const c1 = el("div","card");
+  c1.append(el("h3",null,"Meetings per month"));
+  c1.append(el("div","sub","Bank/lender conversations logged from SharePoint call notes + email"));
+  c1.append(monthChart(ms));
+  g.append(c1);
+
+  const c2 = el("div","card");
+  c2.append(el("h3",null,"Most engaged lenders"));
+  c2.append(el("div","sub","By number of logged meetings"));
+  const byCount = new Map();
+  ms.forEach(m => m.banks.forEach(b => byCount.set(b,(byCount.get(b)||0)+1)));
+  c2.append(hBarChart({rows: [...byCount.entries()].map(([label,value])=>({label,value})).sort((a,b)=>b.value-a.value), valueFmt: v=>v, maxBars: 10}));
+  g.append(c2);
+
+  if (D.bank_commitments && D.bank_commitments.length) {
+    const c5 = el("div","card");
+    c5.append(el("h3",null,"Total lender commitments by bank"));
+    c5.append(el("div","sub","Top 12 · Q2 2026 portfolio commitments across all facilities"));
+    c5.append(hBarChart({rows: D.bank_commitments.map(b => ({label:b.bank, value:b.total_usd, sub:b.facilities + " facilities"})), valueFmt: fmtC}));
+    c5.append(el("div","note","Per-bank rollups on the Banks tab."));
+    g.append(c5);
+  }
+
+  if (D.fee_matrix) {
+    const c3 = el("div","card");
+    c3.append(el("h3",null,"Fees paid by bank — 2025 & 2026 combined"));
+    c3.append(el("div","sub","Top 12 · source: " + D.fee_matrix.source));
+    c3.append(hBarChart({rows: feeBanks.map(f => ({label:f.bank, value:f.total_combined})).sort((a,b)=>b.value-a.value), valueFmt: fmtC}));
+    c3.append(el("div","note","Full fee matrix on the Fees tab."));
+    g.append(c3);
+  }
+
+  if (D.facilities && D.facilities.length) {
+    const c4 = el("div","card");
+    c4.append(el("h3",null,"Facility volume"));
+    c4.append(el("div","sub","Total facility size (USD m equivalent)"));
+    c4.append(hBarChart({rows: D.facilities.filter(f=>f.total_size_musd).map(f => ({label:f.name, value:f.total_size_musd, sub:f.status})).sort((a,b)=>b.value-a.value), valueFmt: fmtM, color: getComputedStyle(document.documentElement).getPropertyValue("--series-3").trim()}));
+    g.append(c4);
+  }
+  v.append(g);
+
+  const rec = el("div","card");
+  rec.append(el("h3",null,"Latest conversations"));
+  rec.append(el("div","sub","Five most recent — click to expand; full log on the Bank Meetings tab"));
+  ms.slice(0,5).forEach(m => rec.append(meetingCard(m)));
+  v.append(rec);
+}
+
+function viewMeetings(v) {
+  const ms = filteredMeetings();
+  const legend = el("div","legendrow");
+  const k1 = el("span"); const key1 = el("span","key"); key1.style.background = "var(--series-1)"; k1.append(key1, document.createTextNode("SharePoint call notes"));
+  const k2 = el("span"); const key2 = el("span","key"); key2.style.background = "var(--series-2)"; k2.append(key2, document.createTextNode("Email call notes"));
+  legend.append(k1,k2);
+  v.append(legend);
+  ms.forEach(m => v.append(meetingCard(m)));
+  if (!ms.length) v.append(el("div","note","No meetings match the current filters."));
+}
+
+function viewBanks(v) {
+  const q = $("#fSearch").value.trim().toLowerCase();
+  const bank = $("#fBank").value;
+  ROLLUPS.filter(r => (!bank || r.name === bank) && (!q || r.name.toLowerCase().includes(q))).forEach(r => {
+    const c = el("div","card");
+    const head = el("div","bank-head");
+    const left = el("div");
+    left.append(el("h3",null,r.name));
+    const stats = el("div","stats");
+    stats.append(el("span",null, r.meetings.length + " meeting" + (r.meetings.length===1?"":"s")));
+    if (r.portfolio) stats.append(el("span",null,"Commitments " + fmtC(r.portfolio.total_usd) + " · " + r.portfolio.facilities + " fac."));
+    if (r.fees) stats.append(el("span",null,"Fees " + fmtC(r.fees.total_combined)));
+    if (r.meetings.length) stats.append(el("span",null,"Last contact " + r.meetings[0].date));
+    head.append(left, stats);
+    c.append(head);
+    const body = el("div","bank-body");
+    if (r.commitments.length) {
+      body.append(el("h3",null,"Facility participations (where lender-level detail is extracted)"));
+      body.append(makeTable(["Facility","Role","Commitment","Fees","Status"],
+        r.commitments.sort((a,b)=>(b.amount||0)-(a.amount||0)).map(cm => ({cells:[cm.facility, cm.role||"—", cm.amount?fmtM(cm.amount):"—", cm.fee_note||"—", cm.status||"—"]})),
+        new Set([2])));
+    }
+    if (r.fees) {
+      const fs = el("div","lastnote");
+      fs.textContent = "Fees paid — 2025: " + fmtC(r.fees.total_2025) + " · 2026: " + fmtC(r.fees.total_2026) + " · Combined: " + fmtC(r.fees.total_combined);
+      body.append(fs);
+    }
+    if (r.meetings.length) {
+      body.append(el("h3",null,"Conversation log"));
+      r.meetings.forEach(m => body.append(meetingCard(m)));
+    }
+    c.append(body);
+    head.onclick = () => c.classList.toggle("open");
+    v.append(c);
+  });
+}
+
+function viewFacilities(v) {
+  (D.facilities||[]).forEach(f => {
+    const c = el("div","card");
+    const head = el("div","bank-head");
+    const left = el("div");
+    left.append(el("h3",null,f.name));
+    const sub = el("div","sub");
+    sub.append(el("span","pill region-" + (f.region||"Global"), f.region || "Global"));
+    sub.append(el("span","tag",f.type||""));
+    if (f.status) sub.append(el("span","tag",f.status));
+    if (f.guarantor) sub.append(el("span","tag","Guarantor: " + f.guarantor));
+    left.append(sub);
+    const stats = el("div","stats");
+    if (f.total_size_musd) stats.append(el("span",null,"Total " + fmtM(f.total_size_musd) + (f.currency && f.currency!=="USD" ? " ("+f.currency+")" : "")));
+    if (f.as_of) stats.append(el("span",null,"as of " + f.as_of));
+    head.append(left, stats);
+    c.append(head);
+    const body = el("div","bank-body");
+    if (f.description) body.append(el("div","lastnote",f.description));
+    if (f.lenders && f.lenders.length) {
+      body.append(makeTable(["Lender","Role","Commitment","Fees"],
+        f.lenders.slice().sort((a,b)=>(b.commitment_musd||0)-(a.commitment_musd||0))
+          .map(l => ({cells:[l.bank, l.role||"—", l.commitment_musd?fmtM(l.commitment_musd):"—", l.fee_note||"—"]})),
+        new Set([2])));
+    } else body.append(el("div","note","Lender-level breakdown not yet extracted for this facility."));
+    c.append(body);
+    head.onclick = () => c.classList.toggle("open");
+    v.append(c);
+  });
+  if (!(D.facilities||[]).length) v.append(el("div","note","No facility data loaded."));
+  if ((D.meta.data_gaps||[]).length) {
+    const c = el("div","card");
+    c.append(el("h3",null,"Data caveats"));
+    const ul = el("ul"); ul.style.paddingLeft = "18px"; ul.style.color = "var(--text-secondary)"; ul.style.fontSize = "12.5px";
+    D.meta.data_gaps.forEach(gp => ul.append(el("li",null,gp)));
+    c.append(ul);
+    v.append(c);
+  }
+}
+
+function viewFees(v) {
+  if (!D.fee_matrix) { v.append(el("div","note","No fee data loaded.")); return; }
+  const fm = D.fee_matrix;
+  const c = el("div","card");
+  c.append(el("h3",null,"Lender fees — 2025 & 2026 transactions"));
+  c.append(el("div","sub","Source: " + fm.source + " · figures are total fees paid per bank"));
+  const q = $("#fSearch").value.trim().toLowerCase();
+  const rows = fm.banks.filter(b => !q || b.bank.toLowerCase().includes(q))
+    .sort((a,b) => b.total_combined - a.total_combined)
+    .map(b => ({cells:[b.bank, fmt$(b.total_2025), fmt$(b.total_2026), fmt$(b.total_combined)]}));
+  rows.push({total:true, cells:["Total", fmt$(fm.grand_totals.y2025), fmt$(fm.grand_totals.y2026), fmt$(fm.grand_totals.combined)]});
+  c.append(makeTable(["Bank","2025 fees","2026 fees","Combined"], rows, new Set([1,2,3])));
+  if (fm.note) c.append(el("div","note",fm.note));
+  v.append(c);
+
+  if (fm.deals_2025 || fm.deals_2026) {
+    const c2 = el("div","card");
+    c2.append(el("h3",null,"Transactions covered"));
+    const d1 = el("div","lastnote"); d1.append(el("strong",null,"2025: "));
+    (fm.deals_2025||[]).forEach(d => d1.append(el("span","tag",d)));
+    const d2 = el("div","lastnote"); d2.append(el("strong",null,"2026: "));
+    (fm.deals_2026||[]).forEach(d => d2.append(el("span","tag",d)));
+    c2.append(d1,d2);
+    v.append(c2);
+  }
+}
+
+function viewMaterials(v) {
+  const ms = filteredMeetings().filter(m => (m.materials_shared||[]).length);
+  const c = el("div","card");
+  c.append(el("h3",null,"Materials shared with lenders"));
+  c.append(el("div","sub","Documents, term sheets, models and packages referenced in call notes and emails"));
+  c.append(makeTable(["Date","Bank(s)","Project","Material","Source"],
+    ms.flatMap(m => m.materials_shared.map(mat => ({cells:[m.date, m.bank_label, m.project, mat, m.source_kind === "email" ? "Email" : "SharePoint"]})))));
+  v.append(c);
+  if (!ms.length) v.append(el("div","note","No materials match the current filters."));
+}
+
+/* ---------- render ---------- */
+function render() {
+  tabsNav.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  const filterable = ["overview","meetings","banks","materials","fees"].includes(tab);
+  $("#filters").style.display = filterable ? "flex" : "none";
+  const v = $("#view");
+  v.replaceChildren();
+  ({overview:viewOverview, meetings:viewMeetings, banks:viewBanks,
+    facilities:viewFacilities, fees:viewFees, materials:viewMaterials})[tab](v);
+  if (filterable && tab !== "fees") $("#fCount").textContent = filteredMeetings().length + " of " + meetings.length + " meetings";
+  else $("#fCount").textContent = "";
+}
+render();
+</script>
+</body>
+</html>
