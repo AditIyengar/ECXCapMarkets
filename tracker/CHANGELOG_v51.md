@@ -33,3 +33,8 @@
 - **Project Scioto — Ashville 1**: Finance Size $4.8bn → **$2.4bn** (description + metric note the revision; the prior $4.8bn evidently covered both phases). Linked lenders' pipeline exposure adjusts automatically.
 - **Project Scioto — Ashville 2**: Finance Size TBD → **$2.4bn**; now ranks in the size sort next to Ashville 1 instead of at the bottom. Capacity / building / timing still TBC (standing open item narrows to those).
 - Id baked into SYNCED_INPUT_IDS — the entry auto-clears from browser queues on next open.
+
+## v54 Changelog (8/4/26) — Multi-Region Tags (Global / NA)
+- **Project Narluga (HoldCo), Project Leroy II and LC Facilities are now tagged both Global and NA** — two pills on the card, and the cards match both the Global and US region filters.
+- Mechanics: a project's `region` can now hold multiple tags in one string ("Global / NA"). New helpers `REGION_TOKENS()` (split for display — one pill per tag) and `regionMatches()` (filtering — any tag matches; NA aliases to the US filter, EMEA to Europe). Applied on project cards, the lender-card project panel, project chips (border color = first tag), and both region filters (projects + lenders).
+- Side fix: EMEA-tagged projects (Spigola, Vaasa, Salar, Herring) previously matched no filter option — they now correctly appear under Europe.

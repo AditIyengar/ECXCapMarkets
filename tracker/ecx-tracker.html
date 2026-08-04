@@ -1,10 +1,10 @@
-<!-- ECX Fundraising Tracker v53 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
+<!-- ECX Fundraising Tracker v54 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
      React 18.2.0 + ReactDOM inlined (cdnjs UMD builds), DM Sans / Libre Baskerville
      embedded as woff2 data URIs, bank logos embedded in BANK_ICONS (Google s2 /
      DuckDuckGo favicons fetched at build time). Old claude.ai postMessage shim and
      html-to-image removed (unused by app code). Save/export buttons use the artifact
      downloads capability when available; 5-min autosave disabled in the viewer. -->
-<title>ECX Fundraising Tracker v53</title>
+<title>ECX Fundraising Tracker v54</title>
 <style>
 /* latin-ext */
 @font-face {
@@ -594,7 +594,7 @@ var PROJECTS = [{
 },{
   name: "Project Narluga (HoldCo)",
   description: "HoldCo financing program with Ares & Oaktree, $1.35bn combined — grouped card covering the initial Narluga facility and the Narwhal IV upsize, broken out below. Centralizing fundraising across Herndon and McNair.",
-  region: "Global",
+  region: "Global / NA",
   type: "HoldCo",
   owner: "Sander Borgers",
   teaserData: {
@@ -709,7 +709,7 @@ var PROJECTS = [{
 },{
   name: "Project Leroy II",
   description: "Leroy (Blackstone) land bank & capex facility program — grouped card covering the three current workstreams: the ~$1bn facility upsize, the addition of the Austin Campus, and the addition of Norway. Expand for each workstream.",
-  region: "Global",
+  region: "Global / NA",
   type: "Land Bank / Capex Facility",
   owner: "Laura Godschalx",
   teaserData: {
@@ -855,7 +855,7 @@ var PROJECTS = [{
 },{
   name: "LC Facilities",
   description: "Inaugural or new uncommitted LC facilities with various relationship banks. $100-500m. Various stages of engagement. Multiple banks being approached to increase LC commitments.",
-  region: "Global",
+  region: "Global / NA",
   type: "Trade Finance",
   owner: "Laura Godschalx",
   teaserData: {
@@ -3629,11 +3629,22 @@ var STATUSES = ["All Status", "capacity_limited", "approached"];
 function getRegionColor(region) {
   var map = {
     US: "#2563EB",
+    NA: "#2563EB",
     Europe: "#059669",
+    EMEA: "#059669",
     APAC: "#D97706",
     Global: "#7C3AED"
   };
   return map[region] || "#6B7280";
+}
+// A project may carry multiple region tags as one string, e.g. "Global / NA" — split for
+// display (one pill per tag) and filtering (any tag matches; NA counts as US, EMEA as Europe).
+function REGION_TOKENS(region) {
+  return String(region || "").split("/").map(function (t) { return t.trim(); }).filter(function (t) { return t; });
+}
+function regionMatches(region, filter) {
+  var alias = { NA: "US", EMEA: "Europe" };
+  return REGION_TOKENS(region).some(function (t) { return t === filter || alias[t] === filter; });
 }
 function getTypeColor(type) {
   var map = {
@@ -3968,7 +3979,7 @@ function LenderCard(_ref6) {
       return p.name === projName;
     });
     var isClosed = projName.toLowerCase().includes("closed") || (info.projects[projName] || "").toUpperCase().startsWith("CLOSED");
-    var regionColor = proj ? getRegionColor(proj.region) : "#6B7280";
+    var regionColor = proj ? getRegionColor(REGION_TOKENS(proj.region)[0]) : "#6B7280";
     return /*#__PURE__*/React.createElement("span", {
       key: projName,
       onClick: function onClick(e) {
@@ -4121,9 +4132,12 @@ function LenderCard(_ref6) {
         marginBottom: 6,
         flexWrap: "wrap"
       }
-    }, proj && /*#__PURE__*/React.createElement(Pill, {
-      label: proj.region,
-      color: getRegionColor(proj.region)
+    }, proj && REGION_TOKENS(proj.region).map(function (rt) {
+      return /*#__PURE__*/React.createElement(Pill, {
+        key: rt,
+        label: rt,
+        color: getRegionColor(rt)
+      });
     }), proj && /*#__PURE__*/React.createElement(Pill, {
       label: proj.type,
       color: getTypeColor(proj.type)
@@ -4418,9 +4432,12 @@ function ProjectCard(_ref1) {
       flexWrap: "wrap",
       marginBottom: 6
     }
-  }, /*#__PURE__*/React.createElement(Pill, {
-    label: project.region,
-    color: getRegionColor(project.region)
+  }, REGION_TOKENS(project.region).map(function (rt) {
+    return /*#__PURE__*/React.createElement(Pill, {
+      key: rt,
+      label: rt,
+      color: getRegionColor(rt)
+    });
   }), /*#__PURE__*/React.createElement(Pill, {
     label: project.type,
     color: getTypeColor(project.type)
@@ -10995,7 +11012,7 @@ function App() {
           var proj = PROJECTS.find(function (p) {
             return p.name === projName;
           });
-          return proj && proj.region === filterRegion;
+          return proj && regionMatches(proj.region, filterRegion);
         });
         if (!hasRegion) return false;
       }
@@ -11035,7 +11052,7 @@ function App() {
   var projSizeUSDm = PROJ_SIZE_USDM;
   var filteredProjects = _useMemo(function () {
     return PROJECTS.filter(function (p) {
-      if (filterRegion !== "All Regions" && p.region !== filterRegion) return false;
+      if (filterRegion !== "All Regions" && !regionMatches(p.region, filterRegion)) return false;
       if (filterType !== "All Types" && p.type !== filterType) return false;
       if (searchText) {
         var text = (p.name + p.description + p.type).toLowerCase();
