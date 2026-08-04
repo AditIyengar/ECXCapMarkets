@@ -1,10 +1,10 @@
-<!-- ECX Fundraising Tracker v54 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
+<!-- ECX Fundraising Tracker v55 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
      React 18.2.0 + ReactDOM inlined (cdnjs UMD builds), DM Sans / Libre Baskerville
      embedded as woff2 data URIs, bank logos embedded in BANK_ICONS (Google s2 /
      DuckDuckGo favicons fetched at build time). Old claude.ai postMessage shim and
      html-to-image removed (unused by app code). Save/export buttons use the artifact
      downloads capability when available; 5-min autosave disabled in the viewer. -->
-<title>ECX Fundraising Tracker v54</title>
+<title>ECX Fundraising Tracker v55</title>
 <style>
 /* latin-ext */
 @font-face {
@@ -593,6 +593,7 @@ var PROJECTS = [{
   }
 },{
   name: "Project Narluga (HoldCo)",
+  expectedClose: "26Q1",
   description: "HoldCo financing program with Ares & Oaktree, $1.35bn combined — grouped card covering the initial Narluga facility and the Narwhal IV upsize, broken out below. Centralizing fundraising across Herndon and McNair.",
   region: "Global / NA",
   type: "HoldCo",
@@ -617,14 +618,17 @@ var PROJECTS = [{
   workstreams: [{
     name: "Narluga — Initial HoldCo Facility",
     size: "$350m",
+    close: "26Q1 per pipeline file (targeting 15-May-26)",
     description: "HoldCo financing for McNair — initial facility to be New Albany South only with Ares. 90% LTC. Ares IC approved; Oaktree greenlit. Docs to be agreed, CP process ongoing. Targeting 15-May-26 close."
   }, {
     name: "Narwhal IV — HoldCo Upsize",
     size: "$1.0bn",
+    close: "TBD per pipeline file",
     description: "Fourth tranche of the Narwhal (Ares HoldCo) facility. Oaktree joining alongside Ares. Centralizes fundraising across Herndon and McNair. LTC TBD."
   }]
 },{
   name: "Mirai — Japan",
+  expectedClose: "26H1",
   description: "Pre-contract financing solution for land, power and C&S investments in Japan. $200m. 65-70% LTC. MUFG and SMBC as leads. Subject to satisfactory rating process on McNair and shareholder look-through.",
   region: "APAC",
   type: "Pre-Contract Bridge",
@@ -708,6 +712,7 @@ var PROJECTS = [{
   }
 },{
   name: "Project Leroy II",
+  expectedClose: "26Q2",
   description: "Leroy (Blackstone) land bank & capex facility program — grouped card covering the three current workstreams: the ~$1bn facility upsize, the addition of the Austin Campus, and the addition of Norway. Expand for each workstream.",
   region: "Global / NA",
   type: "Land Bank / Capex Facility",
@@ -744,6 +749,7 @@ var PROJECTS = [{
   }]
 },{
   name: "Project Metropolis I — KL Cyberjaya",
+  expectedClose: "26Q2",
   description: "Senior project financing for Cyberjaya KUL21, Malaysia. 72MW Oracle lease signed. $640m. Bookbuild process ongoing — many banks full on OCI. Considering underwritten execution by private credit (Apollo). Due diligence ready early next week.",
   region: "APAC",
   type: "Project Finance",
@@ -799,6 +805,7 @@ var PROJECTS = [{
   }
 },{
   name: "Project Marvel III / Atlas — ACX India",
+  expectedClose: "26Q2",
   description: "Marvel III (a.k.a. Project Atlas): $500m senior term loan bridge for the 1.05GW / $6.3bn+ AdaniConneX portfolio — Hyderabad campus (HYD22-26, built-to-suit gross lease incl. O&M) + Vizag campus (powered shell), both under long-term USD offtakes with highly rated US hyperscalers. 80% gearing, 48-month bullet, PF take-out intended within 6-12 months. Lenders: MUFG, SCB, Natixis, ING, Clifford Capital.",
   region: "APAC",
   type: "Portfolio Bridge",
@@ -831,6 +838,7 @@ var PROJECTS = [{
   }
 },{
   name: "Project Vaasa — Finland",
+  expectedClose: "26Q3",
   description: "Financing for 192MW site in Finland (McNair). Preparing materials and financial model. Lead banks TBD.",
   region: "EMEA",
   type: "Project Finance",
@@ -906,6 +914,7 @@ var PROJECTS = [{
   }
 },{
   name: "Project Salar — Norway & Finland",
+  expectedClose: "26Q3",
   description: "Nordic combined financing, $4.46bn total — grouped card with the two country workstreams broken out below. Leroy bridge + PF take-out structure. MSFT as primary tenant. Preparing materials and model.",
   region: "EMEA",
   type: "Project Finance",
@@ -1080,6 +1089,7 @@ var PROJECTS = [{
   }
 },{
   name: "Project Metropolis II — Johor",
+  expectedClose: "Paused",
   description: "PAUSED. Portfolio financing of Johor JHB01/2 for 108MW ByteDance. Paused due to ByteDance 180MW cancellation. Monitor for restart.",
   region: "APAC",
   type: "Project Finance",
@@ -4465,7 +4475,55 @@ function ProjectCard(_ref1) {
       color: "#111827",
       fontFamily: "'Libre Baskerville', Georgia, serif"
     }
-  }, project.name)), sizeLabel ? /*#__PURE__*/React.createElement("div", {
+  }, project.name)), project.expectedClose && project.expectedClose !== "Paused" ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#065F46",
+      color: "#fff",
+      borderRadius: 10,
+      padding: "7px 14px",
+      textAlign: "center",
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9.5,
+      color: "#A7F3D0",
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+      fontWeight: 700
+    }
+  }, "Expected Close"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 17,
+      fontWeight: 800,
+      lineHeight: 1.2,
+      marginTop: 2
+    }
+  }, project.expectedClose)) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#F3F4F6",
+      color: "#9CA3AF",
+      border: "1px solid #E5E7EB",
+      borderRadius: 10,
+      padding: "7px 14px",
+      textAlign: "center",
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9.5,
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+      fontWeight: 700
+    }
+  }, "Expected Close"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 15,
+      fontWeight: 800,
+      lineHeight: 1.2,
+      marginTop: 2
+    }
+  }, project.expectedClose === "Paused" ? "Paused" : "TBD")), sizeLabel ? /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0F2444",
       color: "#fff",
@@ -4474,7 +4532,7 @@ function ProjectCard(_ref1) {
       textAlign: "center",
       flexShrink: 0
     }
-  }, /*#__PURE__*/React.createElement("div", {
+  },/*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 9.5,
       color: "#93C5FD",
@@ -4577,7 +4635,14 @@ function ProjectCard(_ref1) {
         padding: "2px 8px",
         whiteSpace: "nowrap"
       }
-    }, ws.size) : null), /*#__PURE__*/React.createElement("div", {
+    }, ws.size) : null), ws.close ? /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: "#065F46",
+        fontWeight: 600,
+        marginTop: 3
+      }
+    }, "⏱ Expected close: ", ws.close) : null, /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 12,
         color: "#4B5563",
@@ -10491,7 +10556,29 @@ function InputsTab(_p) {
     return h("div", { style: { fontSize: 11, color: "#9CA3AF", marginBottom: 4, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" } }, "📅 " + (e.date || e.ts), e.author ? " · " + e.author : "", lenderTags(e), e.date ? h("span", { style: { color: "#D1D5DB" } }, "logged " + e.ts) : null, h("span", { style: { color: "#E5E7EB" } }, "#" + e.id));
   };
   var allLenderNames = Object.keys(LENDERS).sort();
+  // "Start here" intro panel — open by default for newcomers; collapse state remembered per browser.
+  var gs = React.useState(function () {
+    try { return window.localStorage.getItem("ecx_intro_collapsed_v1") !== "1"; } catch (e) { return true; }
+  });
+  var introOpen = gs[0], setIntroOpen = gs[1];
+  var toggleIntro = function () {
+    var nv = !introOpen;
+    setIntroOpen(nv);
+    try { window.localStorage.setItem("ecx_intro_collapsed_v1", nv ? "0" : "1"); } catch (e) {}
+  };
+  var introLine = function (title, text) {
+    return h("div", { style: { fontSize: 12, color: "#334155", lineHeight: 1.65 } }, h("b", { style: { color: "#0F2444" } }, title + " — "), text);
+  };
   return h("div", { style: { maxWidth: 900, margin: "0 auto" } },
+    h("div", { style: { background: "linear-gradient(135deg, #F0F6FF 0%, #EFF6FF 100%)", border: "1px solid #BFDBFE", borderRadius: 12, marginBottom: 16, overflow: "hidden" } },
+      h("div", { onClick: toggleIntro, style: { padding: "14px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 10 } },
+        h("div", { style: { fontSize: 14, fontWeight: 800, color: "#0F2444" } }, "🧭 New here? How this tracker works"),
+        h("span", { style: { marginLeft: "auto", fontSize: 11, color: "#1D4ED8", fontWeight: 600 } }, introOpen ? "collapse ▲" : "expand ▼")),
+      introOpen ? h("div", { style: { padding: "0 20px 16px", display: "flex", flexDirection: "column", gap: 8 } },
+        introLine("What this is", "EdgeConneX Capital Markets' live tracker of every bank relationship and the debt fundraising program — one shared link, always the latest version. It is the team's single view of who we've talked to, who's committed to what, who's being courted for which deal, what we've paid, and the full debt stack."),
+        introLine("The tabs", "Active Lenders — every institution with full call history, commitments and pipeline involvement. Active Projects — live financings, largest first; grouped cards (Leroy, HoldCo, Salar) break out workstreams when expanded. Closed 2025 & 2026 — completed deals with lender-level terms and fees. Lender Fees — fees paid by bank (Chris Wenger's monthly file). Global Cap Table — the $22bn debt stack, tied to the monthly Debt Overview. 📖 Guide — the full manual with every source file, owner and refresh cadence."),
+        introLine("This tab", "The team's capture inbox. 1. Add what just happened (a meeting, a rejection, an indication) — pick the date, link the lender(s), tick 'documented call' if it was a real meeting. 2. Approve it — it appears on those lender cards immediately in your browser. 3. Every so often, Copy sync digest and paste it into the Claude tracker chat — that bakes approved entries into the published version for the whole team and clears them from your queue automatically."),
+        introLine("Backed by", "Call-notes emails to the DCM list + Outlook Bank Meetings, the CF Pipeline files and deal teasers, the EdgeConneX Commitments workbook, Chris Wenger's monthly Lender Fees Summary and Debt Overview — plus what the team drops in right here.")) : null),
     h("div", { style: { background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "20px 24px", marginBottom: 16 } },
       h("div", { style: { fontSize: 15, fontWeight: 800, color: "#111827", marginBottom: 4 } }, "✍️ Team Inputs & Review"),
       h("div", { style: { fontSize: 12, color: "#6B7280", lineHeight: 1.6, marginBottom: 14 } }, "Drop updates the moment they happen. Link the lender(s) the update is about and, once approved below, the note is applied to those lender cards immediately in this browser — no waiting. The periodic Claude sync then bakes approved entries into the published tracker for the whole team and clears them from your queue automatically."),
@@ -11386,7 +11473,7 @@ function App() {
       color: "#6B7280",
       marginBottom: 16
     }
-  }, "Showing ", filteredProjects.length, " of ", PROJECTS.length, " projects \u00B7 sorted by expected financing size (largest first; unsized last)"), /*#__PURE__*/React.createElement("div", {
+  }, "Showing ", filteredProjects.length, " of ", PROJECTS.length, " projects \u00B7 sorted by expected financing size (largest first; unsized last) \u00B7 expected close per Corporate Finance Pipeline_NEW.xlsx (Funding Date column, read 8/4/26)"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(440px, 1fr))",
