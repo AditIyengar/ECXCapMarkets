@@ -1,10 +1,10 @@
-<!-- ECX Fundraising Tracker v56 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
+<!-- ECX Fundraising Tracker v57 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
      React 18.2.0 + ReactDOM inlined (cdnjs UMD builds), DM Sans / Libre Baskerville
      embedded as woff2 data URIs, bank logos embedded in BANK_ICONS (Google s2 /
      DuckDuckGo favicons fetched at build time). Old claude.ai postMessage shim and
      html-to-image removed (unused by app code). Save/export buttons use the artifact
      downloads capability when available; 5-min autosave disabled in the viewer. -->
-<title>ECX Fundraising Tracker v56</title>
+<title>ECX Fundraising Tracker v57</title>
 <style>
 /* latin-ext */
 @font-face {
@@ -4948,6 +4948,139 @@ var LENDER_FEES = [
 {bank:"Rabobank",y25:[null,null,null,null,null,null,null,null,null,null,null,null,null,null],y26:[null,null,null,164482.2,null,null,null,0]},
 {bank:"Farmer Mac",y25:[null,null,null,null,null,null,null,156250,null,null,null,null,null,null],y26:[null,null,null,0,null,null,null,0]},
 {bank:"Investec",y25:[null,null,null,null,null,null,null,null,null,null,null,null,null,62500],y26:[null,null,null,0,null,null,null,0]}
+];
+
+// ── Lender Commitments Data (Source: EdgeConneX Commitments (07.17.2026).xlsx — Overview tab — Chris Wenger, Portfolio Management) ──
+// Values in USD at EUR/USD 1.14, as of 6/30/2026. null = not in facility. Totals are computed in the
+// component, never hardcoded. Parsed with per-row checksum vs the file's own Total column and per-facility
+// tie-out vs the file's Grand Total row (all columns tie to the dollar; Apollo/Apterra Beluga memo rows included).
+var LENDER_COMMITS_META = { source: "EdgeConneX Commitments (07.17.2026).xlsx", asOf: "6/30/2026", fx: "EUR/USD 1.14", owner: "Chris Wenger — Portfolio Management", location: "12. Portfolio Management - Loans Outstanding/04. Debt Overviews/02. Portfolio Commitments" };
+var COMMIT_FACILITIES = ["HoldCo","Leroy","AMS RE","Project Vendace","Project Orca","Beluga","ABS","ABS VFN","Tarpon","Tarpon EBL","Shiner","Wahoo I & II","Walleye","Webster","Bluefin","Marvel I","Marvel II","Gotham","Gotham EBL","Metropolis PF","Metropolis EBL","LC's"];
+var COMMIT_FAC_REGION = ["Global","Global","Europe","Europe","Europe","Europe","North America","North America","North America","North America","North America","North America","North America","North America","LATAM","APAC","APAC","APAC","APAC","APAC","APAC","LC"];
+var LENDER_COMMITS = [
+{bank:"Blackstone",v:[null,1000000000,null,null,null,null,null,null,null,null,null,null,750000000,null,null,null,null,null,null,null,null,null],bl:-600000000},
+{bank:"SocGen",v:[null,null,null,428681250,null,491755163,null,null,53390000,14424591,99194087,null,111842214,null,34925000,null,50000000,25000000,22500000,null,null,300000000]},
+{bank:"Ares",v:[1275876439,null,null,null,null,null,23470238,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Natixis",v:[null,null,null,null,null,369753648,null,null,53390000,14424591,99194087,30000000,111842214,null,89000000,25500000,35000000,41300000,45833333,83355408,26666667,300000000]},
+{bank:"SMBC",v:[null,null,null,null,null,275994652,null,null,53390000,14424591,null,104166667,111842214,null,null,35500000,132500000,77046153,null,null,null,100000000]},
+{bank:"ING Bank",v:[null,null,null,null,null,238166388,null,25000000,53390000,14424591,null,80000000,null,null,null,15500000,62500000,50876923,45833333,83355408,26666667,112000000]},
+{bank:"MUFG",v:[null,null,null,null,null,171472500,null,null,53390000,null,null,104166667,111842214,null,null,35500000,74000000,57176923,23333333,56512141,26666667,100000000]},
+{bank:"BBVA",v:[null,null,null,null,null,308650500,null,null,58500000,13750000,null,104166667,85000000,null,null,null,null,48000000,null,null,null,500000000]},
+{bank:"OCBC",v:[null,null,null,null,null,268640250,null,null,58500000,13750000,null,104166667,85000000,null,null,null,null,null,null,83355408,26666667,null]},
+{bank:"KfW",v:[null,null,null,null,null,195228300,null,null,58500000,13750000,null,104166667,85000000,null,null,null,85000000,35000000,null,null,null,null]},
+{bank:"Intesa",v:[null,null,null,null,null,251493000,null,null,58500000,13750000,null,null,85000000,null,null,null,100000000,20000000,null,null,null,null]},
+{bank:"Rabobank",v:[null,null,null,null,null,308650500,null,null,null,null,null,104166667,85000000,null,null,null,null,null,null,null,null,150000000]},
+{bank:"ABN AMRO",v:[null,null,null,null,null,463176413,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,15000000]},
+{bank:"Goldman Sachs",v:[null,null,null,314366250,null,null,null,null,null,null,null,50000000,null,null,null,null,null,null,null,null,null,null]},
+{bank:"TD",v:[null,null,null,null,null,182904000,null,25000000,null,null,85000000,104166667,85000000,null,null,null,null,null,null,null,null,null]},
+{bank:"SCB",v:[null,null,null,null,null,44033020,null,null,58500000,13750000,null,null,85000000,null,null,30500000,25000000,51300000,22500000,null,null,100000000]},
+{bank:"Mizuho",v:[null,null,null,null,null,199270479,null,null,null,null,null,90000000,null,null,null,35500000,null,76300000,null,83355408,null,null]},
+{bank:"MEAG",v:[null,null,null,null,null,388661948,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"BNP Paribas AM",v:[null,null,null,null,null,200051250,null,null,null,null,null,104166667,85000000,null,null,null,null,null,null,83355408,26666667,null]},
+{bank:"CACIB",v:[null,null,null,null,null,308650500,null,null,58500000,13750000,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"GIC",v:[369055168,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Unicredit",v:[null,null,null,null,null,262924500,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Clifford Capital",v:[null,null,null,null,null,85736250,null,null,null,null,null,null,null,null,3075000,null,50000000,16300000,null,83355408,26666667,null]},
+{bank:"ADIA",v:[242521968,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"BCI",v:[242521968,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"RBC",v:[null,null,null,null,null,null,null,null,null,null,null,104166667,111842214,null,null,null,null,null,null,null,null,null]},
+{bank:"Insight",v:[null,null,null,null,234345750,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Man Group",v:[null,null,null,null,228630000,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"LBBW",v:[null,null,null,null,17147250,205767000,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"First Citizens",v:[null,null,null,null,null,null,null,null,58500000,13750000,50000000,104166667,null,null,null,null,null,null,null,null,null,null]},
+{bank:"NatWest",v:[null,null,null,null,null,125746500,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Nord LB",v:[null,null,null,null,null,108599250,null,null,null,null,null,null,65000000,null,null,null,35000000,null,null,null,null,null]},
+{bank:"JPMorgan",v:[null,null,null,null,null,null,null,null,null,null,99194087,104166667,null,null,null,null,null,null,null,null,null,null]},
+{bank:"AIG",v:[null,null,null,null,null,null,187761905,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Nordea",v:[null,null,null,null,null,190048688,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"National Bank of Canada",v:[null,null,null,null,null,null,null,null,null,null,85000000,104166667,null,null,null,null,null,null,null,null,null,null]},
+{bank:"CoBank",v:[null,null,null,null,null,null,null,null,75000000,null,50000000,50000000,null,null,null,null,null,null,null,null,null,null]},
+{bank:"NAB",v:[null,null,null,null,null,155866017,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"PSP",v:[158166501,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"PKO Bank",v:[null,null,null,null,null,154325250,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Barclays",v:[null,null,null,null,3429450,null,null,null,null,null,50000000,104166667,null,null,null,null,null,null,null,null,null,200000000]},
+{bank:"Nomura",v:[null,null,null,null,null,null,null,null,null,null,99194087,45000000,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Shinhan Bank",v:[null,null,null,null,null,40010250,null,null,null,null,null,null,65000000,null,null,null,36000000,null,null,null,null,null]},
+{bank:"Siemens",v:[null,null,null,null,null,34294500,null,null,35000000,null,null,null,null,null,null,null,25000000,40000000,null,null,null,null]},
+{bank:"NIBC",v:[null,null,68589000,null,null,45726000,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Mizrahi",v:[null,null,null,null,null,null,null,null,null,null,50000000,null,65000000,null,null,null,null,null,null,null,null,null]},
+{bank:"KDB",v:[null,null,null,null,null,null,null,null,null,null,null,null,85000000,null,null,null,25000000,null,null,null,null,null]},
+{bank:"Bank Leumi",v:[null,null,null,null,null,null,null,null,null,null,null,104166667,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Bank of America",v:[null,null,null,null,null,null,null,null,null,null,null,104166667,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Credit Agricole",v:[null,null,null,114315000,null,null,null,null,null,null,null,104166667,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Truist",v:[null,null,null,null,null,null,null,null,null,null,null,104166667,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Wells Fargo",v:[null,null,null,null,null,null,null,null,null,null,null,104166667,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Morgan Stanley",v:[null,null,null,null,null,null,null,null,null,null,99194087,null,null,null,null,null,null,null,null,null,null,null],bl:600000000},
+{bank:"HKMC",v:[null,null,null,null,null,78458957,null,null,null,null,null,null,null,null,null,null,null,15000000,null,null,null,null]},
+{bank:"Webster",v:[null,null,null,null,null,null,null,null,null,null,null,40000000,30000000,25000000,null,null,null,null,null,null,null,null]},
+{bank:"New York Life",v:[null,null,null,null,91452000,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Bank Sinopac",v:[null,null,null,null,null,27435600,null,null,null,null,null,null,null,null,null,15000000,50000000,null,null,null,null,null]},
+{bank:"Regions",v:[null,null,null,null,null,null,null,null,null,null,null,90000000,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Bank of China",v:[null,null,null,null,null,null,null,null,null,null,null,null,85000000,null,null,null,null,null,null,null,null,null]},
+{bank:"CIC",v:[null,null,null,null,null,78877350,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Woori",v:[null,null,null,null,null,null,null,null,null,null,null,null,55000000,null,null,null,25000000,null,null,null,null,null]},
+{bank:"Metlife",v:[null,null,null,null,null,null,70410714,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Bank of Baroda",v:[null,null,null,null,null,null,null,null,null,null,null,null,65000000,null,null,null,null,null,null,null,null,null]},
+{bank:"Huntington",v:[null,null,null,null,null,null,null,null,null,null,null,null,65000000,null,null,null,null,null,null,null,null,null]},
+{bank:"ICBC",v:[null,null,null,null,null,null,null,null,null,null,null,null,65000000,null,null,null,null,null,null,null,null,null]},
+{bank:"UOB",v:[null,null,null,null,null,null,null,null,null,null,null,null,65000000,null,null,null,null,null,null,null,null,null]},
+{bank:"Blackrock",v:[null,null,null,null,61958730,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Hana Securities",v:[null,null,null,null,null,null,null,null,null,null,60000000,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Daichi Life",v:[null,null,null,null,null,28575842,null,null,null,null,null,null,null,null,null,null,30000000,null,null,null,null,null]},
+{bank:"GPIM",v:[null,null,null,null,null,null,55389762,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"AG INSURANCE",v:[null,null,null,null,null,57157500,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"ANZ",v:[null,null,null,null,null,57157500,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"M&G",v:[null,null,null,null,55214145,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Henderson",v:[null,null,null,null,54299625,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"IMCO",v:[52722167,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"NPS",v:[52722167,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"EDR",v:[null,null,null,null,null,51441750,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Associated Bank",v:[null,null,null,null,null,null,null,null,null,null,null,null,50000000,null,null,null,null,null,null,null,null,null]},
+{bank:"Caterpillar",v:[null,null,null,null,null,null,null,null,25000000,null,null,25000000,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Citi",v:[null,null,null,null,null,null,null,null,null,null,null,50000000,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Flagstar",v:[null,null,null,null,null,null,null,null,null,null,null,50000000,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Principal Life Insurance Company",v:[null,null,null,null,null,null,null,null,null,null,49500000,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Bayfront",v:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,43000000,null,null,15000000,null,null,null,null]},
+{bank:"SEMA",v:[42177734,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Fidelity",v:[null,null,null,null,41267715,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Ampega",v:[null,null,null,null,null,40010250,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Banco Sabadell",v:[null,null,null,null,null,null,null,null,35000000,null,null,null,50000000,null,null,null,null,null,null,null,null,null]},
+{bank:"KKR Credit",v:[null,null,null,null,null,null,29103095,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"First Commercial",v:[null,null,null,null,null,null,null,null,null,null,null,null,30000000,null,null,null,null,null,null,null,null,null]},
+{bank:"Preferred Bank",v:[null,null,null,null,null,null,null,null,null,null,30000000,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"American Century",v:[null,null,null,null,null,null,24409048,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Bank of Hope",v:[null,null,null,null,null,null,null,null,null,null,null,null,25000000,null,null,null,null,null,null,null,null,null]},
+{bank:"Investec",v:[null,null,null,null,null,null,null,null,null,null,null,25000000,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Kookmin",v:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,25000000,null,null,null,null,null]},
+{bank:"National Cooperative Bank",v:[null,null,null,null,null,null,null,null,null,null,25000000,null,50000000,null,null,null,null,null,null,null,null,null]},
+{bank:"PT Bank",v:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,25000000,null,null,null,null]},
+{bank:"E Sun",v:[null,null,null,null,null,22863000,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Zencap",v:[null,null,null,null,null,20576700,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Banco Latinoamericano de Comercio Exterior, S.A.",v:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,20000000,null,null,null,null,null,null,null]},
+{bank:"Brown Brothers",v:[null,null,null,null,null,null,18776191,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Lincoln Benefit",v:[null,null,null,null,null,null,18776191,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Taishin",v:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,20000000,null,null,null,null,null,null]},
+{bank:"Fisher",v:[null,null,null,null,16804305,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Allspring Global",v:[null,null,null,null,null,null,14551548,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Kuvare",v:[null,null,null,null,null,null,14082143,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"TCW",v:[null,null,null,null,1143150,null,9388095,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Axiom",v:[null,null,null,null,null,null,null,null,null,null,null,null,10000000,null,null,null,null,null,null,null,null,null]},
+{bank:"Hawkspoint",v:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,10000000,null,null,null,null,null,null,null]},
+{bank:"KGI",v:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,10000000,null,null,null,null,null]},
+{bank:"Sanlam",v:[null,null,null,null,null,null,null,null,null,null,10000000,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"The Northwestern",v:[null,null,null,null,null,null,9388095,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Blue Owl",v:[null,null,null,null,null,null,6571667,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Fortress Credit",v:[null,null,null,null,null,null,4694048,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"BCSM",v:[null,null,null,null,3086505,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"New Century",v:[null,null,null,null,null,null,2347024,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Alagna Advisors",v:[null,null,null,null,null,null,1877619,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Americo Financial",v:[null,null,null,null,null,null,1877619,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"National Westminster Bank",v:[null,null,null,null,null,null,null,null,null,null,null,null,85000000,null,null,null,null,null,null,null,null,null]},
+{bank:"JA Mitsui Leasing",v:[null,null,null,null,null,null,null,null,null,null,null,null,50000000,null,null,null,null,null,null,null,null,null]},
+{bank:"DBS Bank",v:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,83355408,null,null]},
+{bank:"Apple Bank",v:[null,null,null,null,null,null,null,null,null,null,null,null,25000000,null,null,null,null,null,null,null,null,null]},
+{bank:"Apterra Infrastructure Capital",v:[null,null,null,null,null,26387712,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+{bank:"Apollo Capital Management",v:[null,null,null,null,null,157183125,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}
 ];
 // ── Closed Projects Data ─────────────────────────────────────────────────────;
 var CLOSED_PROJECTS = [
@@ -10510,6 +10643,7 @@ function GuideTab() {
     { data: "Bank conversations, call notes & last-contact dates (Active Lenders tab)", src: "\u201CCall Notes: [Bank]\u201D emails sent to the DCM distribution list (dcm@edgeconnex.com) and filed in the Outlook \u201CBank Meetings\u201D folder; project-specific call-note documents on SharePoint; confirmed bank meetings on team calendars.", loc: "Outlook \u203A Bank Meetings folder \u00B7 SharePoint \u203A Corporate Finance_Team \u203A [Project] \u203A 03. Due Diligence \u203A 05. Call Notes", own: "Whoever held the call writes it up and sends to DCM. Folded into lender cards on each tracker sync." },
     { data: "Existing facilities & lender commitments (on each lender card)", src: "EdgeConneX Commitments workbook (latest: Q2.2026 VF) plus the monthly Debt Overview files.", loc: "SharePoint \u203A 12. Portfolio Management - Loans Outstanding \u203A 04. Debt Overviews", own: "Chris Wenger \u2014 Portfolio Management. Refreshed quarterly (commitments) / monthly (debt overview)." },
     { data: "Fees paid by bank (Lender Fees tab)", src: "Lender Fees Summary workbook \u2014 currently Lender Fees Summary_7.21.26_VF.xlsx. Circulated monthly by email to the DCM list; the tab mirrors it cell-for-cell (null = not in deal, $0 = in deal, no fee).", loc: "SharePoint \u203A 12. Portfolio Management \u203A 04. Debt Overviews \u203A 09. Lender Fees \u203A Sent to EQT", own: "Chris Wenger \u2014 monthly. Ask Claude to refresh the tab when a new file lands." },
+    { data: "Commitments by bank (Lender Commitments tab)", src: "EdgeConneX Commitments workbook \u2014 currently EdgeConneX Commitments (07.17.2026).xlsx, Overview tab (banks \u00d7 facilities, USD at the file\u2019s EUR/USD rate). The tab mirrors it cell-for-cell; totals computed, tied to the file\u2019s Grand Total row.", loc: "SharePoint \u203a 12. Portfolio Management \u203a 04. Debt Overviews \u203a 02. Portfolio Commitments", own: "Chris Wenger \u2014 refreshed with each new commitments file. Ask Claude to refresh the tab when a new file lands." },
     { data: "Active projects, expected deal sizes & teaser details (Active Projects tab)", src: "Corporate Finance Pipeline workbook + ECX Financing Pipeline 2026 + EQT Debt & AI Overview deck. The \u201CExpected Size\u201D box and the largest-first ordering both read the \u201CFinance Size\u201D figure from these sources.", loc: "SharePoint \u203A 12. Portfolio Management \u203A 14. Financing Pipeline (and CF Pipeline meeting materials)", own: "Deal owners (Laura / Marjolein / Sander) \u2014 updated around weekly CF Pipeline meetings." },
     { data: "Bank appetite & deal-by-deal roles (context inside lender cards)", src: "ECX Bank Relationship Monitoring workbook \u2014 balance-sheet exposure by bank, CLA/JLA/MLA roles, invited/declined status per syndication.", loc: "SharePoint \u203A Corporate Finance_Team \u203A 08. Lenders", own: "Corporate Finance team." },
     { data: "Closed deals (Closed 2025 & 2026 tab)", src: "Deal records at close \u2014 commitments, allocations, pricing and fee detail per transaction; EUR deals converted at the ECB reference rate noted on the tab.", loc: "Deal files + Lender Fees Summary", own: "Static once closed; new closings added on sync." },
@@ -11124,6 +11258,88 @@ function LenderTableView(props) {
 }
 
 // ── Lender Fees Tab (Source: Chris Wenger monthly fee summary) ───────────────
+// ── Lender Commitments tab (v57) — mirrors the Lender Fees tab, from Chris Wenger's commitments file ──
+function LenderCommitsTab() {
+  var h = React.createElement;
+  var vs = React.useState("summary");
+  var view = vs[0], setView = vs[1];
+  var qs = React.useState("");
+  var q = qs[0], setQ = qs[1];
+  var exs = React.useState(null);
+  var expandedBank = exs[0], setExpandedBank = exs[1];
+  var fmt = function (n) { return n == null ? "—" : "$" + Math.round(n).toLocaleString("en-US"); };
+  var fmtM = function (n) { return n == null ? "—" : n >= 1e9 ? "$" + (n / 1e9).toFixed(2).replace(/\.?0+$/, "") + "bn" : "$" + Math.round(n / 1e6).toLocaleString("en-US") + "m"; };
+  var rows = LENDER_COMMITS.map(function (r) {
+    var tot = 0, cnt = 0;
+    r.v.forEach(function (x) { if (x) { tot += x; cnt += 1; } });
+    return { bank: r.bank, v: r.v, bl: r.bl, total: tot, cnt: cnt };
+  }).sort(function (a, b) { return b.total - a.total; });
+  var shown = rows.filter(function (r) { return r.bank.toLowerCase().indexOf(q.toLowerCase()) !== -1; });
+  var grand = rows.reduce(function (s, r) { return s + r.total; }, 0);
+  var facTotals = COMMIT_FACILITIES.map(function (_, i) { return rows.reduce(function (s, r) { return s + (r.v[i] || 0); }, 0); });
+  var cardStyle = { background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "16px 20px", flex: 1, minWidth: 160 };
+  var labStyle = { fontSize: 11, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.06em" };
+  var thStyle = { padding: "10px 14px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap", background: "#F8FAFC", position: "sticky", top: 0 };
+  var numTd = { padding: "9px 14px", textAlign: "right", whiteSpace: "nowrap", color: "#374151", fontVariantNumeric: "tabular-nums" };
+  var btn = function (key, label) {
+    return h("button", { key: key, onClick: function () { setView(key); }, style: { padding: "7px 14px", borderRadius: 8, border: "1px solid " + (view === key ? "#1D4ED8" : "#D1D5DB"), background: view === key ? "#1D4ED8" : "#fff", color: view === key ? "#fff" : "#374151", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" } }, label);
+  };
+  return h("div", { style: { padding: "24px 32px", maxWidth: 1400, margin: "0 auto" } },
+    h("div", { style: { display: "flex", gap: 14, marginBottom: 20, flexWrap: "wrap" } },
+      h("div", { style: cardStyle }, h("div", { style: labStyle }, "Total Commitments"), h("div", { style: { fontSize: 24, fontWeight: 800, color: "#1D4ED8", marginTop: 4 } }, fmtM(grand))),
+      h("div", { style: cardStyle }, h("div", { style: labStyle }, "Institutions"), h("div", { style: { fontSize: 24, fontWeight: 800, color: "#111827", marginTop: 4 } }, rows.filter(function (r) { return r.total > 0; }).length)),
+      h("div", { style: cardStyle }, h("div", { style: labStyle }, "Facilities"), h("div", { style: { fontSize: 24, fontWeight: 800, color: "#111827", marginTop: 4 } }, COMMIT_FACILITIES.length)),
+      h("div", { style: cardStyle }, h("div", { style: labStyle }, "Largest Single Commitment"), h("div", { style: { fontSize: 24, fontWeight: 800, color: "#065F46", marginTop: 4 } }, fmtM(rows.length ? rows[0].total : null)), h("div", { style: { fontSize: 11, color: "#6B7280", marginTop: 2 } }, rows.length ? rows[0].bank : ""))
+    ),
+    h("div", { style: { display: "flex", gap: 8, marginBottom: 16, alignItems: "center", flexWrap: "wrap" } },
+      btn("summary", "Summary by Bank"), btn("matrix", "Matrix — by Facility"),
+      h("input", { value: q, onChange: function (e) { setQ(e.target.value); }, placeholder: "Filter banks..", style: { marginLeft: "auto", border: "1px solid #D1D5DB", borderRadius: 8, padding: "7px 12px", fontSize: 12, minWidth: 180, background: "#fff", fontFamily: "inherit" } })
+    ),
+    h("div", { style: { background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, overflow: "auto", maxHeight: "calc(100vh - 380px)" } },
+      view === "summary" ? h("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: 12.5 } },
+        h("thead", null, h("tr", null, h("th", { style: thStyle }, "#"), h("th", { style: thStyle }, "Bank / Institution"), h("th", { style: Object.assign({}, thStyle, { textAlign: "right" }) }, "Facilities"), h("th", { style: Object.assign({}, thStyle, { textAlign: "right" }) }, "Total Commitment"))),
+        h("tbody", null, shown.map(function (r, i) {
+          var isOpen = expandedBank === r.bank;
+          var mainRow = h("tr", { key: r.bank, onClick: function onClick() { setExpandedBank(isOpen ? null : r.bank); }, style: { borderBottom: "1px solid #F1F5F9", background: isOpen ? "#EFF6FF" : i % 2 === 0 ? "#fff" : "#F8FAFC", cursor: "pointer" } },
+            h("td", { style: { padding: "9px 14px", color: "#9CA3AF", fontSize: 11, whiteSpace: "nowrap" } }, (isOpen ? "▾ " : "▸ ") + (i + 1)),
+            h("td", { style: { padding: "9px 14px", fontWeight: 600, color: "#111827" } }, r.bank, r.bl ? h("span", { style: { marginLeft: 8, fontSize: 10, fontWeight: 700, color: r.bl > 0 ? "#065F46" : "#B45309", background: r.bl > 0 ? "#ECFDF5" : "#FFFBEB", border: "1px solid " + (r.bl > 0 ? "#A7F3D0" : "#FCD34D"), borderRadius: 8, padding: "1px 7px" } }, (r.bl > 0 ? "+" : "−") + fmtM(Math.abs(r.bl)) + " backleverage") : null),
+            h("td", { style: numTd }, r.cnt),
+            h("td", { style: Object.assign({}, numTd, { fontWeight: 700, color: "#1D4ED8" }) }, fmt(r.total)));
+          if (!isOpen) return mainRow;
+          var facs = [];
+          r.v.forEach(function (x, j) { if (x) facs.push({ fac: COMMIT_FACILITIES[j], region: COMMIT_FAC_REGION[j], amt: x }); });
+          facs.sort(function (a, b) { return b.amt - a.amt; });
+          var detailRow = h("tr", { key: r.bank + "__facs" }, h("td", { colSpan: 4, style: { padding: "10px 20px 16px 34px", background: "#F8FAFC", borderBottom: "2px solid #BFDBFE" } },
+            h("div", { style: { fontSize: 11, fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 } }, r.bank + " — commitments by facility (" + facs.length + ")"),
+            h("table", { style: { borderCollapse: "collapse", fontSize: 12 } },
+              h("thead", null, h("tr", null,
+                h("th", { style: { padding: "4px 24px 4px 0", textAlign: "left", fontSize: 10.5, color: "#9CA3AF", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" } }, "Facility"),
+                h("th", { style: { padding: "4px 24px 4px 0", textAlign: "left", fontSize: 10.5, color: "#9CA3AF", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" } }, "Region"),
+                h("th", { style: { padding: "4px 0", textAlign: "right", fontSize: 10.5, color: "#9CA3AF", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" } }, "Commitment"))),
+              h("tbody", null, facs.map(function (d, k) {
+                return h("tr", { key: d.fac, style: { borderBottom: k === facs.length - 1 ? "none" : "1px solid #EEF2F7" } },
+                  h("td", { style: { padding: "5px 24px 5px 0", color: "#374151", fontWeight: 600, whiteSpace: "nowrap" } }, d.fac),
+                  h("td", { style: { padding: "5px 24px 5px 0", color: "#6B7280" } }, d.region),
+                  h("td", { style: { padding: "5px 0", textAlign: "right", color: "#1D4ED8", fontWeight: 600, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" } }, fmt(d.amt)));
+              })))));
+          return [mainRow, detailRow];
+        }), h("tr", { key: "__total", style: { borderTop: "2px solid #BAE6FD", background: "#EFF6FF" } },
+          h("td", null, ""), h("td", { style: { padding: "10px 14px", fontWeight: 700, color: "#1D4ED8" } }, "TOTAL"),
+          h("td", { style: Object.assign({}, numTd, { fontWeight: 800 }) }, ""),
+          h("td", { style: Object.assign({}, numTd, { fontWeight: 800, color: "#1D4ED8" }) }, fmt(grand))))
+      ) : h("table", { style: { borderCollapse: "collapse", fontSize: 12 } },
+        h("thead", null, h("tr", null, [h("th", { key: "b", style: Object.assign({}, thStyle, { left: 0, zIndex: 2 }) }, "Bank")].concat(COMMIT_FACILITIES.map(function (d, j) { return h("th", { key: d, style: Object.assign({}, thStyle, { textAlign: "right" }), title: COMMIT_FAC_REGION[j] }, d); }), [h("th", { key: "t", style: Object.assign({}, thStyle, { textAlign: "right" }) }, "Total")]))),
+        h("tbody", null, shown.filter(function (r) { return r.total > 0; }).map(function (r, i) {
+          return h("tr", { key: r.bank, style: { borderBottom: "1px solid #F1F5F9", background: i % 2 === 0 ? "#fff" : "#F8FAFC" } },
+            [h("td", { key: "b", style: { padding: "8px 14px", fontWeight: 600, color: "#111827", whiteSpace: "nowrap", position: "sticky", left: 0, background: i % 2 === 0 ? "#fff" : "#F8FAFC", zIndex: 1 } }, r.bank)].concat(r.v.map(function (x, j) { return h("td", { key: j, style: numTd }, x == null ? "—" : fmtM(x)); }), [h("td", { key: "t", style: Object.assign({}, numTd, { fontWeight: 700, color: "#1D4ED8" }) }, fmtM(r.total))]));
+        }), h("tr", { key: "__ftot", style: { borderTop: "2px solid #BAE6FD", background: "#EFF6FF" } },
+          [h("td", { key: "b", style: { padding: "8px 14px", fontWeight: 700, color: "#1D4ED8", position: "sticky", left: 0, background: "#EFF6FF", zIndex: 1 } }, "TOTAL")].concat(facTotals.map(function (x, j) { return h("td", { key: j, style: Object.assign({}, numTd, { fontWeight: 800 }) }, fmtM(x)); }), [h("td", { key: "t", style: Object.assign({}, numTd, { fontWeight: 800, color: "#1D4ED8" }) }, fmtM(grand))])))
+      )
+    ),
+    h("div", { style: { marginTop: 10, padding: "10px 16px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 11, color: "#6B7280", lineHeight: 1.6 } },
+      "Source: " + LENDER_COMMITS_META.source + " (Overview tab, as of " + LENDER_COMMITS_META.asOf + ", " + LENDER_COMMITS_META.fx + ") — " + LENDER_COMMITS_META.owner + ". Location: " + LENDER_COMMITS_META.location + ". Values per source file (EUR facilities converted at the file's FX); totals computed on full precision and tie to the file's Grand Total row to the dollar. “—” = not in facility. Backleverage badges: Blackstone provided −$600m backleverage to Morgan Stanley (+$600m) per the file's Backleverage column — headline totals exclude it. Bank names exactly as in the source; the Wahoo relationship-bank list and fund/insurance ABS holders appear as individual rows.")
+  );
+}
 function LenderFeesTab() {
   var h = React.createElement;
   var vs = React.useState("summary");
@@ -11377,7 +11593,7 @@ function App() {
     _lvs2 = _slicedToArray(_lvs, 2),
     lenderView = _lvs2[0],
     setLenderView = _lvs2[1];
-  var TABS = [["inputs", "\u270d\ufe0f Inputs & Review"], ["lenders", "Active Lenders (".concat(Object.keys(LENDERS).length, ")")],["projects", "Active Projects (".concat(PROJECTS.length, ")")], ["closed", "Closed 2025 & 2026 (14)"], ["fees", "Lender Fees"], ["captable", "Global Cap Table"], ["guide", "\uD83D\uDCD6 Guide"]];
+  var TABS = [["inputs", "\u270d\ufe0f Inputs & Review"], ["lenders", "Active Lenders (".concat(Object.keys(LENDERS).length, ")")],["projects", "Active Projects (".concat(PROJECTS.length, ")")], ["closed", "Closed 2025 & 2026 (14)"], ["fees", "Lender Fees"], ["commits", "Lender Commitments"], ["captable", "Global Cap Table"], ["guide", "\uD83D\uDCD6 Guide"]];
   return /*#__PURE__*/React.createElement("div", {
     style: {
       minHeight: "100vh",
@@ -11673,7 +11889,7 @@ function App() {
     }));
   }))), activeTab === "closed" && /*#__PURE__*/React.createElement(ClosedProjectsTab, {
     projects: CLOSED_PROJECTS
-  }), activeTab === "fees" && /*#__PURE__*/React.createElement(LenderFeesTab, null), activeTab === "inputs" && /*#__PURE__*/React.createElement(InputsTab, {
+  }), activeTab === "fees" && /*#__PURE__*/React.createElement(LenderFeesTab, null), activeTab === "commits" && /*#__PURE__*/React.createElement(LenderCommitsTab, null), activeTab === "inputs" && /*#__PURE__*/React.createElement(InputsTab, {
     onDataChange: bumpDataVersion
   }), activeTab === "review" && /*#__PURE__*/React.createElement(ReviewTab, null), activeTab === "guide" && /*#__PURE__*/React.createElement(GuideTab, null), activeTab === "captable" && /*#__PURE__*/React.createElement(GlobalCapTableTab, null), activeTab === "pipeline" && /*#__PURE__*/React.createElement(FinancingPipelineTab, null), activeTab === "bond" && /*#__PURE__*/React.createElement(BondMarketTab, {
     notes: BOND_MARKET_NOTES
