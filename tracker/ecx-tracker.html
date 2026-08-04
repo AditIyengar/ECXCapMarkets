@@ -1,10 +1,10 @@
-<!-- ECX Fundraising Tracker v55 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
+<!-- ECX Fundraising Tracker v56 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
      React 18.2.0 + ReactDOM inlined (cdnjs UMD builds), DM Sans / Libre Baskerville
      embedded as woff2 data URIs, bank logos embedded in BANK_ICONS (Google s2 /
      DuckDuckGo favicons fetched at build time). Old claude.ai postMessage shim and
      html-to-image removed (unused by app code). Save/export buttons use the artifact
      downloads capability when available; 5-min autosave disabled in the viewer. -->
-<title>ECX Fundraising Tracker v55</title>
+<title>ECX Fundraising Tracker v56</title>
 <style>
 /* latin-ext */
 @font-face {
@@ -526,6 +526,10 @@ var PROJECTS = [{
   }
 },{
   name: "Project Austin",
+  outreach: [{ bank: "Goldman Sachs", status: "lead", note: "[GS] lead candidate per pipeline" },
+    { bank: "Natixis", status: "dialogue", note: "Pipeline support list" },
+    { bank: "MUFG", status: "dialogue", note: "Pipeline support list" },
+    { bank: "SMBC", status: "dialogue", note: "Pipeline support list" }],
   description: "Financing for first Austin Campus 10-series. $6.4bn total. 650MW committed + 350MW reserved = 1,000MW. Multiple customers (MSFT/CoreWeave, Google, Meta, Anthropic). BCEI owns energy center. Need to finalize power story before structuring.",
   region: "US",
   type: "Project Finance",
@@ -593,6 +597,12 @@ var PROJECTS = [{
   }
 },{
   name: "Project Narluga (HoldCo)",
+  outreach: [{ bank: "Ares", status: "lead", note: "Narluga signed 21-May, funded 10-Jun per pipeline; Narwhal IV TS final, AOS drafting docs" },
+    { bank: "Oaktree", status: "lead", note: "Greenlit — co-investor alongside Ares" },
+    { bank: "Brookfield", status: "dialogue", note: "Confirmed will work with Oaktree for the full $1bn (co-investor structure)" },
+    { bank: "CPPIB", status: "dialogue", note: "Active in Narwhal HoldCo process (4/1/26)" },
+    { bank: "GIP / BlackRock", status: "dialogue", note: "Bracketed in pipeline lender list" },
+    { bank: "Apollo", status: "dialogue", note: "On HoldCo shortlist since 1/14/26; NDA executed" }],
   expectedClose: "26Q1",
   description: "HoldCo financing program with Ares & Oaktree, $1.35bn combined — grouped card covering the initial Narluga facility and the Narwhal IV upsize, broken out below. Centralizing fundraising across Herndon and McNair.",
   region: "Global / NA",
@@ -628,6 +638,10 @@ var PROJECTS = [{
   }]
 },{
   name: "Mirai — Japan",
+  outreach: [{ bank: "SMBC", status: "dialogue", note: "TS finalized with MUFG, SMBC, Mizuho (bracketed in pipeline; project moved to Removed 8/4/26)" },
+    { bank: "MUFG", status: "dialogue", note: "Bracketed lender group" },
+    { bank: "Mizuho", status: "dialogue", note: "Bracketed lender group" },
+    { bank: "Nomura", status: "dialogue", note: "Bracketed lender group" }],
   expectedClose: "26H1",
   description: "Pre-contract financing solution for land, power and C&S investments in Japan. $200m. 65-70% LTC. MUFG and SMBC as leads. Subject to satisfactory rating process on McNair and shareholder look-through.",
   region: "APAC",
@@ -658,6 +672,20 @@ var PROJECTS = [{
   }
 },{
   name: "Project Scioto — Ashville 1",
+  outreach: [{ bank: "Morgan Stanley", status: "lead", note: "Lead — 60% of wallet per Ashville Wallet; EL signed" },
+    { bank: "Natixis", status: "invited", note: "Invite Tier I (6.1% wallet)" },
+    { bank: "SocGen", status: "invited", note: "Invite Tier I (6.1% wallet)" },
+    { bank: "Goldman Sachs", status: "invited", note: "Invite Tier II (3.0%)" },
+    { bank: "Barclays", status: "invited", note: "Invite Tier II (3.0%)" },
+    { bank: "JP Morgan", status: "invited", note: "Invite Tier II (3.0%)" },
+    { bank: "MUFG", status: "invited", note: "Invite Tier III (1.5%)" },
+    { bank: "TD", status: "invited", note: "Invite Tier III (1.5%)" },
+    { bank: "BBVA", status: "invited", note: "Invite Tier III (1.5%)" },
+    { bank: "BNP", status: "invited", note: "Invite Tier III (1.5%)" },
+    { bank: "CACIB", status: "invited", note: "Invite Tier III (1.5%)" },
+    { bank: "Nomura", status: "invited", note: "Invite Tier III (1.5%)" },
+    { bank: "Rabobank", status: "invited", note: "Invite Tier III (1.5%)" },
+    { bank: "SMBC", status: "invited", note: "Invite Tier III (1.5%)" }],
   description: "Ashville phase 1 (CMH11). 490MW Anthropic project financing (Herndon, Google wrap). $2.4bn (revised from $4.8bn — phases 1 and 2 are $2.4bn each, team input 8/4/26). ABS/bond execution. MS leading with GS, JPM, NTX, SG, MUFG, Barclays as potential JBRs. Awaiting term sheet and engagement letter from MS. Tech DD ongoing.",
   region: "US",
   type: "Project Finance / ABS",
@@ -693,6 +721,10 @@ var PROJECTS = [{
   }
 },{
   name: "Project Scioto — Ashville 2",
+  outreach: [{ bank: "Apollo", status: "lead", note: "Lead (with Apterra) — term sheet received" },
+    { bank: "Apterra", status: "lead", note: "Lead platform alongside Apollo" },
+    { bank: "Blackstone", status: "lead", note: "Term sheet received — co-lead track per pipeline (Apollo, Bx)" },
+    { bank: "Barclays", status: "dialogue", note: "Actively engaged for backleverage" }],
   description: "Ashville phase 2 — second phase of the New Albany campus financing, split out from Project Scioto (8/4/26). Apollo / Apterra confirmed as lead (8/4/26 team input). $2.4bn (team input 8/4/26). Capacity, building and timing to be confirmed; expected to follow the phase 1 framework (Herndon, Anthropic offtake, Google wrap).",
   region: "US",
   type: "Project Finance / ABS",
@@ -712,6 +744,10 @@ var PROJECTS = [{
   }
 },{
   name: "Project Leroy II",
+  outreach: [{ bank: "Blackstone", status: "lead", note: "Existing Leroy lender — leading the increase" },
+    { bank: "Goldman Sachs", status: "support", note: "Support per pipeline" },
+    { bank: "Wells Fargo", status: "dialogue", note: "Still looking for $75m ticket (pipeline 8/4/26)" },
+    { bank: "BMO", status: "dialogue", note: "Approached on the $1bn upsize (1/20/26 call)" }],
   expectedClose: "26Q2",
   description: "Leroy (Blackstone) land bank & capex facility program — grouped card covering the three current workstreams: the ~$1bn facility upsize, the addition of the Austin Campus, and the addition of Norway. Expand for each workstream.",
   region: "Global / NA",
@@ -749,6 +785,16 @@ var PROJECTS = [{
   }]
 },{
   name: "Project Metropolis I — KL Cyberjaya",
+  outreach: [{ bank: "Natixis", status: "lead", note: "MLA — docs process ongoing, signing expected in 2-3 weeks" },
+    { bank: "Clifford Capital", status: "lead", note: "MLA — credit approvals 87% obtained" },
+    { bank: "OCBC", status: "lead", note: "MLA" },
+    { bank: "Mizuho", status: "lead", note: "MLA" },
+    { bank: "MUFG", status: "lead", note: "MLA — 2% upfront fees; Co-Docs bank role to be decided" },
+    { bank: "BNP", status: "support", note: "Support group per pipeline" },
+    { bank: "DBS", status: "support", note: "Support group per pipeline" },
+    { bank: "ING Bank", status: "support", note: "Support group per pipeline" },
+    { bank: "Deutsche Bank", status: "dialogue", note: "[DB] — in dialogue per pipeline" },
+    { bank: "Apollo", status: "proposal", note: "Private-credit underwritten alternative; 7/22: could act in senior at ~300bps with ECX guarantee" }],
   expectedClose: "26Q2",
   description: "Senior project financing for Cyberjaya KUL21, Malaysia. 72MW Oracle lease signed. $640m. Bookbuild process ongoing — many banks full on OCI. Considering underwritten execution by private credit (Apollo). Due diligence ready early next week.",
   region: "APAC",
@@ -805,6 +851,16 @@ var PROJECTS = [{
   }
 },{
   name: "Project Marvel III / Atlas — ACX India",
+  outreach: [{ bank: "Natixis", status: "lead", note: "Lead — TS sign-offs in progress" },
+    { bank: "ING Bank", status: "lead", note: "Lead" },
+    { bank: "MUFG", status: "lead", note: "Lead" },
+    { bank: "DBS", status: "support", note: "Support group per pipeline" },
+    { bank: "Rabobank", status: "support", note: "Support group per pipeline" },
+    { bank: "SCB", status: "support", note: "Support group per pipeline" },
+    { bank: "Clifford Capital", status: "support", note: "Support group per pipeline" },
+    { bank: "Intesa", status: "support", note: "Support group per pipeline" },
+    { bank: "SMBC", status: "support", note: "Support group per pipeline" },
+    { bank: "Goldman Sachs", status: "dialogue", note: "3/23: eager for materials; onshore DCH FX hedging capability" }],
   expectedClose: "26Q2",
   description: "Marvel III (a.k.a. Project Atlas): $500m senior term loan bridge for the 1.05GW / $6.3bn+ AdaniConneX portfolio — Hyderabad campus (HYD22-26, built-to-suit gross lease incl. O&M) + Vizag campus (powered shell), both under long-term USD offtakes with highly rated US hyperscalers. 80% gearing, 48-month bullet, PF take-out intended within 6-12 months. Lenders: MUFG, SCB, Natixis, ING, Clifford Capital.",
   region: "APAC",
@@ -862,6 +918,15 @@ var PROJECTS = [{
   }
 },{
   name: "LC Facilities",
+  outreach: [{ bank: "BBVA", status: "lead", note: "Project Liverpool lead — launched 7/14/26" },
+    { bank: "SocGen", status: "lead", note: "Project Liverpool lead" },
+    { bank: "Natixis", status: "lead", note: "Project Liverpool lead (organizing ICLA weekly calls)" },
+    { bank: "ABN AMRO", status: "declined", note: "Declined Liverpool per bank matrix (8/4/26)" },
+    { bank: "Mizuho", status: "declined", note: "Declined Liverpool per bank matrix" },
+    { bank: "BNP", status: "declined", note: "Declined Liverpool per bank matrix" },
+    { bank: "CACIB", status: "declined", note: "Declined Liverpool per bank matrix" },
+    { bank: "UniCredit", status: "declined", note: "Declined Liverpool per bank matrix" },
+    { bank: "LBBW", status: "declined", note: "Declined Liverpool per bank matrix" }],
   description: "Inaugural or new uncommitted LC facilities with various relationship banks. $100-500m. Various stages of engagement. Multiple banks being approached to increase LC commitments.",
   region: "Global / NA",
   type: "Trade Finance",
@@ -914,6 +979,19 @@ var PROJECTS = [{
   }
 },{
   name: "Project Salar — Norway & Finland",
+  outreach: [{ bank: "CACIB", status: "lead", note: "Mandated lead — selected, 7/24 kick-off" },
+    { bank: "Natixis", status: "lead", note: "Mandated lead" },
+    { bank: "Rabobank", status: "lead", note: "Mandated lead" },
+    { bank: "SocGen", status: "lead", note: "Mandated lead" },
+    { bank: "BNP", status: "invited", note: "CLA group (7 CLAs)" },
+    { bank: "ING Bank", status: "invited", note: "CLA group" },
+    { bank: "BBVA", status: "invited", note: "CLA group" },
+    { bank: "MUFG", status: "invited", note: "CLA group" },
+    { bank: "SMBC", status: "invited", note: "CLA group" },
+    { bank: "ABN AMRO", status: "invited", note: "CLA group" },
+    { bank: "LBBW", status: "invited", note: "CLA group" },
+    { bank: "Apollo", status: "proposal", note: "7/23: bank loan + institutional tranche, LTC 80-90%, can go to 100% commitment — not mandated" },
+    { bank: "PIMCO", status: "proposal", note: "7/28: +$2bn 100% UW proposal at +275bps / 150bps upfront, LTC 80%, 15yr — not mandated" }],
   expectedClose: "26Q3",
   description: "Nordic combined financing, $4.46bn total — grouped card with the two country workstreams broken out below. Leroy bridge + PF take-out structure. MSFT as primary tenant. Preparing materials and model.",
   region: "EMEA",
@@ -979,6 +1057,12 @@ var PROJECTS = [{
   }
 },{
   name: "Marvel II & IV — India",
+  outreach: [{ bank: "MUFG", status: "dialogue", note: "Bridge group — take-out banking strategy pending" },
+    { bank: "SCB", status: "dialogue", note: "Bridge group" },
+    { bank: "Natixis", status: "dialogue", note: "Bridge group" },
+    { bank: "ING Bank", status: "dialogue", note: "Bridge group" },
+    { bank: "Clifford Capital", status: "dialogue", note: "Bridge group" },
+    { bank: "Nomura", status: "dialogue", note: "Syndication interest noted (call notes)" }],
   description: "Bridge and PF take-out for Hyderabad ($2.07bn, MSFT) and Vizag ($1.96bn, Alphabet). Total $4.0bn. ACX (AdaniConneX) portfolio. Launched as Project Atlas / ACX India.",
   region: "APAC",
   type: "Project Finance",
@@ -1037,6 +1121,7 @@ var PROJECTS = [{
   }
 },{
   name: "Project Herring — AMS09/12/14",
+  outreach: [{ bank: "NIBC", status: "lead", note: "Negotiating TS — extension of existing NIBC facility" }],
   description: "AMS09 / AMS12 / AMS14 + Prologis RCF. $140m. NIBC as lead. Swapping current EUR 60m facility. Herndon entity.",
   region: "EMEA",
   type: "RCF",
@@ -1063,6 +1148,10 @@ var PROJECTS = [{
   }
 },{
   name: "Malaysia Bridge Increase",
+  outreach: [{ bank: "Natixis", status: "dialogue", note: "Bridge lender group" },
+    { bank: "Clifford Capital", status: "dialogue", note: "Bridge lender group" },
+    { bank: "OCBC", status: "dialogue", note: "Bridge lender group" },
+    { bank: "CACIB", status: "dialogue", note: "Bridge lender group" }],
   description: "Increase of existing Malaysia (Metropolis) bridge facility. $350m. OCI lease signed. ByteDance in progress. Lenders: Natixis, Clifford Capital, OCBC, CACIB.",
   region: "APAC",
   type: "Bridge",
@@ -1147,6 +1236,16 @@ var PROJECTS = [{
   }
 },{
   name: "Project Vendace — Sweden Syndication",
+  outreach: [{ bank: "SocGen", status: "lead", note: "Syndicating EUR 175m first" },
+    { bank: "Goldman Sachs", status: "lead", note: "Brought down after SG" },
+    { bank: "TD Securities", status: "invited", note: "New invite week of 4/21 — more active in Europe" },
+    { bank: "Nordea", status: "invited", note: "New invite — SG testing appetite" },
+    { bank: "SMBC", status: "invited", note: "New invite week of 4/21" },
+    { bank: "CACIB", status: "dialogue", note: "Still working — access issues delayed review" },
+    { bank: "Natixis", status: "dialogue", note: "Still working — call pending" },
+    { bank: "BNP", status: "declined", note: "4/21: challenging location + post-close derisking another bank" },
+    { bank: "BBVA", status: "declined", note: "4/21: no land financing (policy); structure too aggressive" },
+    { bank: "MUFG", status: "declined", note: "Feb: cannot do landbanking in EU model" }],
   description: "Post-close syndication of Project Vendace (closed 25-Feb-26). SocGen (EUR 175m first) and Goldman Sachs syndicating down their positions. Three lenders declined (BNP, BBVA, MUFG); two still being worked (CACIB, NTX); new invites sent to TD Securities, Nordea, and SMBC.",
   region: "EMEA",
   type: "Syndication",
@@ -4392,6 +4491,15 @@ function projectSizeLabel(p) {
   var mm = String(hit.value).match(/\$\s*[0-9]+(?:\.[0-9]+)?(?:\s*[-\u2013]\s*[0-9]+(?:\.[0-9]+)?)?\s*(?:bn|b|m)/i);
   return mm ? mm[0].replace(/\s+/g, "") : null;
 }
+// Bank-outreach status groups (order = display order). Sources: CF Pipeline bank matrix + call notes.
+var OUTREACH_GROUPS = [
+  ["lead", "Lead / Mandated", { bg: "#0F2444", color: "#fff", border: "#0F2444" }],
+  ["invited", "Invited", { bg: "#EFF6FF", color: "#1D4ED8", border: "#BFDBFE" }],
+  ["support", "Support", { bg: "#F0F9FF", color: "#0369A1", border: "#BAE6FD" }],
+  ["dialogue", "In dialogue", { bg: "#F8FAFC", color: "#475569", border: "#CBD5E1" }],
+  ["proposal", "Proposal received", { bg: "#F5F3FF", color: "#6D28D9", border: "#DDD6FE" }],
+  ["declined", "Declined", { bg: "#FEF2F2", color: "#B91C1C", border: "#FCA5A5" }]
+];
 function ProjectCard(_ref1) {
   var project = _ref1.project,
     lenderNotes = _ref1.lenderNotes,
@@ -4467,7 +4575,18 @@ function ProjectCard(_ref1) {
       fontWeight: 700,
       whiteSpace: "nowrap"
     }
-  }, "▤ ", project.workstreams.length, " workstreams") : null), /*#__PURE__*/React.createElement("h3", {
+  }, "▤ ", project.workstreams.length, " workstreams") : null, project.outreach ? /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: "#F0FDF4",
+      color: "#166534",
+      border: "1px solid #BBF7D0",
+      borderRadius: 20,
+      padding: "2px 9px",
+      fontSize: 11,
+      fontWeight: 700,
+      whiteSpace: "nowrap"
+    }
+  }, "🏦 ", project.outreach.length, " banks approached") : null), /*#__PURE__*/React.createElement("h3", {
     style: {
       margin: 0,
       fontSize: 15,
@@ -4650,6 +4769,67 @@ function ProjectCard(_ref1) {
         marginTop: 4
       }
     }, ws.description));
+  })), expanded && project.outreach && /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderTop: "1px solid #F3F4F6",
+      padding: "14px 20px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      color: "#1E3A5F",
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+      marginBottom: 2
+    }
+  }, "🏦 Bank Outreach (", project.outreach.length, ")"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10.5,
+      color: "#9CA3AF",
+      marginBottom: 10
+    }
+  }, "Who we've talked to about this deal — per the CF Pipeline bank matrix (8/4/26) + call notes. Hover a bank for detail; click to open its card."), OUTREACH_GROUPS.map(function (g) {
+    var rows = project.outreach.filter(function (o) { return o.status === g[0]; });
+    if (rows.length === 0) return null;
+    return /*#__PURE__*/React.createElement("div", {
+      key: g[0],
+      style: {
+        display: "flex",
+        gap: 6,
+        flexWrap: "wrap",
+        alignItems: "center",
+        marginBottom: 7
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 10,
+        fontWeight: 700,
+        color: "#6B7280",
+        textTransform: "uppercase",
+        letterSpacing: "0.05em",
+        minWidth: 118
+      }
+    }, g[1], " (", rows.length, ")"), rows.map(function (o) {
+      var hasCard = !!LENDERS[o.bank];
+      return /*#__PURE__*/React.createElement("span", {
+        key: o.bank,
+        title: (o.note || "") + (hasCard ? " — click to open lender card" : ""),
+        onClick: hasCard ? function (e) { e.stopPropagation(); onSelectLender(o.bank); } : undefined,
+        style: {
+          background: g[2].bg,
+          color: g[2].color,
+          border: "1px solid " + g[2].border,
+          borderRadius: 14,
+          padding: "3px 10px",
+          fontSize: 11.5,
+          fontWeight: 700,
+          whiteSpace: "nowrap",
+          cursor: hasCard ? "pointer" : "default",
+          textDecoration: o.status === "declined" ? "line-through" : "none"
+        }
+      }, o.status === "declined" ? "✕ " : "", o.bank, hasCard ? " ↗" : "");
+    }));
   })), expanded && notesCount > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       borderTop: "1px solid #F3F4F6"
