@@ -27,3 +27,9 @@
 - **Why not fully automatic for everyone**: the artifact runtime on this account has no shared-state capability (downloads + read-only MCP only), so a static page cannot push data to other viewers. Approved entries re-apply from localStorage on every open in that browser; the periodic Claude sync ("Copy sync digest" → paste to Claude) bakes them into the published version for the whole team, and baked ids (SYNCED_INPUT_IDS) auto-clear local queues — loop unchanged from v49/50.
 - Sync digest now carries [lenders: …] and [documented call] tags so the bake applies exactly what the approver saw.
 - QC: all JS blocks node --check clean; paren/brace/bracket balance zero; Playwright offline test green (approve→apply→undo on Apollo verified, incl. lastContact 7/23/26 → 8/3/26 → restore).
+
+## v53 Changelog (8/4/26) — Inputs Sync: Ashville 1 & 2 Sized at $2.4bn Each
+- Synced approved inputs digest entry [#1785867667640] (8/4/26 — AI): "ashville 1 and ashville 2 are 2.4BN each".
+- **Project Scioto — Ashville 1**: Finance Size $4.8bn → **$2.4bn** (description + metric note the revision; the prior $4.8bn evidently covered both phases). Linked lenders' pipeline exposure adjusts automatically.
+- **Project Scioto — Ashville 2**: Finance Size TBD → **$2.4bn**; now ranks in the size sort next to Ashville 1 instead of at the bottom. Capacity / building / timing still TBC (standing open item narrows to those).
+- Id baked into SYNCED_INPUT_IDS — the entry auto-clears from browser queues on next open.

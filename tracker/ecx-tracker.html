@@ -1,10 +1,10 @@
-<!-- ECX Fundraising Tracker v52 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
+<!-- ECX Fundraising Tracker v53 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
      React 18.2.0 + ReactDOM inlined (cdnjs UMD builds), DM Sans / Libre Baskerville
      embedded as woff2 data URIs, bank logos embedded in BANK_ICONS (Google s2 /
      DuckDuckGo favicons fetched at build time). Old claude.ai postMessage shim and
      html-to-image removed (unused by app code). Save/export buttons use the artifact
      downloads capability when available; 5-min autosave disabled in the viewer. -->
-<title>ECX Fundraising Tracker v52</title>
+<title>ECX Fundraising Tracker v53</title>
 <style>
 /* latin-ext */
 @font-face {
@@ -654,13 +654,13 @@ var PROJECTS = [{
   }
 },{
   name: "Project Scioto — Ashville 1",
-  description: "Ashville phase 1 (CMH11). 490MW Anthropic project financing (Herndon, Google wrap). $4.8bn. ABS/bond execution. MS leading with GS, JPM, NTX, SG, MUFG, Barclays as potential JBRs. Awaiting term sheet and engagement letter from MS. Tech DD ongoing.",
+  description: "Ashville phase 1 (CMH11). 490MW Anthropic project financing (Herndon, Google wrap). $2.4bn (revised from $4.8bn — phases 1 and 2 are $2.4bn each, team input 8/4/26). ABS/bond execution. MS leading with GS, JPM, NTX, SG, MUFG, Barclays as potential JBRs. Awaiting term sheet and engagement letter from MS. Tech DD ongoing.",
   region: "US",
   type: "Project Finance / ABS",
   owner: "Laura Godschalx",
   teaserData: {
-    asOf: "April 2026",
-    source: "Corporate Finance Pipeline_NEW.xlsx (04/20/26)",
+    asOf: "August 2026",
+    source: "Corporate Finance Pipeline_NEW.xlsx (04/20/26); size revised per team input 8/4/26 (AI)",
     metrics: [{
       label: "Asset",
       value: "Ashville — CMH11 (New Albany, Ohio)"
@@ -669,7 +669,7 @@ var PROJECTS = [{
       value: "Herndon"
     }, {
       label: "Finance Size",
-      value: "$4.8bn"
+      value: "$2.4bn (was $4.8bn — phases 1 & 2 now $2.4bn each)"
     }, {
       label: "Capacity",
       value: "490MW"
@@ -689,19 +689,19 @@ var PROJECTS = [{
   }
 },{
   name: "Project Scioto — Ashville 2",
-  description: "Ashville phase 2 — second phase of the New Albany campus financing, split out from Project Scioto (8/4/26). Apollo / Apterra confirmed as lead (8/4/26 team input). Size, capacity, building and timing to be confirmed; expected to follow the phase 1 framework (Herndon, Anthropic offtake, Google wrap).",
+  description: "Ashville phase 2 — second phase of the New Albany campus financing, split out from Project Scioto (8/4/26). Apollo / Apterra confirmed as lead (8/4/26 team input). $2.4bn (team input 8/4/26). Capacity, building and timing to be confirmed; expected to follow the phase 1 framework (Herndon, Anthropic offtake, Google wrap).",
   region: "US",
   type: "Project Finance / ABS",
   owner: "Laura Godschalx",
   teaserData: {
     asOf: "August 2026",
-    source: "Split out from Project Scioto per Aditya (8/4/26) — phase 2 parameters to be confirmed",
+    source: "Split out from Project Scioto per Aditya (8/4/26); size per team input 8/4/26 (AI)",
     metrics: [{
       label: "Asset", value: "Ashville phase 2 — New Albany, Ohio (building TBC)"
     }, {
-      label: "Finance Size", value: "TBD"
+      label: "Finance Size", value: "$2.4bn"
     }, {
-      label: "Status", value: "Apollo / Apterra confirmed as lead (8/4/26 team input). Size / capacity / timing to be populated once confirmed."
+      label: "Status", value: "Apollo / Apterra confirmed as lead (8/4/26 team input). $2.4bn size confirmed (team input 8/4/26); capacity / timing to be populated once confirmed."
     }, {
       label: "Lead Banks", value: "Apollo / Apterra (lead)"
     }]
@@ -10289,7 +10289,7 @@ function GuideTab() {
 
 // ── Team Inputs workflow (v52): Add + Approve on the single Inputs & Review tab → approval applies linked-lender updates live in that browser → Copy sync digest for Claude → synced ids baked below auto-clear on next version ──
 // On each sync, Claude appends the synced entry ids to SYNCED_INPUT_IDS. Any browser-stored entry with a matching id is purged on load.
-var SYNCED_INPUT_IDS = [1785864176262];
+var SYNCED_INPUT_IDS = [1785864176262, 1785867667640];
 var INPUTS_LS_KEY = "ecx_tracker_inputs_v1";
 function loadInputEntries() {
   var list = [];
