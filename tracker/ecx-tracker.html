@@ -1,10 +1,10 @@
-<!-- ECX Fundraising Tracker v51 — artifact edition of v50. Fully self-contained:
+<!-- ECX Fundraising Tracker v52 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
      React 18.2.0 + ReactDOM inlined (cdnjs UMD builds), DM Sans / Libre Baskerville
      embedded as woff2 data URIs, bank logos embedded in BANK_ICONS (Google s2 /
      DuckDuckGo favicons fetched at build time). Old claude.ai postMessage shim and
      html-to-image removed (unused by app code). Save/export buttons use the artifact
      downloads capability when available; 5-min autosave disabled in the viewer. -->
-<title>ECX Fundraising Tracker v51</title>
+<title>ECX Fundraising Tracker v52</title>
 <style>
 /* latin-ext */
 @font-face {
@@ -592,63 +592,37 @@ var PROJECTS = [{
     }]
   }
 },{
-  name: "Project Narluga",
-  description: "HoldCo financing for McNair — initial facility to be New Albany South only with Ares. $350m. 90% LTC. Ares IC approval required. Oaktree also involved. Docs to be agreed, CP process ongoing.",
+  name: "Project Narluga (HoldCo)",
+  description: "HoldCo financing program with Ares & Oaktree, $1.35bn combined — grouped card covering the initial Narluga facility and the Narwhal IV upsize, broken out below. Centralizing fundraising across Herndon and McNair.",
   region: "Global",
   type: "HoldCo",
   owner: "Sander Borgers",
   teaserData: {
     asOf: "April 2026",
-    source: "Corporate Finance Pipeline_NEW.xlsx (04/20/26)",
+    source: "Corporate Finance Pipeline_NEW.xlsx (04/20/26) + ECX Financing Pipeline 2026vEDIT.xlsx",
     metrics: [{
       label: "Facility",
-      value: "HoldCo — McNair (New Albany South initial)"
+      value: "HoldCo — Ares & Oaktree (Narluga initial + Narwhal IV upsize)"
     }, {
       label: "Finance Size",
-      value: "$350m"
-    }, {
-      label: "LTC",
-      value: "90%"
+      value: "$1.35bn combined ($350m Narluga + $1.0bn Narwhal IV)"
     }, {
       label: "Lead Banks",
       value: "Ares, Oaktree"
     }, {
-      label: "Status",
-      value: "Ares IC approved. Oaktree greenlit. Docs to be agreed. CP process ongoing. Targeting 15-May-26 close."
-    }, {
       label: "Timing",
-      value: "Q2 2026 (15-May-26)"
+      value: "Q2 2026 (Narluga targeting 15-May-26)"
     }]
-  }
-},{
-  name: "Narwhal IV",
-  description: "Ares HoldCo upsize — fourth tranche of Narwhal facility. $1.0bn. Oaktree joining alongside Ares. Centralizing fundraising across Herndon and McNair.",
-  region: "Global",
-  type: "HoldCo",
-  owner: "Sander Borgers",
-  teaserData: {
-    asOf: "March 2026",
-    source: "ECX Financing Pipeline 2026vEDIT.xlsx + EQT Debt & AI Overview_v3",
-    metrics: [{
-      label: "Facility",
-      value: "Narwhal IV — Ares HoldCo upsize"
-    }, {
-      label: "Finance Size",
-      value: "$1.0bn"
-    }, {
-      label: "LTC",
-      value: "TBD"
-    }, {
-      label: "Lead Banks",
-      value: "Ares, Oaktree"
-    }, {
-      label: "Financing Strategy",
-      value: "Upsize of existing Narwhal HoldCo facility. Centralizing Herndon + McNair fundraising."
-    }, {
-      label: "Timing",
-      value: "Q2 2026"
-    }]
-  }
+  },
+  workstreams: [{
+    name: "Narluga — Initial HoldCo Facility",
+    size: "$350m",
+    description: "HoldCo financing for McNair — initial facility to be New Albany South only with Ares. 90% LTC. Ares IC approved; Oaktree greenlit. Docs to be agreed, CP process ongoing. Targeting 15-May-26 close."
+  }, {
+    name: "Narwhal IV — HoldCo Upsize",
+    size: "$1.0bn",
+    description: "Fourth tranche of the Narwhal (Ares HoldCo) facility. Oaktree joining alongside Ares. Centralizes fundraising across Herndon and McNair. LTC TBD."
+  }]
 },{
   name: "Mirai — Japan",
   description: "Pre-contract financing solution for land, power and C&S investments in Japan. $200m. 65-70% LTC. MUFG and SMBC as leads. Subject to satisfactory rating process on McNair and shareholder look-through.",
@@ -734,7 +708,7 @@ var PROJECTS = [{
   }
 },{
   name: "Project Leroy II",
-  description: "Facility increase to existing Leroy (Blackstone) land bank & capex facility. ~$1bn upsize (potential $2bn). Adding Austin Campus, Norway. Updated CF and budget shared with Leroy lender. Targeting May 2026 closing.",
+  description: "Leroy (Blackstone) land bank & capex facility program — grouped card covering the three current workstreams: the ~$1bn facility upsize, the addition of the Austin Campus, and the addition of Norway. Expand for each workstream.",
   region: "Global",
   type: "Land Bank / Capex Facility",
   owner: "Laura Godschalx",
@@ -748,22 +722,26 @@ var PROJECTS = [{
       label: "Finance Size",
       value: "~$1bn (potential upsize to $2bn)"
     }, {
-      label: "New Assets",
-      value: "Austin Campus (McNair/Herndon), Norway"
-    }, {
       label: "Lead Lender",
       value: "Blackstone (existing) + Wells Fargo"
-    }, {
-      label: "Status",
-      value: "Updated CF and budget shared. Targeting April/May close. Capped by ~$300m total capacity."
-    }, {
-      label: "Upcoming",
-      value: "Leroy Austin Campus — McNair Parent close 30-May-26 ($300m); Leroy Upsize 30-May-26 (-$20m fee)"
     }, {
       label: "Timing",
       value: "Q2 2026"
     }]
-  }
+  },
+  workstreams: [{
+    name: "Leroy Upsize",
+    size: "~$1bn",
+    description: "Facility increase to the existing Leroy (Blackstone) land bank & capex facility — ~$1bn upsize with potential to $2bn. Updated CF and budget shared with the Leroy lender. Discussing separate regionalized tranches, potentially adding APAC. Upsize close targeted 30-May-26 (−$20m fee)."
+  }, {
+    name: "Addition of Austin Campus",
+    size: "$300m",
+    description: "Austin Campus (McNair/Herndon) added to the Leroy borrowing base — McNair Parent close targeted 30-May-26 ($300m). Capped by ~$300m total capacity. Distinct from the standalone $6.4bn Project Austin campus PF (separate card)."
+  }, {
+    name: "Addition of Norway",
+    size: "TBD",
+    description: "Norway assets added to the Leroy facility as bridge capacity — feeds the Salar PF take-out (see Project Salar — Norway & Finland). Sizing TBD."
+  }]
 },{
   name: "Project Metropolis I — KL Cyberjaya",
   description: "Senior project financing for Cyberjaya KUL21, Malaysia. 72MW Oracle lease signed. $640m. Bookbuild process ongoing — many banks full on OCI. Considering underwritten execution by private credit (Apollo). Due diligence ready early next week.",
@@ -928,7 +906,7 @@ var PROJECTS = [{
   }
 },{
   name: "Project Salar — Norway & Finland",
-  description: "Nordic combined financing: Norway (264MW / $2.58bn) + Finland (192MW / $1.88bn). Total $4.46bn. Leroy bridge + PF take-out structure. MSFT as primary tenant. Preparing materials and model.",
+  description: "Nordic combined financing, $4.46bn total — grouped card with the two country workstreams broken out below. Leroy bridge + PF take-out structure. MSFT as primary tenant. Preparing materials and model.",
   region: "EMEA",
   type: "Project Finance",
   owner: "Marjolein Heida",
@@ -954,7 +932,16 @@ var PROJECTS = [{
       label: "Timing",
       value: "Q2 2026"
     }]
-  }
+  },
+  workstreams: [{
+    name: "Norway",
+    size: "$2.58bn",
+    description: "264MW Norway — Leroy bridge into term PF take-out. MSFT primary tenant. Bridge capacity via the Leroy Norway addition (see Project Leroy II)."
+  }, {
+    name: "Finland",
+    size: "$1.88bn",
+    description: "192MW Finland (McNair) — Leroy bridge into term PF take-out. MSFT primary tenant. Early materials also tracked as Project Vaasa — Finland (separate card) until workstreams converge."
+  }]
 },{
   name: "PCX Global",
   description: "PowerConneX financing. $1bn. BCEI owns Austin energy center. Power story in development. Pre-contract stage. Laura Godschalx leading.",
@@ -1236,7 +1223,7 @@ var LENDERS = {
       "Metropolis": "7/22/26 - With ECX guarantee, can potentially act in senior at 300bps or below. Etna proceeds major credit positive. Requested net leverage + LTV note.",
       "ACX HoldCo": "7/22/26 - Indicative +500 handle (high 500s). USD 300-500m, shareable with other HoldCo lenders. No IG rating needed. Singapore borrower suggested for enforcement outside India (TBC).",
       "ACX PF (Hyderabad / Vizag)": "7/22/26 - Appetite up to 1/4-1/3 of ~USD 1bn tickets. >250bps WA threshold (tightened from mid-300s in April). Tenor to 15yr. Needs IG private rating + construction risk mitigation.",
-      "Project Salar": "7/23/26 - Bank loan + institutional tranche. LTC 80-90%, upfront LTV <69%, yield 8.50%, 5-7yr floating. Can go to 100% commitment. No rating (Kroll). Teaser to be shared post-NDA check.",
+      "Project Salar — Norway & Finland": "7/23/26 - Bank loan + institutional tranche. LTC 80-90%, upfront LTV <69%, yield 8.50%, 5-7yr floating. Can go to 100% commitment. No rating (Kroll). Teaser to be shared post-NDA check.",
       "Project Scioto — Ashville 2": "8/4/26 - Apollo/Apterra confirmed leading Ashville 2 (team input — AI). Structure, size and timing TBC."
     }
   },
@@ -1368,7 +1355,7 @@ var LENDERS = {
     projects: {
       "Equipment Facility (Nemo)": "1/20/26 - Jake can do separate financing for Engines and LLE. Will be differentiated enough from Leroy. Would include both LCs and funding for deposits.",
       "PowerConneX Financing": "1/20/26 - Jake can do separate financing for differentiated capability with PCX.",
-      "Leroy Upsize": "1/20/26 - Initial upsizing of $1bn. Target closing February / no later than Q1 end March. Discussing separate regionalized tranches, potentially adding APAC."
+      "Project Leroy II": "1/20/26 - Leroy Upsize: initial upsizing of $1bn. Target closing February / no later than Q1 end March. Discussing separate regionalized tranches, potentially adding APAC."
     }
   },
   BMO: {
@@ -4442,7 +4429,18 @@ function ProjectCard(_ref1) {
       fontSize: 11,
       color: "#9CA3AF"
     }
-  }, notesCount, " lender", notesCount !== 1 ? "s" : "")), /*#__PURE__*/React.createElement("h3", {
+  }, notesCount, " lender", notesCount !== 1 ? "s" : ""), project.workstreams ? /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: "#EEF2FF",
+      color: "#3730A3",
+      border: "1px solid #C7D2FE",
+      borderRadius: 20,
+      padding: "2px 9px",
+      fontSize: 11,
+      fontWeight: 700,
+      whiteSpace: "nowrap"
+    }
+  }, "▤ ", project.workstreams.length, " workstreams") : null), /*#__PURE__*/React.createElement("h3", {
     style: {
       margin: 0,
       fontSize: 15,
@@ -4511,7 +4509,66 @@ function ProjectCard(_ref1) {
       color: "#6B7280",
       lineHeight: 1.6
     }
-  }, project.description)), expanded && notesCount > 0 && /*#__PURE__*/React.createElement("div", {
+  }, project.description)), expanded && project.workstreams && /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderTop: "1px solid #F3F4F6",
+      background: "#FBFCFE",
+      padding: "14px 20px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      color: "#1E3A5F",
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+      marginBottom: 10
+    }
+  }, "Workstreams / Sub-projects (", project.workstreams.length, ")"), project.workstreams.map(function (ws, wi) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: wi,
+      style: {
+        background: "#fff",
+        border: "1px solid #E5E7EB",
+        borderLeft: "3px solid #0F2444",
+        borderRadius: 8,
+        padding: "10px 14px",
+        marginBottom: 8
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        justifyContent: "space-between",
+        gap: 10,
+        alignItems: "baseline",
+        flexWrap: "wrap"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 13,
+        fontWeight: 700,
+        color: "#111827"
+      }
+    }, ws.name), ws.size ? /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 12,
+        fontWeight: 800,
+        color: ws.size === "TBD" ? "#9CA3AF" : "#0F2444",
+        background: ws.size === "TBD" ? "#F3F4F6" : "#EFF6FF",
+        border: "1px solid " + (ws.size === "TBD" ? "#E5E7EB" : "#BFDBFE"),
+        borderRadius: 6,
+        padding: "2px 8px",
+        whiteSpace: "nowrap"
+      }
+    }, ws.size) : null), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: "#4B5563",
+        lineHeight: 1.6,
+        marginTop: 4
+      }
+    }, ws.description));
+  })), expanded && notesCount > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       borderTop: "1px solid #F3F4F6"
     }
@@ -4796,6 +4853,7 @@ name: "Beluga Accordion II",
 {
 
 name: "Wahoo Upsize II (Mar 2026)",
+  family: "Wahoo — DevCo RCF",
   closedDate: "March 11, 2026",
   region: "US",
   type: "Project Finance",
@@ -4896,6 +4954,7 @@ name: "Project Vendace (Sweden)",
 {
 
 name: "Wahoo Upsize I (Dec 2025)",
+  family: "Wahoo — DevCo RCF",
   closedDate: "December 30, 2025",
   region: "US",
   type: "Project Finance",
@@ -5523,6 +5582,7 @@ name: "Project Narwhal III (Ares HoldCo Upsize)",
 {
 
 name: "Project Wahoo II (PHX11 + CHI04)",
+  family: "Wahoo — DevCo RCF",
   closedDate: "January 17, 2025",
   region: "US",
   type: "Project Finance",
@@ -5563,6 +5623,7 @@ name: "Project Wahoo II (PHX11 + CHI04)",
 {
 
 name: "Project Wahoo (Wahoo I — DevCo RCF)",
+  family: "Wahoo — DevCo RCF",
   closedDate: "July 18, 2024",
   region: "US",
   type: "Project Finance",
@@ -9332,6 +9393,26 @@ function ClosedProjectsTab(_ref22) {
     _useState21 = _slicedToArray(_useState20, 2),
     expandedIdx = _useState21[0],
     setExpandedIdx = _useState21[1];
+  // Family grouping (v52): deals sharing a `family` field render as ONE grouped card; expanding it
+  // reveals every closing in the family (all years), each still expandable to its full detail.
+  var _famS = _useState(null);
+  var openFamily = _famS[0], setOpenFamily = _famS[1];
+  var displayed = [];
+  var famSeen = {};
+  (yearFilter !== "lc_surety" ? filtered : []).forEach(function (p) {
+    if (p.family) {
+      if (!famSeen[p.family]) { famSeen[p.family] = true; displayed.push({ __family: p.family }); }
+    } else displayed.push(p);
+  });
+  var countFor = function (yr) {
+    var seen = {}, n = 0;
+    projects.forEach(function (p) {
+      if (!p.closedDate || !p.closedDate.includes(yr)) return;
+      if (yr === "2025" && p.closedDate.includes("2026")) return;
+      if (p.family) { if (!seen[p.family]) { seen[p.family] = true; n++; } } else n++;
+    });
+    return n;
+  };
   var EUR_USD = 1.16413; // EUR/USD per Lender Fees Summary_3.25.26
   var fmt = function fmt(n, currency) {
     if (n == null) return "—";
@@ -9416,7 +9497,7 @@ function ClosedProjectsTab(_ref22) {
     style: { marginBottom: 4 }
   }, /*#__PURE__*/React.createElement("div", {
     style: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }
-  }, [["2026", 5], ["2025", 9], ["lc_surety", "LC & Surety"]].map(function(pair) {
+  }, [["2026", countFor("2026")], ["2025", countFor("2025")], ["lc_surety", "LC & Surety"]].map(function(pair) {
     var isLC = pair[0] === "lc_surety";
     return /*#__PURE__*/React.createElement("button", {
       key: pair[0],
@@ -9429,7 +9510,47 @@ function ClosedProjectsTab(_ref22) {
         boxShadow: yearFilter === pair[0] ? ("0 0 0 2px " + (isLC ? "#3B82F6" : "#10B981")) : "none"
       }
     }, isLC ? pair[1] : (pair[0] + " (" + pair[1] + ")"));
-  }))), yearFilter !== "lc_surety" && filtered.map(function (project, idx) {
+  }))), yearFilter !== "lc_surety" && displayed.map(function renderDeal(project, idx) {
+    if (project.__family) {
+      var fam = project.__family;
+      var members = projects.filter(function (m) { return m.family === fam; });
+      var famOpen = openFamily === fam;
+      return /*#__PURE__*/React.createElement("div", {
+        key: "fam-" + fam,
+        style: {
+          background: "#fff",
+          border: "2px solid #BFDBFE",
+          borderRadius: 14,
+          overflow: "hidden",
+          boxShadow: famOpen ? "0 4px 24px rgba(0,0,0,0.08)" : "0 1px 4px rgba(0,0,0,0.04)"
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        onClick: function onClick() { setOpenFamily(famOpen ? null : fam); },
+        style: { padding: "18px 24px", cursor: "pointer", background: famOpen ? "#EFF6FF" : "#fff" }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }
+      }, /*#__PURE__*/React.createElement("div", { style: { flex: 1 } }, /*#__PURE__*/React.createElement("div", {
+        style: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8, alignItems: "center" }
+      }, /*#__PURE__*/React.createElement("span", {
+        style: { background: "#DBEAFE", color: "#1E40AF", border: "1px solid #BFDBFE", borderRadius: 6, padding: "3px 10px", fontSize: 11, fontWeight: 700 }
+      }, "▤ GROUPED · ", members.length, " closings 2024–2026"), /*#__PURE__*/React.createElement(Pill, {
+        label: "US",
+        color: "#2563EB"
+      }), /*#__PURE__*/React.createElement(Pill, {
+        label: "DevCo RCF",
+        color: "#0284C7"
+      })), /*#__PURE__*/React.createElement("h3", {
+        style: { margin: 0, fontSize: 16, fontWeight: 700, color: "#111827", fontFamily: "'Libre Baskerville', Georgia, serif" }
+      }, fam), /*#__PURE__*/React.createElement("p", {
+        style: { margin: "6px 0 0", fontSize: 12, color: "#6B7280", lineHeight: 1.5 }
+      }, "EdgeConneX DevCo revolving credit facility program — established Jul 2024 at $1.2bn (Wahoo I), expanded via Wahoo II (Jan 2025), Upsize I to $2.0bn (Dec 2025) and Upsize II to $2.5bn (Mar 2026). Expand for each closing.")), /*#__PURE__*/React.createElement("span", {
+        style: { color: "#9CA3AF", fontSize: 18, flexShrink: 0 }
+      }, famOpen ? "▲" : "▼"))), famOpen && /*#__PURE__*/React.createElement("div", {
+        style: { borderTop: "1px solid #DBEAFE", padding: "14px 18px", display: "flex", flexDirection: "column", gap: 12, background: "#F8FAFC" }
+      }, members.map(function (m, mi) {
+        return renderDeal(m, "fam-" + fam + "-" + mi);
+      })));
+    }
     var isOpen = expandedIdx === idx;
     return /*#__PURE__*/React.createElement("div", {
       key: idx,
@@ -10130,7 +10251,7 @@ function GuideTab() {
     { data: "Active projects, expected deal sizes & teaser details (Active Projects tab)", src: "Corporate Finance Pipeline workbook + ECX Financing Pipeline 2026 + EQT Debt & AI Overview deck. The \u201CExpected Size\u201D box and the largest-first ordering both read the \u201CFinance Size\u201D figure from these sources.", loc: "SharePoint \u203A 12. Portfolio Management \u203A 14. Financing Pipeline (and CF Pipeline meeting materials)", own: "Deal owners (Laura / Marjolein / Sander) \u2014 updated around weekly CF Pipeline meetings." },
     { data: "Bank appetite & deal-by-deal roles (context inside lender cards)", src: "ECX Bank Relationship Monitoring workbook \u2014 balance-sheet exposure by bank, CLA/JLA/MLA roles, invited/declined status per syndication.", loc: "SharePoint \u203A Corporate Finance_Team \u203A 08. Lenders", own: "Corporate Finance team." },
     { data: "Closed deals (Closed 2025 & 2026 tab)", src: "Deal records at close \u2014 commitments, allocations, pricing and fee detail per transaction; EUR deals converted at the ECB reference rate noted on the tab.", loc: "Deal files + Lender Fees Summary", own: "Static once closed; new closings added on sync." },
-    { data: "Quick team updates (Inputs tab)", src: "Typed directly into this tracker by anyone on the team \u2014 e.g. a rejection, a meeting that just happened, a new indication.", loc: "Saved in your own browser until synced \u2014 not visible to teammates until folded in.", own: "Anyone. Copy for Claude sync \u2192 paste into the Claude tracker chat \u2192 Clear." }
+    { data: "Quick team updates (Inputs & Review tab)", src: "Typed directly into this tracker by anyone on the team \u2014 e.g. a rejection, a meeting that just happened, a new indication. Link the lender(s) when composing.", loc: "Approving an entry applies it to the linked lender cards immediately in your browser; it becomes permanent for everyone at the next Claude sync.", own: "Anyone. Approve \u2192 applied live \u2192 Copy sync digest \u2192 paste into the Claude tracker chat periodically." }
   ];
   return h("div", { style: { maxWidth: 1050, margin: "0 auto" } },
     h("div", { style: card },
@@ -10155,7 +10276,7 @@ function GuideTab() {
       h("div", { style: { marginTop: 10, fontSize: 11, color: "#9CA3AF", lineHeight: 1.6 } }, "All SharePoint paths sit under Corporate Finance_Team (Eelco Holst's site), which syncs to your machine via OneDrive.")),
     h("div", { style: card },
       hd("\uD83D\uDD04 How the tracker gets updated"),
-      p("1. As things happen \u2014 drop a quick note in the Inputs tab, or send call notes to the DCM list as usual."),
+      p("1. As things happen \u2014 drop a quick note in the Inputs & Review tab (link the lender it concerns), approve it, and it shows on that lender's card in your browser immediately. Or send call notes to the DCM list as usual."),
       p("2. To sync \u2014 open the team's Claude tracker workspace and ask in plain language: \u201Csync the latest call notes\u201D, \u201Crefresh the Lender Fees tab from Chris's latest file\u201D, or paste the Inputs digest. Claude reads the source files, updates the cards, runs quality checks, and saves the next version (v36 \u2192 v37 \u2026) into the Coding folder \u2014 prior versions are kept as rollback."),
       p("3. The full technical playbook (data conventions, refresh workflows, changelog) lives in ECX_Tracker_Upload_Instructions.md in the Instructions folder, one level up from Coding.")),
     h("div", { style: card },
@@ -10166,7 +10287,7 @@ function GuideTab() {
       p("Inputs \u2014 the capture inbox described above. Closed 2025 & 2026 \u2014 completed transactions with terms and fee detail.")));
 }
 
-// ── Team Inputs workflow (v49): Add (Inputs tab) → Approve (Review tab) → Copy for Claude sync → synced ids baked below auto-clear on next version ──
+// ── Team Inputs workflow (v52): Add + Approve on the single Inputs & Review tab → approval applies linked-lender updates live in that browser → Copy sync digest for Claude → synced ids baked below auto-clear on next version ──
 // On each sync, Claude appends the synced entry ids to SYNCED_INPUT_IDS. Any browser-stored entry with a matching id is purged on load.
 var SYNCED_INPUT_IDS = [1785864176262];
 var INPUTS_LS_KEY = "ecx_tracker_inputs_v1";
@@ -10185,7 +10306,231 @@ function loadInputEntries() {
 function persistInputEntries(list) {
   try { window.localStorage.setItem(INPUTS_LS_KEY, JSON.stringify(list)); return true; } catch (e) { return false; }
 }
-function InputsTab() {
+// ── Dynamic apply (v52) ──────────────────────────────────────────────────────
+// Approving an entry that is linked to lender(s) folds it into the live LENDERS data
+// immediately — note added (and lastContact bumped when marked as a documented call).
+// This applies in the approver's browser only (static file, no shared backend) and
+// re-applies on every open until the Claude sync bakes the entry into the published
+// version, at which point SYNCED_INPUT_IDS purges it from the local queue.
+var APPLIED_INPUT_IDS = {};
+function ECX_DATE_VAL(s) {
+  var m = String(s || "").match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if (!m) return 0;
+  var y = +m[3];
+  if (y < 100) y += 2000;
+  return y * 10000 + (+m[1]) * 100 + (+m[2]);
+}
+function applyInputEntry(e) {
+  if (!e || e.status !== "approved" || APPLIED_INPUT_IDS[e.id]) return false;
+  APPLIED_INPUT_IDS[e.id] = true;
+  var touched = false;
+  (e.lenders || []).forEach(function (ln) {
+    var info = LENDERS[ln];
+    if (!info) return;
+    if (!info.notes) info.notes = [];
+    var note = {
+      date: e.date || e.ts,
+      source: "Team input — Inputs tab (" + (e.author || "team") + ", " + (e.date || e.ts) + ")" + (e.isCall ? "" : " — intel, not a documented call"),
+      content: e.text,
+      _inputId: e.id
+    };
+    if (e.isCall && e.date && ECX_DATE_VAL(e.date) > ECX_DATE_VAL(info.lastContact)) {
+      note._prevLastContact = info.lastContact || "";
+      info.lastContact = e.date;
+    }
+    info.notes.unshift(note);
+    touched = true;
+  });
+  return touched;
+}
+function unapplyInputEntry(e) {
+  if (!e || !APPLIED_INPUT_IDS[e.id]) return;
+  Object.keys(LENDERS).forEach(function (ln) {
+    var info = LENDERS[ln];
+    if (!info || !info.notes) return;
+    for (var i = info.notes.length - 1; i >= 0; i--) {
+      if (info.notes[i]._inputId === e.id) {
+        if (info.notes[i]._prevLastContact !== undefined) info.lastContact = info.notes[i]._prevLastContact;
+        info.notes.splice(i, 1);
+      }
+    }
+  });
+  delete APPLIED_INPUT_IDS[e.id];
+}
+// Fold previously approved entries stored in this browser into the data before first render.
+loadInputEntries().forEach(applyInputEntry);
+// ── Inputs & Review (v52) — one tab: compose, approve, and the approval applies the update
+// to the tracker data in this browser instantly. The Claude sync bakes approved entries into
+// the next published version (permanent for everyone) and auto-clears them from local queues.
+function InputsTab(_p) {
+  var onDataChange = _p && _p.onDataChange;
+  var h = React.createElement;
+  var st = React.useState(loadInputEntries);
+  var entries = st[0], setEntries = st[1];
+  var xs = React.useState("");
+  var text = xs[0], setText = xs[1];
+  var as = React.useState("");
+  var author = as[0], setAuthor = as[1];
+  var ds = React.useState("");
+  var edate = ds[0], setEdate = ds[1];
+  var cs = React.useState(false);
+  var isCall = cs[0], setIsCall = cs[1];
+  var lls = React.useState([]);
+  var linked = lls[0], setLinked = lls[1];
+  var ms = React.useState("");
+  var msg = ms[0], setMsg = ms[1];
+  var flash = function (m, t) { setMsg(m); setTimeout(function () { setMsg(""); }, t || 3500); };
+  var persist = function (list) {
+    setEntries(list);
+    if (!persistInputEntries(list)) flash("Warning: could not save to browser storage — entries live for this session only.", 5000);
+  };
+  var fmtDate = function (iso) {
+    if (!iso) return "";
+    var p = iso.split("-");
+    if (p.length !== 3) return iso;
+    return (+p[1]) + "/" + (+p[2]) + "/" + p[0].slice(2);
+  };
+  var addEntry = function () {
+    if (!text.trim()) return;
+    var now = new Date();
+    var evDate = edate ? fmtDate(edate) : now.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit" });
+    var entry = { id: now.getTime(), status: "pending", date: evDate, ts: now.toLocaleString("en-US", { month: "numeric", day: "numeric", year: "2-digit", hour: "numeric", minute: "2-digit" }), author: author.trim(), text: text.trim(), lenders: linked.slice(), isCall: isCall };
+    persist([entry].concat(entries));
+    setText(""); setLinked([]); setIsCall(false);
+    flash("Added — pending approval below.", 3000);
+  };
+  var approve = function (e) {
+    var upd = Object.assign({}, e, { status: "approved" });
+    persist(entries.map(function (x) { return x.id === e.id ? upd : x; }));
+    var applied = applyInputEntry(upd);
+    if (onDataChange) onDataChange();
+    if (applied) flash("✔ Approved — applied to " + upd.lenders.join(", ") + " in this browser now. It becomes permanent for everyone at the next Claude sync.", 7000);
+    else flash("✔ Approved — queued for the next Claude sync." + (upd.lenders && upd.lenders.length ? "" : " Tip: link a lender when composing to see it applied in the tracker immediately."), 7000);
+  };
+  var backToPending = function (e) {
+    unapplyInputEntry(e);
+    persist(entries.map(function (x) { return x.id === e.id ? Object.assign({}, x, { status: "pending" }) : x; }));
+    if (onDataChange) onDataChange();
+    flash("Moved back to pending — removed from the tracker data in this browser.");
+  };
+  var removeEntry = function (e) {
+    unapplyInputEntry(e);
+    persist(entries.filter(function (x) { return x.id !== e.id; }));
+    if (onDataChange) onDataChange();
+  };
+  var pending = entries.filter(function (e) { return e.status !== "approved"; });
+  var approved = entries.filter(function (e) { return e.status === "approved"; });
+  var digest = function () {
+    return "ECX TRACKER — APPROVED TEAM INPUTS FOR SYNC (exported " + new Date().toLocaleString("en-US") + ")\nNote for Claude: fold each entry into the tracker data — entries tagged [lenders: …] were already applied live in the approver's browser (note per lender; lastContact bumped only when tagged as a documented call) — apply the same to the published data, then bake these entry ids into SYNCED_INPUT_IDS in the next version so they auto-clear from browsers.\n" + approved.map(function (e) {
+      var tags = "";
+      if (e.lenders && e.lenders.length) tags += " [lenders: " + e.lenders.join(", ") + (e.isCall ? "; documented call" : "") + "]";
+      else if (e.isCall) tags += " [documented call]";
+      return "- [#" + e.id + "] [" + (e.date || e.ts) + (e.author ? " — " + e.author : "") + "]" + tags + " " + e.text + (e.date ? "  (logged " + e.ts + ")" : "");
+    }).join("\n");
+  };
+  var copyAll = function () {
+    if (approved.length === 0) { flash("Nothing approved yet — approve entries first."); return; }
+    var t = digest();
+    var done = function () { flash("Copied " + approved.length + (approved.length === 1 ? " approved entry" : " approved entries") + " — paste into the Claude tracker chat to bake into the next version.", 6000); };
+    var fallback = function () {
+      var ta = document.createElement("textarea");
+      ta.value = t;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); done(); } catch (e2) { flash("Copy blocked by browser — use Download .txt instead.", 5000); }
+      document.body.removeChild(ta);
+    };
+    try {
+      if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(t).then(done, fallback); } else { fallback(); }
+    } catch (e) { fallback(); }
+  };
+  var downloadAll = function () {
+    if (approved.length === 0) { flash("Nothing approved yet — approve entries first."); return; }
+    window.ECX_SAVE_FILE("ECX_Tracker_ApprovedInputs_" + new Date().toISOString().slice(0, 10) + ".txt", digest(), "text/plain");
+    flash("Downloaded — share the file or paste its contents into the Claude tracker chat.", 5000);
+  };
+  var clearAll = function () {
+    if (entries.length === 0) return;
+    if (window.confirm("Clear ALL " + entries.length + " entries (pending and approved) from this browser? Applied entries are also removed from the tracker data here. Normally not needed — synced entries clear automatically in the next version.")) {
+      approved.forEach(unapplyInputEntry);
+      persist([]);
+      if (onDataChange) onDataChange();
+      flash("All entries cleared.");
+    }
+  };
+  var btn = function (label, onClick, kind) {
+    var solid = kind === "primary";
+    var danger = kind === "danger";
+    var green = kind === "approve";
+    return h("button", { onClick: onClick, style: { padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", border: "1px solid " + (solid ? "#1D4ED8" : danger ? "#FCA5A5" : green ? "#34D399" : "#D1D5DB"), background: solid ? "#1D4ED8" : green ? "#059669" : "#fff", color: solid || green ? "#fff" : danger ? "#B91C1C" : "#374151" } }, label);
+  };
+  var lenderTags = function (e) {
+    if (!e.lenders || !e.lenders.length) return null;
+    return h("span", null, e.lenders.map(function (ln) {
+      return h("span", { key: ln, style: { background: "#EFF6FF", color: "#1D4ED8", border: "1px solid #BFDBFE", borderRadius: 10, padding: "1px 8px", fontSize: 10.5, fontWeight: 700, marginRight: 4 } }, "🏦 " + ln);
+    }), e.isCall ? h("span", { style: { background: "#ECFDF5", color: "#059669", border: "1px solid #A7F3D0", borderRadius: 10, padding: "1px 8px", fontSize: 10.5, fontWeight: 700 } }, "📞 documented call") : null);
+  };
+  var meta = function (e) {
+    return h("div", { style: { fontSize: 11, color: "#9CA3AF", marginBottom: 4, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" } }, "📅 " + (e.date || e.ts), e.author ? " · " + e.author : "", lenderTags(e), e.date ? h("span", { style: { color: "#D1D5DB" } }, "logged " + e.ts) : null, h("span", { style: { color: "#E5E7EB" } }, "#" + e.id));
+  };
+  var allLenderNames = Object.keys(LENDERS).sort();
+  return h("div", { style: { maxWidth: 900, margin: "0 auto" } },
+    h("div", { style: { background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "20px 24px", marginBottom: 16 } },
+      h("div", { style: { fontSize: 15, fontWeight: 800, color: "#111827", marginBottom: 4 } }, "✍️ Team Inputs & Review"),
+      h("div", { style: { fontSize: 12, color: "#6B7280", lineHeight: 1.6, marginBottom: 14 } }, "Drop updates the moment they happen. Link the lender(s) the update is about and, once approved below, the note is applied to those lender cards immediately in this browser — no waiting. The periodic Claude sync then bakes approved entries into the published tracker for the whole team and clears them from your queue automatically."),
+      h("div", { style: { display: "flex", gap: 12, marginBottom: 10, flexWrap: "wrap", alignItems: "flex-end" } },
+        h("div", null,
+          h("div", { style: { fontSize: 10, fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 } }, "Date of update / meeting"),
+          h("input", { type: "date", value: edate, onChange: function (e) { setEdate(e.target.value); }, style: { border: "1px solid #D1D5DB", borderRadius: 8, padding: "7px 12px", fontSize: 12.5, fontFamily: "inherit" } })),
+        h("div", null,
+          h("div", { style: { fontSize: 10, fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 } }, "Your initials (optional)"),
+          h("input", { value: author, onChange: function (e) { setAuthor(e.target.value); }, placeholder: "e.g. AI / LG / MH", style: { width: 140, border: "1px solid #D1D5DB", borderRadius: 8, padding: "7px 12px", fontSize: 12.5, fontFamily: "inherit" } })),
+        h("div", null,
+          h("div", { style: { fontSize: 10, fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 } }, "Link lender(s) — applied on approval"),
+          h("select", { value: "", onChange: function (e) { var v = e.target.value; if (v && linked.indexOf(v) === -1) setLinked(linked.concat([v])); }, style: { border: "1px solid #D1D5DB", borderRadius: 8, padding: "7px 12px", fontSize: 12.5, fontFamily: "inherit", background: "#fff", cursor: "pointer", minWidth: 180 } },
+            h("option", { value: "" }, "+ add lender…"),
+            allLenderNames.filter(function (n) { return linked.indexOf(n) === -1; }).map(function (n) { return h("option", { key: n, value: n }, n); }))),
+        h("label", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#374151", paddingBottom: 8, cursor: "pointer" } },
+          h("input", { type: "checkbox", checked: isCall, onChange: function (e) { setIsCall(e.target.checked); } }),
+          "documented call / meeting (bumps Last Contact)")),
+      linked.length > 0 ? h("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 } }, linked.map(function (ln) {
+        return h("span", { key: ln, style: { background: "#EFF6FF", color: "#1D4ED8", border: "1px solid #BFDBFE", borderRadius: 12, padding: "3px 10px", fontSize: 11.5, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 6 } }, "🏦 " + ln,
+          h("span", { onClick: function () { setLinked(linked.filter(function (x) { return x !== ln; })); }, style: { cursor: "pointer", color: "#93C5FD", fontWeight: 800 } }, "✕"));
+      })) : null,
+      h("textarea", { value: text, onChange: function (e) { setText(e.target.value); }, onKeyDown: function (e) { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") addEntry(); }, rows: 4, placeholder: "e.g. BBVA rejected Vendace syndication — structure too aggressive, no land financing as a rule…  or  Met Barclays 8/4 — keen on Liverpool LC, indication due Friday, wants the model", style: { width: "100%", border: "1px solid #D1D5DB", borderRadius: 8, padding: "10px 12px", fontSize: 13, lineHeight: 1.6, fontFamily: "inherit", resize: "vertical" } }),
+      h("div", { style: { display: "flex", gap: 8, marginTop: 12, alignItems: "center", flexWrap: "wrap" } },
+        btn("+ Add entry", addEntry, "primary"),
+        h("span", { style: { fontSize: 11, color: "#9CA3AF" } }, "Ctrl+Enter to add"),
+        h("span", { style: { marginLeft: "auto", fontSize: 12, color: "#059669", fontWeight: 600 } }, msg))),
+    h("div", { style: { display: "flex", gap: 8, marginBottom: 12, alignItems: "center" } },
+      h("div", { style: { fontSize: 12, fontWeight: 700, color: "#B45309", textTransform: "uppercase", letterSpacing: "0.06em" } }, "⏳ Pending approval (" + pending.length + ")")),
+    pending.length === 0 ? h("div", { style: { background: "#F8FAFC", border: "1px dashed #CBD5E1", borderRadius: 12, padding: "16px 24px", textAlign: "center", color: "#9CA3AF", fontSize: 13, marginBottom: 22 } }, "Nothing awaiting approval.") : h("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 22 } }, pending.map(function (e) {
+      return h("div", { key: e.id, style: { background: "#fff", border: "1px solid #FDE68A", borderLeft: "3px solid #F59E0B", borderRadius: 10, padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start" } },
+        h("div", { style: { flex: 1 } }, meta(e), h("div", { style: { fontSize: 13, color: "#374151", lineHeight: 1.6, whiteSpace: "pre-wrap" } }, e.text)),
+        h("div", { style: { display: "flex", gap: 6, flexShrink: 0 } },
+          btn("✔ Approve & apply", function () { approve(e); }, "approve"),
+          btn("✕", function () { if (window.confirm("Delete this entry?")) removeEntry(e); }, "danger")));
+    })),
+    h("div", { style: { display: "flex", gap: 8, marginBottom: 12, alignItems: "center", flexWrap: "wrap" } },
+      h("div", { style: { fontSize: 12, fontWeight: 700, color: "#065F46", textTransform: "uppercase", letterSpacing: "0.06em" } }, "✅ Approved — live in this browser (" + approved.length + ")"),
+      h("div", { style: { marginLeft: "auto", display: "flex", gap: 8 } },
+        btn("📋 Copy sync digest", copyAll, "primary"),
+        btn("⬇ Download .txt", downloadAll),
+        btn("Clear all", clearAll, "danger"))),
+    approved.length === 0 ? h("div", { style: { background: "#F8FAFC", border: "1px dashed #CBD5E1", borderRadius: 12, padding: "16px 24px", textAlign: "center", color: "#9CA3AF", fontSize: 13 } }, "No approved entries yet — approve pending items above. Entries linked to a lender are applied to that lender's card the moment they are approved.") : h("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }, approved.map(function (e) {
+      var appliedLive = e.lenders && e.lenders.length > 0;
+      return h("div", { key: e.id, style: { background: "#F0FDF4", border: "1px solid #86EFAC", borderLeft: "3px solid #059669", borderRadius: 10, padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start" } },
+        h("div", { style: { flex: 1 } }, meta(e),
+          h("div", { style: { fontSize: 13, color: "#374151", lineHeight: 1.6, whiteSpace: "pre-wrap" } }, e.text),
+          h("div", { style: { fontSize: 10.5, color: appliedLive ? "#059669" : "#9CA3AF", fontWeight: 600, marginTop: 4 } }, appliedLive ? "⚡ Applied to " + e.lenders.join(", ") + " in this browser — permanent for everyone after the next Claude sync." : "Queued for the next Claude sync (no linked lender — nothing applied live).")),
+        h("div", { style: { display: "flex", gap: 6, flexShrink: 0 } },
+          btn("↩ Undo", function () { backToPending(e); }),
+          btn("✕", function () { if (window.confirm("Delete this entry? It will also be removed from the tracker data in this browser.")) removeEntry(e); }, "danger")));
+    })),
+    h("div", { style: { marginTop: 14, padding: "10px 16px", background: "#FFFBEB", borderRadius: 8, border: "1px solid #FCD34D", fontSize: 11, color: "#92400E", lineHeight: 1.6 } }, "⚠️ How this works: 1. approved entries update the tracker you are looking at right now, in this browser only (static file — no shared backend). 2. Teammates see them once the sync digest is sent to Claude and the next version is published to this same link. 3. Synced entries auto-clear from every browser's queue via their baked-in ids."));
+}
+
+function InputsTab_OLD_v51() {
   var h = React.createElement;
   var st = React.useState(loadInputEntries);
   var entries = st[0], setEntries = st[1];
@@ -10611,6 +10956,13 @@ function App() {
     setHighlightProject = _useState35[1];
 
   // Build project→lender notes map
+  // Bumped when an approved team input is applied/un-applied at runtime, so memoized
+  // lender/project views recompute against the mutated LENDERS data.
+  var _dvS = _useState(0);
+  var dataVersion = _dvS[0];
+  var bumpDataVersion = function bumpDataVersion() {
+    _dvS[1](function (x) { return x + 1; });
+  };
   var projectLenderMap = _useMemo(function () {
     var map = {};
     PROJECTS.forEach(function (p) {
@@ -10628,7 +10980,7 @@ function App() {
       });
     });
     return map;
-  }, []);
+  }, [dataVersion]);
 
   // Filter lenders
   var filteredLenders = _useMemo(function () {
@@ -10677,7 +11029,7 @@ function App() {
       if (d !== 0) return d;
       return a[0].localeCompare(b[0]);
     });
-  }, [filterStatus, filterType, filterRegion, searchText]);
+  }, [filterStatus, filterType, filterRegion, searchText, dataVersion]);
 
   // Filter projects — sorted by expected financing size (from the "Finance Size" teaser metric), largest first; unsized projects alphabetical at the bottom
   var projSizeUSDm = PROJ_SIZE_USDM;
@@ -10741,7 +11093,7 @@ function App() {
     _lvs2 = _slicedToArray(_lvs, 2),
     lenderView = _lvs2[0],
     setLenderView = _lvs2[1];
-  var TABS = [["inputs", "Inputs"], ["review", "\u2705 Review"], ["lenders", "Active Lenders (".concat(Object.keys(LENDERS).length, ")")], ["projects", "Active Projects (".concat(PROJECTS.length, ")")], ["closed", "Closed 2025 & 2026 (14)"], ["fees", "Lender Fees"], ["captable", "Global Cap Table"], ["guide", "\uD83D\uDCD6 Guide"]];
+  var TABS = [["inputs", "\u270d\ufe0f Inputs & Review"], ["lenders", "Active Lenders (".concat(Object.keys(LENDERS).length, ")")],["projects", "Active Projects (".concat(PROJECTS.length, ")")], ["closed", "Closed 2025 & 2026 (14)"], ["fees", "Lender Fees"], ["captable", "Global Cap Table"], ["guide", "\uD83D\uDCD6 Guide"]];
   return /*#__PURE__*/React.createElement("div", {
     style: {
       minHeight: "100vh",
@@ -11037,7 +11389,9 @@ function App() {
     }));
   }))), activeTab === "closed" && /*#__PURE__*/React.createElement(ClosedProjectsTab, {
     projects: CLOSED_PROJECTS
-  }), activeTab === "fees" && /*#__PURE__*/React.createElement(LenderFeesTab, null), activeTab === "inputs" && /*#__PURE__*/React.createElement(InputsTab, null), activeTab === "review" && /*#__PURE__*/React.createElement(ReviewTab, null), activeTab === "guide" && /*#__PURE__*/React.createElement(GuideTab, null), activeTab === "captable" && /*#__PURE__*/React.createElement(GlobalCapTableTab, null), activeTab === "pipeline" && /*#__PURE__*/React.createElement(FinancingPipelineTab, null), activeTab === "bond" && /*#__PURE__*/React.createElement(BondMarketTab, {
+  }), activeTab === "fees" && /*#__PURE__*/React.createElement(LenderFeesTab, null), activeTab === "inputs" && /*#__PURE__*/React.createElement(InputsTab, {
+    onDataChange: bumpDataVersion
+  }), activeTab === "review" && /*#__PURE__*/React.createElement(ReviewTab, null), activeTab === "guide" && /*#__PURE__*/React.createElement(GuideTab, null), activeTab === "captable" && /*#__PURE__*/React.createElement(GlobalCapTableTab, null), activeTab === "pipeline" && /*#__PURE__*/React.createElement(FinancingPipelineTab, null), activeTab === "bond" && /*#__PURE__*/React.createElement(BondMarketTab, {
     notes: BOND_MARKET_NOTES
   }), activeTab === "hy" && /*#__PURE__*/React.createElement(HYBondTab, null), activeTab === "pipeline_notes" && /*#__PURE__*/React.createElement(PipelineNotesTab, null), activeTab === "financing" && /*#__PURE__*/React.createElement(FinancingMarketTab, null), activeTab === "insurance" && /*#__PURE__*/React.createElement("div", null, function () {
     var bdOracleLenders = Object.entries(LENDERS).filter(function (_ref33) {
