@@ -1,10 +1,10 @@
-<!-- ECX Fundraising Tracker v58 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
+<!-- ECX Fundraising Tracker v59 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
      React 18.2.0 + ReactDOM inlined (cdnjs UMD builds), DM Sans / Libre Baskerville
      embedded as woff2 data URIs, bank logos embedded in BANK_ICONS (Google s2 /
      DuckDuckGo favicons fetched at build time). Old claude.ai postMessage shim and
      html-to-image removed (unused by app code). Save/export buttons use the artifact
      downloads capability when available; 5-min autosave disabled in the viewer. -->
-<title>ECX Fundraising Tracker v58</title>
+<title>ECX Fundraising Tracker v59</title>
 <style>
 /* latin-ext */
 @font-face {
@@ -991,7 +991,8 @@ var PROJECTS = [{
     { bank: "ABN AMRO", status: "invited", note: "CLA group" },
     { bank: "LBBW", status: "invited", note: "CLA group" },
     { bank: "Apollo", status: "proposal", note: "7/23: bank loan + institutional tranche, LTC 80-90%, can go to 100% commitment — not mandated" },
-    { bank: "PIMCO", status: "proposal", note: "7/28: +$2bn 100% UW proposal at +275bps / 150bps upfront, LTC 80%, 15yr — not mandated" }],
+    { bank: "PIMCO", status: "proposal", note: "7/28: +$2bn 100% UW proposal at +275bps / 150bps upfront, LTC 80%, 15yr — not mandated" },
+    { bank: "Kutxabank", status: "dialogue", note: "8/5: to be added to the CLA invite list — relationship call w/ Marjolein; €30-50m sweet spot, max €115m" }],
   expectedClose: "26Q3",
   description: "Nordic combined financing, $4.46bn total — grouped card with the two country workstreams broken out below. Leroy bridge + PF take-out structure. MSFT as primary tenant. Preparing materials and model.",
   region: "EMEA",
@@ -2124,6 +2125,45 @@ var LENDERS = {
       "Equipment Facility (Nemo)": "1/29/26 - Ok with long tenure while acknowledging LLE will stay in for 6 months then get refi-ed. Could do 100% LTC by marketing it as a HoldCo. DDTL structure to unlock institutional funds."
     }
   },
+  Kutxabank: {
+    status: "approached",
+    type: "Bank",
+    contacts: "Carmela Delso, Alejandro Mendezona, Naia Eroa",
+    lastContact: "8/5/26",
+    lastFundraisingCall: "8/5/26",
+    financialLead: "MH",
+    contactDetails: [{
+      name: "Carmela Delso",
+      title: "Kutxabank",
+      email: "-",
+      phone: "-"
+    }, {
+      name: "Alejandro Mendezona",
+      title: "Kutxabank",
+      email: "-",
+      phone: "-"
+    }, {
+      name: "Naia Eroa",
+      title: "Kutxabank",
+      email: "-",
+      phone: "-"
+    }],
+    notes: [{
+      date: "8/5/26",
+      source: "Email — Marjolein Heida (Meeting notes - Kutxabank 5/8, to DCM)",
+      author: "Marjolein Heida",
+      attendees: "ECX: Marjolein Heida | Kutxabank: Carmela Delso, Alejandro Mendezona, Naia Eroa",
+      content: "ECX/EQT relationship call following the €20m transfer for Beluga (SocGen sell-down) — likes the portfolio effect.\n\nProfile: originally a Spanish retail bank; management change is driving increased corporate banking activity. Geography: EMEA, US + Australia. Already a lender to EQT portfolio company Zelestra and looking to expand the EQT relationship. Focus on new clients in energy + digital infra (3 DC transactions done). Full product suite: PF, leveraged finance, RE + Letters of Credit.\n\nTicket size: €30-50m sweet spot, max €115m. Tenant preference: BTS / hyperscale.\n\nNext step: add to the Project Salar invite list."
+    }],
+    existingFacilities: {
+      "Beluga": "$23m (€20m — taken via SocGen sell-down transfer, Aug-26)"
+    },
+    rejectedProjects: {},
+    projects: {
+      "Project Salar — Norway & Finland": "8/5/26 - To be added to the Salar invite list (next step from Marjolein's relationship call). €30-50m sweet-spot ticket, max €115m; prefers BTS/hyperscale."
+    },
+    nextSteps: "Add to Project Salar invite list (per 8/5/26 call)."
+  },
   KDB: {
     status: "approached",
     type: "Bank",
@@ -2800,6 +2840,12 @@ var LENDERS = {
       phone: "-"
     }],
     notes: [{
+      date: "8/4/26",
+      source: "Email thread — ECX x Santander NDA (Jennifer Johnson / Rithika Nistala)",
+      author: "Rithika Nistala",
+      materials: "NDA — Santander redline received 8/3; ECX-signed version sent 8/4 to Santander (Nauman Niaz / Ibrahim Arala) for countersignature.",
+      content: "NDA for the market catch-up workstream executed on the ECX side 8/4/26 and sent to Santander for countersignature (Santander provided their redline 8/3). Clears the way for sharing materials for the market catch-up / TLB-LevFin dialogue."
+    }, {
       date: "7/14/26",
       source: "Email — Laura Godschalx (Santander catch up call 7/14)",
       author: "Laura Godschalx",
