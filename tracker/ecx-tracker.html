@@ -1,10 +1,10 @@
-<!-- ECX Fundraising Tracker v57 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
+<!-- ECX Fundraising Tracker v58 — artifact edition (v50 base + v51 packaging + v52 grouping/inputs). Fully self-contained:
      React 18.2.0 + ReactDOM inlined (cdnjs UMD builds), DM Sans / Libre Baskerville
      embedded as woff2 data URIs, bank logos embedded in BANK_ICONS (Google s2 /
      DuckDuckGo favicons fetched at build time). Old claude.ai postMessage shim and
      html-to-image removed (unused by app code). Save/export buttons use the artifact
      downloads capability when available; 5-min autosave disabled in the viewer. -->
-<title>ECX Fundraising Tracker v57</title>
+<title>ECX Fundraising Tracker v58</title>
 <style>
 /* latin-ext */
 @font-face {
@@ -3731,6 +3731,35 @@ var BOND_MARKET_NOTES = [{
 }];
 
 // ── Helper Functions ──────────────────────────────────────────────────────────
+// v58: keep lender cards and the projects' Bank Outreach in lockstep. The outreach lists
+// (CF Pipeline bank matrix + call notes) live on the project cards; this backfill reflects
+// each entry onto the bank's own card so the two views can never disagree: non-declined
+// statuses land in projects{} (linked chip + Active Pipeline exposure), declines land in
+// rejectedProjects{}. Entries the card already carries are skipped — names are compared
+// normalized, so near-miss keys like "Project Vendace (Sweden) Syndication" vs
+// "Project Vendace — Sweden Syndication" don't duplicate.
+(function backfillOutreachToLenders() {
+  var norm = function (x) { return String(x || "").toLowerCase().replace(/[^a-z0-9]/g, ""); };
+  var labels = { lead: "Lead / mandated", invited: "Invited", support: "Support", dialogue: "In dialogue", proposal: "Proposal received" };
+  PROJECTS.forEach(function (p) {
+    (p.outreach || []).forEach(function (o) {
+      var info = LENDERS[o.bank];
+      if (!info) return;
+      var pn = norm(p.name);
+      var inProjects = Object.keys(info.projects || {}).some(function (k) { return norm(k) === pn; });
+      var inRejected = Object.keys(info.rejectedProjects || {}).some(function (k) { return norm(k) === pn; });
+      if (o.status === "declined") {
+        if (inRejected || inProjects) return;
+        if (!info.rejectedProjects) info.rejectedProjects = {};
+        info.rejectedProjects[p.name] = (o.note || "Declined") + " (per CF Pipeline bank matrix, 8/4/26)";
+        return;
+      }
+      if (inProjects || inRejected) return;
+      if (!info.projects) info.projects = {};
+      info.projects[p.name] = (labels[o.status] || o.status) + " — " + (o.note || "") + " (per CF Pipeline bank matrix / call notes, 8/4/26)";
+    });
+  });
+})();
 var REGIONS = ["All Regions", "US", "Europe", "APAC", "Global"];
 var PROJECT_TYPES = ["All Types", "Project Finance", "HoldCo", "Equipment", "ABS", "LC", "Bond", "Other"];
 var LENDER_TYPES = ["All Types", "Bank", "Credit Fund", "Counsel"];
@@ -10481,20 +10510,20 @@ var CAPTABLE_ACTUALS = {
   url: "https://edgeconnex-my.sharepoint.com/personal/eholst_edgeconnex_com/Documents/Corporate%20Finance_Team/12.%20Portfolio%20Management%20-%20Loans%20Outstanding/04.%20Debt%20Overviews/08.%20EQT/7.16.26%20ECX%20Debt%20Slide/June%202026%20Debt%20Overview.xlsx",
   totalPerFile: 22059.9,
   facilities: {
-    "Wahoo": { c: 2500.0, d: 1286.2, rt: "Floating", mg: "3.25%", bc: "SOFR", ai: "6.50%", mat: "Dec-28", ext: "Dec-30", ph: "114%", cf: "0.25%", hs: "Hedged" },
-    "Webster": { c: 25.0, d: 19.9, rt: "Floating", mg: "3.75%", bc: "SOFR", ai: "7.50%", mat: "Sep-28", ph: "100%", hs: "Hedged" },
-    "Narwhal (Ares HoldCo)": { c: 2402.4, d: 2402.4, rt: "Floating", mg: "5.45%", bc: "EURIBOR", ai: "8.45%", mat: "Feb-31", ph: "77%", cf: "1.50%", hs: "Hedged" },
-    "Beluga": { c: 6721.7, d: 5084.1, rt: "Floating", mg: "2.05%", bc: "EURIBOR", ai: "4.21%", mat: "Mar-33", ph: "100%", cf: "0.79%", hs: "Hedged" },
-    "Gotham SFL": { c: 593.3, d: 428.8, rt: "Floating", mg: "2.79%", bc: "SOFR", ai: "6.56%", mat: "Aug-30", ext: "Aug-32", ph: "93%", cf: "0.86%", hs: "Hedged" },
+    "Wahoo": { hr: "3.25%", hi: "swap", c: 2500.0, d: 1286.2, rt: "Floating", mg: "3.25%", bc: "SOFR", ai: "6.50%", mat: "Dec-28", ext: "Dec-30", ph: "114%", cf: "0.25%", hs: "Hedged" },
+    "Webster": { hr: "3.75%", hi: "cap", c: 25.0, d: 19.9, rt: "Floating", mg: "3.75%", bc: "SOFR", ai: "7.50%", mat: "Sep-28", ph: "100%", hs: "Hedged" },
+    "Narwhal (Ares HoldCo)": { hr: "3.00%", hi: "cap", c: 2402.4, d: 2402.4, rt: "Floating", mg: "5.45%", bc: "EURIBOR", ai: "8.45%", mat: "Feb-31", ph: "77%", cf: "1.50%", hs: "Hedged" },
+    "Beluga": { hr: "2.18%", hi: "swap", c: 6721.7, d: 5084.1, rt: "Floating", mg: "2.05%", bc: "EURIBOR", ai: "4.21%", mat: "Mar-33", ph: "100%", cf: "0.79%", hs: "Hedged" },
+    "Gotham SFL": { hr: "3.77%", hi: "swap", c: 593.3, d: 428.8, rt: "Floating", mg: "2.79%", bc: "SOFR", ai: "6.56%", mat: "Aug-30", ext: "Aug-32", ph: "93%", cf: "0.86%", hs: "Hedged" },
     "Gotham EBL": { c: 160.0, d: 139.2, rt: "Floating", mg: "2.55%", bc: "SOFR", ai: "6.32%", mat: "Jan-27", cf: "0.86%", hs: "Hedged" },
     "AMS RE AMS09": { c: 68.6, d: 20.0, rt: "Floating", mg: "2.50%", bc: "EURIBOR", ai: "4.95%", mat: "Oct-26", hs: "Unhedged" },
-    "Bluefin": { c: 200.0, d: 158.2, rt: "Floating", mg: "2.97%", bc: "SOFR", ai: "6.58%", mat: "Feb-30", ph: "105%", cf: "0.89%", hs: "Hedged" },
-    "Tarpon SFL": { c: 846.5, d: 688.4, rt: "Floating", mg: "2.25%", bc: "SOFR", ai: "5.70%", mat: "Aug-30", ph: "95%", cf: "0.68%", hs: "Hedged" },
+    "Bluefin": { hr: "3.61%", hi: "swap", c: 200.0, d: 158.2, rt: "Floating", mg: "2.97%", bc: "SOFR", ai: "6.58%", mat: "Feb-30", ph: "105%", cf: "0.89%", hs: "Hedged" },
+    "Tarpon SFL": { hr: "3.45%", hi: "swap", c: 846.5, d: 688.4, rt: "Floating", mg: "2.25%", bc: "SOFR", ai: "5.70%", mat: "Aug-30", ph: "95%", cf: "0.68%", hs: "Hedged" },
     "Tarpon EBL": { c: 153.9, d: 153.9, rt: "Floating", mg: "1.50%", bc: "SOFR", ai: "4.95%", mat: "Jan-28", cf: "0.45%", hs: "Hedged" },
-    "Shiner": { c: 1040.5, d: 427.0, rt: "Floating", mg: "3.75%", bc: "SOFR", ai: "7.07%", mat: "Oct-29", ext: "Oct-30", ph: "108%", cf: "1.31%", hs: "Hedged" },
+    "Shiner": { hr: "3.32%", hi: "swap", c: 1040.5, d: 427.0, rt: "Floating", mg: "3.75%", bc: "SOFR", ai: "7.07%", mat: "Oct-29", ext: "Oct-30", ph: "108%", cf: "1.31%", hs: "Hedged" },
     "Leroy": { c: 1000.0, d: 357.1, rt: "Floating", mg: "3.75%", bc: "SOFR", ai: "7.50%", mat: "Aug-29", ext: "Aug-30", cf: "2.50%", hs: "Unhedged" },
-    "Walleye": { c: 3074.2, d: 1637.0, rt: "Floating", mg: "2.50%", bc: "SOFR", ai: "6.21%", mat: "Apr-30", ext: "Apr-31", ph: "74%", cf: "0.75%", hs: "Hedged" },
-    "Metropolis": { c: 326.7, d: 326.7, rt: "Floating", mg: "2.00%", bc: "SOFR", ai: "5.58%", mat: "Nov-26", ext: "May-27", ph: "85%", cf: "0.50%", hs: "Hedged" },
+    "Walleye": { hr: "3.71%", hi: "swap", c: 3074.2, d: 1637.0, rt: "Floating", mg: "2.50%", bc: "SOFR", ai: "6.21%", mat: "Apr-30", ext: "Apr-31", ph: "74%", cf: "0.75%", hs: "Hedged" },
+    "Metropolis": { hr: "3.58%", hi: "swap", c: 326.7, d: 326.7, rt: "Floating", mg: "2.00%", bc: "SOFR", ai: "5.58%", mat: "Nov-26", ext: "May-27", ph: "85%", cf: "0.50%", hs: "Hedged" },
     "Narluga": { c: 360.0, d: 360.0, rt: "Floating", mg: "6.00%", bc: "SOFR", ai: "9.75%", mat: "Jun-32", cf: "1.50%", hs: "Unhedged" },
     "Vendace": { c: 857.4, d: 285.9, rt: "Floating", mg: "2.75%", bc: "EURIBOR", ai: "5.20%", mat: "Feb-27", ext: "Aug-27", cf: "0.96%", hs: "Unhedged" },
     "US ABS I": { c: 348.4, d: 348.4, rt: "Fixed", mg: "4.25%", ai: "4.25%", mat: "Dec-27", hs: "Hedged" },
@@ -10586,7 +10615,7 @@ function GlobalCapTableTab() {
           h("th", { style: Object.assign({}, thStyle, { textAlign: "right" }) }, "Commitments"),
           h("th", { style: Object.assign({}, thStyle, { textAlign: "right" }) }, "Drawn"),
           h("th", { style: Object.assign({}, thStyle, { textAlign: "right" }) }, "Remaining"),
-          h("th", { style: thStyle }, "Rate"),
+          h("th", { style: thStyle }, "Rate \u2014 Paying"),
           h("th", { style: thStyle }, "Maturity"),
           h("th", { style: thStyle }, "Hedge"),
           h("th", { style: Object.assign({}, thStyle, { textAlign: "right" }) }, "# Banks"),
@@ -10595,7 +10624,17 @@ function GlobalCapTableTab() {
           var isOpen = expanded === r.name;
           var dt = r.det || {};
           var rateTop = dt.rt === "Fixed" ? "Fixed " + (dt.mg || "") : dt.mg ? (dt.bc || "") + " + " + dt.mg : "\u2014";
-          var rateSub = dt.rt !== "Fixed" && dt.ai ? dt.ai + " all-in" : "";
+          var pct = function (x) { var m = String(x || "").match(/([0-9]+(?:\.[0-9]+)?)/); return m ? parseFloat(m[1]) : null; };
+          var rateSub = "";
+          if (dt.rt !== "Fixed") {
+            if (dt.hr && dt.hi === "swap" && pct(dt.mg) != null) {
+              rateSub = "paying " + (pct(dt.mg) + pct(dt.hr)).toFixed(2) + "% \u2014 " + (dt.bc || "base") + " swapped @ " + dt.hr;
+            } else if (dt.hr && dt.hi === "cap") {
+              rateSub = "capped \u2014 " + (dt.bc || "base") + " \u2264 " + dt.hr + (pct(dt.mg) != null ? " (max " + (pct(dt.mg) + pct(dt.hr)).toFixed(2) + "%)" : "");
+            } else if (dt.ai) {
+              rateSub = dt.ai + " all-in" + (dt.hs === "Unhedged" ? " @ spot \u2014 floats" : "");
+            }
+          }
           var hedgeCell = dt.hs === "Hedged" ? h("span", { style: { fontSize: 10.5, fontWeight: 700, color: "#065F46", background: "#D1FAE5", border: "1px solid #6EE7B7", borderRadius: 5, padding: "2px 8px", whiteSpace: "nowrap" } }, "\u2713 Hedged" + (dt.ph ? " \u00B7 " + dt.ph : "")) : dt.hs === "Unhedged" ? h("span", { style: { fontSize: 10.5, fontWeight: 700, color: "#92400E", background: "#FEF3C7", border: "1px solid #FCD34D", borderRadius: 5, padding: "2px 8px", whiteSpace: "nowrap" } }, "\u26A0 Unhedged") : h("span", { style: { color: "#9CA3AF" } }, "\u2014");
           var mainRow = h("tr", { key: r.name, onClick: function onClick() { setExpanded(isOpen ? null : r.name); }, style: { borderBottom: "1px solid #F1F5F9", background: isOpen ? "#EFF6FF" : i % 2 === 0 ? "#fff" : "#F8FAFC", cursor: "pointer" } },
             h("td", { style: { padding: "9px 14px", color: "#9CA3AF" } }, isOpen ? "\u25BE" : "\u25B8"),
@@ -10603,7 +10642,7 @@ function GlobalCapTableTab() {
             h("td", { style: Object.assign({}, numTd, { fontWeight: 700, color: "#1D4ED8" }) }, fmtM(r.total)),
             h("td", { style: numTd }, fmtM(r.drawn)),
             h("td", { style: Object.assign({}, numTd, { color: r.remaining != null ? "#065F46" : "#374151" }) }, fmtM(r.remaining)),
-            h("td", { style: { padding: "7px 14px", whiteSpace: "nowrap" } }, h("div", { style: { fontSize: 12, fontWeight: 700, color: dt.rt === "Fixed" ? "#7C3AED" : "#0F2444" } }, rateTop), rateSub ? h("div", { style: { fontSize: 10.5, color: "#6B7280" } }, rateSub) : null),
+            h("td", { style: { padding: "7px 14px", whiteSpace: "nowrap" } }, h("div", { style: { fontSize: 12, fontWeight: 700, color: dt.rt === "Fixed" ? "#7C3AED" : "#0F2444" } }, rateTop), rateSub ? h("div", { style: { fontSize: 10.5, color: dt.hr ? "#065F46" : "#6B7280", fontWeight: dt.hr ? 700 : 400 } }, rateSub) : null),
             h("td", { style: { padding: "9px 14px", whiteSpace: "nowrap", fontSize: 12, fontWeight: 600, color: "#374151" } }, dt.mat || "\u2014", dt.ext && dt.ext !== dt.mat ? h("span", { style: { color: "#9CA3AF", fontWeight: 500 } }, " \u2192 " + dt.ext) : null),
             h("td", { style: { padding: "9px 14px" } }, hedgeCell),
             h("td", { style: numTd }, r.banks.length),
@@ -10614,7 +10653,7 @@ function GlobalCapTableTab() {
           if (dt.rt === "Fixed") { if (dt.mg) terms.push("coupon " + dt.mg); } else if (dt.mg) { terms.push((dt.bc || "") + " + " + dt.mg + (dt.ai ? " (all-in " + dt.ai + ")" : "")); }
           if (dt.mat) terms.push("maturity " + dt.mat + (dt.ext && dt.ext !== dt.mat ? " (ext. " + dt.ext + ")" : ""));
           if (dt.cf) terms.push("commitment fee " + dt.cf);
-          if (dt.hs) terms.push(dt.hs + (dt.ph ? " (" + dt.ph + " of T3 notional)" : ""));
+          if (dt.hs) terms.push(dt.hs + (dt.ph ? " (" + dt.ph + " of T3 notional)" : "") + (dt.hr ? " \u2014 " + (dt.hi === "cap" ? "cap strike " : "swap fixed rate ") + dt.hr + " per Hedging Summary 7.13.26" : ""));
           var detail = h("tr", { key: r.name + "__all" }, h("td", { colSpan: 10, style: { padding: "10px 20px 16px 34px", background: "#F8FAFC", borderBottom: "2px solid #BFDBFE" } },
             h("div", { style: { fontSize: 11.5, color: "#374151", marginBottom: 10, background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 6, padding: "6px 12px", display: "inline-block" } }, h("b", null, "Terms: "), terms.join(" \u00B7 ")),
             h("div", { style: { fontSize: 11, fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 } }, r.name + " \u2014 all committed banks (" + r.banks.length + ")"),
@@ -10628,7 +10667,7 @@ function GlobalCapTableTab() {
         return h("span", { key: x.name, style: { background: "#fff", border: "1px solid #FDE68A", borderRadius: 6, padding: "3px 10px", fontSize: 11.5, fontWeight: 600, color: "#78350F" } }, x.name + (x.total > 0 ? " \u2014 ~" + fmtM(x.total) : "") + " \u00B7 " + x.banks + (x.banks === 1 ? " bank" : " banks"));
       })),
       h("div", { style: { marginTop: 8, fontSize: 11, color: "#92400E", lineHeight: 1.5 } }, "Amounts are card-derived estimates from lender existing-facilities data, not Debt Overview figures. Uncommitted LC lines and the Marvel/ACX (AdaniConneX JV) exposures sit off the Notes Payable Overview by design \u2014 full detail lives on the lender cards.")) : null,
-    h("div", { style: { marginTop: 10, padding: "10px 16px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 11, color: "#6B7280", lineHeight: 1.6 } }, "This tab shows the Notes Payable Overview universe only \u2014 all commitment, drawn and remaining figures come from the " + CAPTABLE_ACTUALS.source + " (EUR at 1.14315). Total commitments tie to $22.059bn, including King ($380.6m) and the $50m RCF which the file's own Total row formula misses. Off-overview exposures are itemized in the amber note above. Rate, maturity and hedge columns come from the same sheet; for multi-tranche facilities (e.g. Ares HoldCo, Leroy, Walleye) the lead named tranche's terms are shown \u2014 tranche-level detail is in the file. Hedge % is the T3 (or T1) hedge notional vs. drawn per the sheet. Bank breakdown chips come from the per-bank existing-facilities data on the lender cards and may not sum exactly to the overview totals (different snapshot dates / FX); facilities without matched card data (e.g. Webster, King, US ABS) show no chips. Click a row for the full committed-bank list. Refresh monthly: ask Claude to update the cap table from the latest Debt Overview (Notes Payable Overview sheet only) and tie out the new total."));
+    h("div", { style: { marginTop: 10, padding: "10px 16px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 11, color: "#6B7280", lineHeight: 1.6 } }, "This tab shows the Notes Payable Overview universe only \u2014 all commitment, drawn and remaining figures come from the " + CAPTABLE_ACTUALS.source + " (EUR at 1.14315). Total commitments tie to $22.059bn, including King ($380.6m) and the $50m RCF which the file's own Total row formula misses. Off-overview exposures are itemized in the amber note above. Rate, maturity and hedge columns come from the same sheet; for multi-tranche facilities (e.g. Ares HoldCo, Leroy, Walleye) the lead named tranche's terms are shown \u2014 tranche-level detail is in the file. Hedge % is the T3 (or T1) hedge notional vs. drawn per the sheet. The Rate column top line is the contractual pricing (base + margin); for hedged floaters the green sub-line is what we actually pay \u2014 margin + the 6/30/26 swap fixed rate (or cap strike) from the Hedging Summary (7.13.2026) sheet in the same workbook, applying to the hedged notional (see Hedge %); the unhedged remainder floats at spot. Unhedged rows show the file\u2019s all-in at the 6/30 spot fixing. Ares HoldCo shows the EUR-tranche 3.00% cap; a second 4.50% cap covers the SOFR tranche per the file. Gotham/Tarpon EBLs are hedged under their facility programs \u2014 no separate swap line in the summary. Bank breakdown chips come from the per-bank existing-facilities data on the lender cards and may not sum exactly to the overview totals (different snapshot dates / FX); facilities without matched card data (e.g. Webster, King, US ABS) show no chips. Click a row for the full committed-bank list. Refresh monthly: ask Claude to update the cap table from the latest Debt Overview (Notes Payable Overview sheet only) and tie out the new total."));
 }
 
 // ── Guide Tab (what this tracker is, where every number comes from, how to update it) ──
@@ -11819,7 +11858,7 @@ function App() {
       color: "#6B7280",
       marginBottom: 16
     }
-  }, "Showing ", filteredLenders.length, " of ", Object.keys(LENDERS).length, " lenders \u00B7 sorted by most recent conversation"), /*#__PURE__*/React.createElement("div", {
+  }, "Showing ", filteredLenders.length, " of ", Object.keys(LENDERS).length, " lenders \u00B7 sorted by active pipeline exposure (largest first; ties by most recent conversation)"), /*#__PURE__*/React.createElement("div", {
     style: { display: "flex", gap: 6, justifyContent: "flex-end", marginTop: -30, marginBottom: 14 }
   }, [["cards", "\u25A6 Cards"], ["table", "\u2630 Table"]].map(function (v) {
     return /*#__PURE__*/React.createElement("button", {
