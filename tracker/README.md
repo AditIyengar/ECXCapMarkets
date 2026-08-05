@@ -2,7 +2,7 @@
 
 **Live URL (stable across versions):** https://claude.ai/code/artifact/a64c39ce-7e3b-4d10-a556-5c889d6e0bdb
 
-`ecx-tracker.html` is the artifact edition of the tracker (currently **v51**, built from `ECX_Tracker_v50.html`). It is published as a claude.ai Artifact so the team opens one URL instead of passing versioned HTML files around. The artifact is private by default — share it with the team from the page's share menu.
+`ecx-tracker.html` is the **master** — the single live file, published under the stable name "ECX Fundraising Tracker — Master" (the artifact title never changes). Internal version numbers live only in the header's LAST_REFRESH stamp and the changelog; each release is archived as a copy under `tracker/versions/ECX_Tracker_v<NN>.html` (v60 onward; git history covers everything). Originally built from `ECX_Tracker_v50.html`. It is published as a claude.ai Artifact so the team opens one URL instead of passing versioned HTML files around. The artifact is private by default — share it with the team from the page's share menu.
 
 ## How this edition differs from the SharePoint file
 

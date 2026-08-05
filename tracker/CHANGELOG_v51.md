@@ -71,3 +71,8 @@
 ## v60 Changelog (8/5/26) — Last-Refresh Stamp + Weekday Auto-Refresh Routine
 - **Header now shows freshness**: "🔄 Last refreshed [date/time ET] (vNN) · auto-sweeps Outlook call notes weekday evenings (ET)" under the tracker subtitle, driven by a LAST_REFRESH constant updated on every sync/refresh.
 - **Automated refresh scheduled**: a routine fires every weekday at 6:30 PM ET (5:30 PM in winter — cron is UTC-fixed) into the tracker maintenance session. Each run: sweeps Aditya's Outlook + Bank Meetings folder for bank call/meeting notes since the last stamp, folds them into cards under the standing conventions (new cards as needed; lastContact only for documented calls; project/outreach links kept in lockstep), runs the full QC suite, republishes to the same artifact URL, updates the stamp, commits + pushes. Quiet stamp-only republish when nothing new; Aditya is pinged only on material changes or failures. Fallback: if a headless run can't reach the Microsoft 365 connector, it skips without touching anything and flags only on repeat failure.
+
+## v61 Changelog (8/5/26) — Master Naming Convention
+- **The published page is now permanently titled "ECX Fundraising Tracker — Master"** — the name no longer changes with each release. Version numbers appear only in the header's Last-refreshed stamp ("… (v61)"), this changelog, and the archive.
+- **Releases are archived as copies in `tracker/versions/`** (`ECX_Tracker_v60.html`, `ECX_Tracker_v61.html`, …) alongside git history, replacing the version-in-title convention. The artifact URL and file path are unchanged.
+- The weekday auto-refresh routine was updated to follow the same convention (stable title, stamp-only version bump, archive copy per release).
