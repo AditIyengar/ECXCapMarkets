@@ -174,3 +174,26 @@ Anything that does not map to an intent falls back to a **ranked keyword search*
 **Noted, not changed:** the file still carries a dead `AIAssistant` component from the pre-artifact build that `fetch`es `api.anthropic.com` with a hardcoded model id. It is unreachable — no entry in `TABS` routes to it — and the CSP would block the call regardless. Left in place to keep this release to the feature; worth deleting on a future pass.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright run drove **21 real questions** through the tab — every one returned the expected answer shape, including the two deliberate nonsense queries, with zero console/page errors and zero external requests. Tab bar now reads Inputs & Review · ❓ Ask · Active Lenders (56) · Active Projects (24) · Closed 2025 & 2026 (18) · Fees · Commitments · Cap Table · Guide. Archived to `tracker/versions/ECX_Tracker_v66.html`.
+
+---
+
+## v67 Changelog (8/10/26) — full sweep
+
+Released **8/10/26, 12:25 PM ET**. Full sweep: mailbox-wide since the v65 data cut (8/10 ~10:40 AM ET) **plus** a complete audit of the "Bank Meetings" folder with no date filter. Title unchanged.
+
+**Coverage note — the "Bank Meetings" folder was being under-read.** Earlier sweeps queried that folder with a date filter, which the Graph search does not combine with `folderName`, so it silently returned nothing. Read without a filter it holds 24 items spanning 7/7–7/28/26. All of them were cross-checked against the tracker and **every one is already reflected**: CIBC catch-up 7/14 (card note 7/14, lastContact 7/15), SMBC meeting with Phil Green and Luke Hanson 7/16 (note 7/16), BMO 7/21, MUFG Austin Energy Center 7/21, Apollo/Apterra 7/22 and 7/23, SMBC catch-up 7/22, PIMCO Nordics 7/28, Santander 7/14. No backlog to recover. Future sweeps should read this folder without a date filter and rely on the cross-check instead.
+
+**One substantive addition — Project Austin site infrastructure financing.** The wastewater and roads financing for the Austin campus, which sits alongside (not inside) the AUS10 debt raise:
+
+- Winstead (Justin Cox) confirmed **tax-exempt MUD bonds are not available** here. Tax counsel's guidance is that the tax base must include at least 10 independent taxpayers, with no single taxpayer responsible for more than 75% of payments — ECX as effectively the sole landowner and taxpayer cannot meet that.
+- The **taxable** route works mechanically: the MUD issues taxable bonds, reimburses ECX for eligible costs, then levies a debt-service property tax over 30 years. But it does not shift the cost the way a residential MUD does — as landowner, ECX would bear the bond repayment plus soft costs and taxes through its own property taxes. Worth understanding before treating this as developer reimbursement.
+- The District has **no financial advisor appointed yet**; that consultant would run the taxable-bond numbers. Winstead offered to walk the group through what a taxable issue entails.
+- Laura asked BCEI for a two-pager before committing to a call. Randy Scott (BCEI) is not the MUD-law expert and handed the questions to Winstead (Justin Cox, Ross Martin).
+
+No lender card was created — Winstead and BCEI are counsel and a development partner, not lenders, per the standing convention.
+
+**Excluded from the sweep:** construction and PM status reports (PHX11/PHX12, CHI03/04, ATL11/12/13, AUS02, AUS11/16, New Albany South, PCX PMO), the Austin GW Campus coordination-call notes, the AUS Campus Land Financing LTA report v2 forward, the Ashville VDR/KYC and structure-chart thread, Ashville due diligence, Google valuation inputs, and the MOR board slides — project-workstream traffic, not bank conversations.
+
+**Still open from v65/v66, unchanged:** Project Canyon (Copia Bridge) has an executed commitment letter and a first Credit Agreement draft but no project card; Barclays, NordLB and Wells Fargo have no lender cards; the dead `AIAssistant` component is still in the file.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright smoke test green — zero console/page errors, zero external requests, 56 lenders / 24 active / 18 closed / 13 market entries, title unchanged, stamp reads v67, and the Ask tab returns the new MUD and tax-exempt-bond language when queried. Archived to `tracker/versions/ECX_Tracker_v67.html`.
