@@ -65,8 +65,15 @@ if (titleAt < 0 || headEnd < 0 || bodyOpen < 0 || bodyClose < 0) {
   fail("could not find the document wrapper markers");
 }
 
-// Favicon travels as a publish parameter, not as markup.
-const head = html.slice(titleAt, headEnd).trim().replace(/<link rel="icon"[\s\S]*?>\s*/, "");
+// Favicon travels as a publish parameter, not as markup. Strip the whole line:
+// the href is an inline SVG data URI containing its own ">" characters, so a
+// lazy match to the first ">" stops inside the SVG and leaves broken markup in
+// the head — which in turn swallows the <title>.
+const head = html.slice(titleAt, headEnd).trim()
+  .split("\n")
+  .filter(function (line) { return !/<link\s+rel="icon"/i.test(line); })
+  .join("\n");
+if (/<link\s+rel="icon"|<\/svg>/i.test(head)) fail("favicon markup survived the strip");
 const body = html.slice(bodyOpen + "<body>".length, bodyClose).trim();
 const out = head + "\n\n" + body + "\n";
 
