@@ -141,6 +141,25 @@
   .projchip.on { color: #fff; border-color: transparent; }
   .projchip.on .dot { display: none; }
 
+  /* quick add */
+  .quickadd { padding: 11px 14px 12px; margin-bottom: 14px; }
+  .qarow { display: flex; align-items: center; gap: 10px; }
+  .qaplus { color: var(--teal); font-size: 19px; font-weight: 700; line-height: 1; }
+  #qa {
+    flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+    font-size: 14px; color: var(--ink); padding: 3px 0;
+  }
+  #qa::placeholder { color: var(--ink-soft); }
+  .qahint { font-size: 11px; color: var(--ink-soft); margin-top: 7px; padding-left: 29px; }
+  .qahint b { color: var(--ink); font-weight: 600; }
+  .qaprev {
+    display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+    margin-top: 9px; padding: 8px 0 0 29px; border-top: 1px dashed var(--line);
+  }
+  .qatitle { font-size: 13px; font-weight: 500; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn:disabled:hover { transform: none; }
+
   /* board */
   .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; align-items: start; }
   .col { padding: 15px 16px; border-top: 4px solid var(--line); }
@@ -810,6 +829,108 @@ window.TASKFLOW_DATA = {
   function isOpen(t) { return t.status !== "Done"; }
   function isOverdue(t) { return isOpen(t) && t.due && t.due < todayISO(); }
 
+  /* ---------------- quick-add parsing -------------------------------------
+   * Typed shorthand, parsed here in the browser — no model call, so it works
+   * on a static page. Recognised: @owner, #project, ! (high) / ~ (low), and a
+   * date in any of: today | tomorrow | <weekday> | next <weekday> |
+   * in N days | eow | 8/14 | aug 14 | 14 aug.
+   * ---------------------------------------------------------------------- */
+  var DAYNAMES = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  var MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+
+  function addDaysISO(iso, n) {
+    var d = parseISO(iso);
+    return civilISO(civil(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + n));
+  }
+  function nextWeekday(targetDow, skipAWeek) {
+    var today = todayISO();
+    var cur = parseISO(today).getUTCDay();
+    var delta = (targetDow - cur + 7) % 7;
+    if (skipAWeek) delta += 7;
+    return addDaysISO(today, delta);
+  }
+  function matchProject(word) {
+    var w = word.toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!w) return null;
+    var exact = null, prefix = null;
+    D.projects.forEach(function (p) {
+      var n = p.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (n === w) exact = p;
+      else if (!prefix && n.indexOf(w) === 0 && w.length >= 3) prefix = p;
+    });
+    return exact || prefix;
+  }
+
+  function parseQuick(raw) {
+    var out = { title: "", projectId: null, due: "", priority: "medium", assignee: "Me", hits: [] };
+    var s = " " + String(raw || "").trim().replace(/\s+/g, " ") + " ";
+
+    s = s.replace(/\s@([A-Za-z][\w.&-]*)\s/g, function (m, n) {
+      out.assignee = n; out.hits.push({ k: "owner", v: n }); return " ";
+    });
+    s = s.replace(/\s#([A-Za-z][\w-]*)\s/g, function (m, n) {
+      var p = matchProject(n);
+      if (!p) return m;
+      out.projectId = p.id; out.hits.push({ k: "project", v: p.name }); return " ";
+    });
+    s = s.replace(/\s(!!|!)\s/g, function () {
+      out.priority = "high"; out.hits.push({ k: "priority", v: "High" }); return " ";
+    });
+    s = s.replace(/\s~\s/g, function () {
+      out.priority = "low"; out.hits.push({ k: "priority", v: "Low" }); return " ";
+    });
+
+    function takeDate(re, fn) {
+      if (out.due) return;
+      s = s.replace(re, function () {
+        var iso = fn.apply(null, arguments);
+        if (!iso) return arguments[0];
+        out.due = iso; out.hits.push({ k: "due", v: fmtDay(iso) });
+        return " ";
+      });
+    }
+    takeDate(/\s(today|tod)\s/i, function () { return todayISO(); });
+    takeDate(/\s(tomorrow|tmrw|tmw)\s/i, function () { return addDaysISO(todayISO(), 1); });
+    takeDate(/\sin (\d{1,3}) days?\s/i, function (m, n) { return addDaysISO(todayISO(), parseInt(n, 10)); });
+    takeDate(/\s(eow|end of week)\s/i, function () { return nextWeekday(5, false); });
+    takeDate(/\s(next )?(sun|mon|tues?|wed(nes)?|thur?s?|fri|sat(ur)?)(day)?\s/i, function (m, nx, stem) {
+      var st = stem.toLowerCase(), dow = -1;
+      for (var i = 0; i < DAYNAMES.length; i++) if (DAYNAMES[i].indexOf(st.slice(0, 3)) === 0) dow = i;
+      if (st.indexOf("thu") === 0) dow = 4;
+      if (st.indexOf("tue") === 0) dow = 2;
+      return dow < 0 ? null : nextWeekday(dow, !!nx);
+    });
+    takeDate(/\s(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\s/, function (m, mo, dy, yr) {
+      var y = yr ? (yr.length === 2 ? 2000 + +yr : +yr) : parseISO(todayISO()).getUTCFullYear();
+      if (+mo < 1 || +mo > 12 || +dy < 1 || +dy > 31) return null;
+      return y + "-" + pad(+mo) + "-" + pad(+dy);
+    });
+    takeDate(/\s([a-z]{3,9}) (\d{1,2})\s/i, function (m, mon, dy) { return monthDay(mon, dy); });
+    takeDate(/\s(\d{1,2}) ([a-z]{3,9})\s/i, function (m, dy, mon) { return monthDay(mon, dy); });
+
+    function monthDay(mon, dy) {
+      var idx = MONTHS.indexOf(mon.toLowerCase().slice(0, 3));
+      if (idx < 0 || +dy < 1 || +dy > 31) return null;
+      var today = todayISO(), y = parseISO(today).getUTCFullYear();
+      var iso = y + "-" + pad(idx + 1) + "-" + pad(+dy);
+      if (iso < today) iso = (y + 1) + "-" + pad(idx + 1) + "-" + pad(+dy); // a past date means next year
+      return iso;
+    }
+
+    out.title = s.replace(/\s+/g, " ").trim();
+    // No explicit #project — infer from a project name appearing in the text.
+    if (!out.projectId && out.title) {
+      var lower = " " + out.title.toLowerCase() + " ";
+      D.projects.forEach(function (p) {
+        if (out.projectId) return;
+        if (lower.indexOf(" " + p.name.toLowerCase() + " ") !== -1) {
+          out.projectId = p.id; out.hits.push({ k: "project", v: p.name + " (from text)" });
+        }
+      });
+    }
+    return out;
+  }
+
   function inboxItems() {
     return (D.inbox || []).map(function (m) {
       return Object.assign({}, m, {
@@ -830,6 +951,7 @@ window.TASKFLOW_DATA = {
     tab: "board",
     project: "all",
     q: "",
+    qa: "",
     showDone: false,
     bucket: "reply",
     month: (function () { var t = parseISO(todayISO()); return civil(t.getUTCFullYear(), t.getUTCMonth(), 1); })(),
@@ -919,6 +1041,8 @@ window.TASKFLOW_DATA = {
     });
     h += "</div>";
 
+    h += quickAddHTML();
+
     h += '<div class="filters">';
     h += '<input type="search" class="field" id="q" placeholder="Search tasks…" value="' + esc(S.q) + '">';
     h += '<label class="toggle"><input type="checkbox" id="showDone"' + (S.showDone ? " checked" : "") + '> show completed</label>';
@@ -952,6 +1076,55 @@ window.TASKFLOW_DATA = {
     h += body.trim() ? '<div class="board">' + body + "</div>"
                      : '<div class="dashed">No tasks match — clear the search or switch project.</div>';
     return h;
+  }
+
+  function quickAddHTML() {
+    var p = parseQuick(S.qa);
+    var hasText = !!p.title;
+    var h = '<div class="card quickadd">';
+    h += '<div class="qarow">';
+    h += '<span class="qaplus" aria-hidden="true">+</span>';
+    h += '<input id="qa" autocomplete="off" placeholder="Add a task…  e.g. Chase T&amp;T on the LTA @T&amp;T #ashville fri !" value="' + esc(S.qa) + '">';
+    h += '<button class="btn btn-teal btn-sm" id="qaAdd"' + (hasText ? "" : " disabled") + '>Add</button>';
+    h += "</div>";
+    if (hasText) {
+      h += '<div class="qaprev"><span class="qatitle">' + esc(p.title) + "</span>";
+      h += '<span class="chip" style="background:' + projById(p.projectId || defaultProject()).color + '22;color:' +
+           projById(p.projectId || defaultProject()).color + '">' +
+           esc(projById(p.projectId || defaultProject()).name) + (p.projectId ? "" : " (default)") + "</span>";
+      if (p.due) h += '<span class="chip" style="background:var(--warn-bg);color:var(--warn-fg)">' + fmtDay(p.due) + "</span>";
+      if (p.priority === "high") h += '<span class="chip" style="background:var(--danger-bg);color:var(--danger-fg)">High</span>';
+      if (p.priority === "low") h += '<span class="chip" style="background:var(--surface-2);color:var(--ink-soft)">Low</span>';
+      if (p.assignee !== "Me") h += '<span class="chip" style="background:var(--cool-bg);color:var(--cool-fg)">' + esc(p.assignee) + "</span>";
+      h += "</div>";
+    } else {
+      h += '<div class="qahint"><b>@name</b> owner · <b>#project</b> · <b>!</b> high · <b>~</b> low · ' +
+           'dates: <b>today</b>, <b>tomorrow</b>, <b>fri</b>, <b>next tue</b>, <b>in 3 days</b>, <b>eow</b>, <b>8/14</b>, <b>aug 14</b></div>';
+    }
+    return h + "</div>";
+  }
+  function defaultProject() {
+    return S.project !== "all" ? S.project : D.projects[0].id;
+  }
+  function commitQuickAdd() {
+    var p = parseQuick(S.qa);
+    if (!p.title) return;
+    L.custom.push({
+      id: "u-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      projectId: p.projectId || defaultProject(),
+      title: p.title,
+      due: p.due,
+      priority: p.priority,
+      assignee: p.assignee,
+      status: "To Do",
+      notes: "",
+      source: "added here " + todayISO()
+    });
+    save();
+    S.qa = "";
+    render();
+    var el = document.getElementById("qa");
+    if (el) el.focus();
   }
 
   function projChip(id, name, color, n) {
@@ -1191,8 +1364,10 @@ window.TASKFLOW_DATA = {
   /* ---------------- events ------------------------------------------------ */
   document.addEventListener("click", function (ev) {
     var t = ev.target.closest("[data-tab],[data-proj],[data-day],[data-mon],[data-bucket]," +
-      "[data-toggle],[data-del],[data-mailtoggle],[data-mailhandled],[data-mailtask],[data-copy],#addTask");
+      "[data-toggle],[data-del],[data-mailtoggle],[data-mailhandled],[data-mailtask],[data-copy],#addTask,#qaAdd");
     if (!t) return;
+
+    if (t.id === "qaAdd") { commitQuickAdd(); return; }
 
     if (t.dataset.tab) { S.tab = t.dataset.tab; render(); return; }
     if (t.dataset.proj) { S.project = t.dataset.proj; render(); return; }
@@ -1255,7 +1430,27 @@ window.TASKFLOW_DATA = {
     }
   });
 
+  document.addEventListener("keydown", function (ev) {
+    if (ev.target.id === "qa" && ev.key === "Enter") { ev.preventDefault(); commitQuickAdd(); }
+    if (ev.target.id === "qa" && ev.key === "Escape") {
+      S.qa = ""; render();
+      var el = document.getElementById("qa"); if (el) el.focus();
+    }
+  });
+
   document.addEventListener("input", function (ev) {
+    // Repaint only the quick-add card so the caret and focus survive each keystroke.
+    if (ev.target.id === "qa") {
+      S.qa = ev.target.value;
+      var caret = ev.target.selectionStart;
+      var card = document.querySelector(".quickadd");
+      if (card) {
+        card.outerHTML = quickAddHTML();
+        var el = document.getElementById("qa");
+        if (el) { el.focus(); el.setSelectionRange(caret, caret); }
+      }
+      return;
+    }
     if (ev.target.id === "q") {
       S.q = ev.target.value;
       var v = document.getElementById("view");
