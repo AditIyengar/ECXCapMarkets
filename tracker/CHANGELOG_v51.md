@@ -142,3 +142,35 @@ Released **8/10/26, 10:45 AM ET**. Sweep window: everything received since the v
 **Flagged:** (1) **Project Canyon is not in the tracker at all.** King & Spalding circulated the first Credit Agreement draft on 8/9 ("ECX - Copia Bridge") against an executed Commitment Letter, with EQT, Grace McLeish, Laura, Matthew Way, Joe and Eelco on it. Legal-draft traffic is out of scope for the sweep, but a live financing with a signed commitment letter and no project card is a real gap — needs size, structure and lender identity before a card can be created. RBC cites Canyon as a success it wants to build on, and BMO's committee "knows a lot more from the Canyon process." (2) Three AUS10 banks still have no lender card: **Barclays, NordLB, Wells Fargo**.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright smoke test green — zero console/page errors, zero external requests, 56 active lenders (was 54), 24 active projects, title unchanged, stamp reads "8/10/26, 10:45 AM ET (v65)", and the new RBC / TD Securities cards plus the MS LTA note, GS Sopaipilla note and materials chips all render. Archived to `tracker/versions/ECX_Tracker_v65.html`.
+
+---
+
+## v66 Changelog (8/10/26) — new "❓ Ask" tab
+
+Released **8/10/26, 11:20 AM ET**. Feature release, no data sweep. Title unchanged.
+
+**New second tab: "❓ Ask".** A question box that answers from the tracker's own records. Type a question (or click one of the suggested chips), get a structured answer with the record it came from, and follow-up chips to drill in. Question history stacks newest-first with a Clear button.
+
+**It is a lookup engine, not a chatbot — and that is a hard constraint, not a choice.** The artifact runs under a strict CSP that blocks every external request, and the only runtime capabilities available to this artifact are `downloads` and `mcp` — there is no model to call. So the tab resolves questions locally: it maps the question to an entity (lender, project, or code like AUS10 / CMH11 / JKT01) and an intent, then reads the answer out of `LENDERS`, `PROJECTS`, `CLOSED_PROJECTS`, `BOND_MARKET_NOTES`, `LENDER_COMMITS` and `LENDER_FEES`. It will not infer, estimate or speculate beyond what is written down, and the header says so.
+
+Intents it answers directly:
+
+- **last contact** — "when did we last speak to SMBC?" Returns lastContact, last fundraising call, the most recent note with a snippet, and restates the convention that lastContact only moves for a documented call or meeting.
+- **contacts** — name, title, email, phone from `contactDetails`, plus the card's coverage note.
+- **next steps** — the card's `nextSteps`, split into a list.
+- **commitments / fees / exposure** — total commitments and a by-facility breakdown from the commitments workbook, fees by year with the largest fee events, plus `existingFacilities`. Bank-name matching is alias-aware, so "SocGen" finds "Societe Generale".
+- **projects per lender** — every active outreach list the bank sits on, its card project notes, and anything it passed on.
+- **project detail** — metrics, owner, expected close, outreach grouped by Lead / Invited / Support / In dialogue / Proposal / Declined, description and workstreams. Closed deals answer with their close date and lender group instead.
+- **lead** — "who is leading Ashville 1?"
+- **rejections** — every recorded pass, or just one bank's.
+- **portfolio hygiene** — coldest relationships (oldest lastContact first, measured against the refresh stamp so answers are deterministic), banks on an outreach list with no lender card, and headline counts.
+- **market** — searches the Bond & Market Intelligence feed, falling back to the newest entries.
+- **what's new** — the newest notes across all cards.
+
+Anything that does not map to an intent falls back to a **ranked keyword search** across every note, project description, market entry and card field, returning snippets labelled with their source. Two guards keep the fallback honest: a query only counts as answered if a reasonably distinctive term lands (a match on a single ubiquitous word is not an answer), and any query word that appears nowhere in the tracker is reported back by name — "Not found anywhere in the tracker: purple, elephant" — so a partial match never reads as a full one.
+
+**Also fixed:** the Closed tab label was hardcoded to "(14)" while `CLOSED_PROJECTS` holds 18 — now computed from the array like the other tab counts.
+
+**Noted, not changed:** the file still carries a dead `AIAssistant` component from the pre-artifact build that `fetch`es `api.anthropic.com` with a hardcoded model id. It is unreachable — no entry in `TABS` routes to it — and the CSP would block the call regardless. Left in place to keep this release to the feature; worth deleting on a future pass.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright run drove **21 real questions** through the tab — every one returned the expected answer shape, including the two deliberate nonsense queries, with zero console/page errors and zero external requests. Tab bar now reads Inputs & Review · ❓ Ask · Active Lenders (56) · Active Projects (24) · Closed 2025 & 2026 (18) · Fees · Commitments · Cap Table · Guide. Archived to `tracker/versions/ECX_Tracker_v66.html`.
