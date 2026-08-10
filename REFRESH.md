@@ -64,7 +64,45 @@ Paste this into a Claude Code session on this repo (or let the scheduled Routine
 >    `taskUpdates` with `status: "Done"` and bump `updateBatch`.
 > 5. Update `meta.as_of`, `meta.generated_at`, `meta.windows` and `meta.sources`, keep
 >    `meta.notes` honest about anything you could not verify.
-> 6. Render-test the page before pushing (see below), then commit and push.
+> 6. Render-test the page (see below), rebuild and republish the shareable artifact to the
+>    existing URL, then commit and push — including `dist/`.
+
+## Publishing the shareable page
+
+The GitHub Pages copy picks up a refresh automatically — it reads `data/taskflow.js` at load.
+The **published artifact does not**: its data is baked in, so it has to be rebuilt and
+republished after each refresh.
+
+```bash
+node tools/build-standalone.js     # -> dist/taskflow-standalone.html
+```
+
+Then republish that file to the existing artifact, passing the URL so it updates in place
+instead of minting a new one:
+
+```
+ARTIFACT_URL = https://claude.ai/code/artifact/16badd5b-3770-4fc1-8ff2-4d65c1f261f9
+
+Artifact(
+  file_path: "dist/taskflow-standalone.html",
+  url:       ARTIFACT_URL,
+  label:     "data 2026-08-10",     # always: "data <meta.as_of>"
+  favicon:   "📋"                    # keep stable — the tab icon identifies the page
+)
+```
+
+Passing `url` is what keeps the link the user has already shared working. A session that
+did not itself publish the artifact will otherwise create a brand-new URL.
+
+### Where versions live
+
+| | Kept where | How to get back to one |
+|---|---|---|
+| **Cloud** | Artifact version picker, one labelled entry per republish | Pick the label on the artifact page |
+| **Local** | `git` — `dist/taskflow-standalone.html` is committed each refresh | `git log -- dist/` then check out the commit |
+
+Commit `dist/` on every refresh. It is generated, but committing it is the point: it leaves a
+diffable local record of exactly what was published, matched to the dataset that produced it.
 
 ## Render test
 

@@ -59,11 +59,13 @@ Data is extracted from (as of 2026-07-23):
 ## Structure
 
 ```
-index.html           — Bank Conversation Dashboard (self-contained, no dependencies)
-data/data.js         — its dataset (banks, meetings, facilities, commitments, fees)
-taskflow/index.html  — TaskFlow desk site (self-contained, no dependencies)
-data/taskflow.js     — its dataset (projects, tasks, calendar, triaged inbox, drafts)
-REFRESH.md           — the TaskFlow data-refresh contract and scheduling instructions
+index.html                       — Bank Conversation Dashboard (self-contained)
+data/data.js                     — its dataset (banks, meetings, facilities, commitments, fees)
+taskflow/index.html              — TaskFlow desk site (self-contained)
+data/taskflow.js                 — its dataset (projects, tasks, calendar, triaged inbox, drafts)
+tools/build-standalone.js        — inlines the dataset into one shareable file
+dist/taskflow-standalone.html    — generated; the exact page published to the artifact URL
+REFRESH.md                       — refresh contract, publishing steps, scheduling
 ```
 
 Open either file in a browser, or serve the repo with GitHub Pages — both render entirely

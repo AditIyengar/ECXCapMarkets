@@ -1,0 +1,1292 @@
+<title>ECX TaskFlow — Desk</title>
+<text y='13' font-size='13'>✓</text></svg>">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #FBFBF9;
+    --surface: #FFFFFF;
+    --surface-2: #F5F5F1;
+    --ink: #232A35;
+    --ink-soft: #6B7280;
+    --line: #ECEAE4;
+    --coral: #FF6B5E;
+    --amber: #FFB020;
+    --teal: #0FA3A3;
+    --violet: #7C6FF0;
+    --pink: #E0699B;
+    --green: #3FB86B;
+    --blue: #5B8DEF;
+    --bronze: #C2882F;
+    --danger-bg: #FFE8E5;
+    --danger-fg: #D8402F;
+    --warn-bg: #FFF3D6;
+    --warn-fg: #A56A00;
+    --ok-bg: #E2F5E9;
+    --ok-fg: #1E7A43;
+    --cool-bg: #DDF3F3;
+    --cool-fg: #0B7A7A;
+    --today-bg: #FFFBF0;
+    --shadow: 0 1px 2px rgba(35,42,53,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #14161A;
+      --surface: #1D2026;
+      --surface-2: #262A31;
+      --ink: #ECEEF2;
+      --ink-soft: #9AA2AF;
+      --line: #30353E;
+      --danger-bg: #3A211E;
+      --danger-fg: #FF9182;
+      --warn-bg: #362B14;
+      --warn-fg: #F0BA5E;
+      --ok-bg: #16301F;
+      --ok-fg: #6FD494;
+      --cool-bg: #123030;
+      --cool-fg: #52C9C9;
+      --today-bg: #2A2415;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #14161A;
+    --surface: #1D2026;
+    --surface-2: #262A31;
+    --ink: #ECEEF2;
+    --ink-soft: #9AA2AF;
+    --line: #30353E;
+    --danger-bg: #3A211E;
+    --danger-fg: #FF9182;
+    --warn-bg: #362B14;
+    --warn-fg: #F0BA5E;
+    --ok-bg: #16301F;
+    --ok-fg: #6FD494;
+    --cool-bg: #123030;
+    --cool-fg: #52C9C9;
+    --today-bg: #2A2415;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--page); color: var(--ink);
+    font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px; line-height: 1.5;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 22px 16px 80px; }
+  .display { font-family: 'Sora', ui-sans-serif, system-ui, sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+  a { color: inherit; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+  .btn {
+    border-radius: 999px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    font-family: inherit; font-size: 13px; padding: 7px 16px;
+    transition: transform .08s ease, background .12s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+  .btn-primary { background: var(--coral); color: #fff; }
+  .btn-quiet { background: var(--surface-2); color: var(--ink); border-color: var(--line); }
+  .btn-teal { background: var(--teal); color: #fff; }
+  .btn-sm { padding: 4px 11px; font-size: 12px; }
+  @media (prefers-reduced-motion: reduce) { .btn:hover { transform: none; } }
+  input, select, textarea { font-family: inherit; font-size: 13.5px; color: var(--ink); background: var(--surface); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--teal); }
+  .field {
+    width: 100%; border-radius: 11px; border: 1px solid var(--line);
+    padding: 9px 12px; background: var(--surface); color: var(--ink);
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px; border-radius: 999px;
+    padding: 2px 9px; font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+
+  /* header */
+  header.top { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; margin-bottom: 16px; }
+  header.top .titleblock { flex: 1; min-width: 240px; }
+  .eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+  h1 { font-size: 25px; margin-top: 3px; }
+  .stamp { font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; }
+
+  .kpis { display: flex; gap: 8px; flex-wrap: wrap; }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: 9px 14px; min-width: 92px; }
+  .kpi .v { font-size: 21px; font-weight: 700; line-height: 1.1; }
+  .kpi .l { font-size: 10.5px; color: var(--ink-soft); margin-top: 2px; text-transform: uppercase; letter-spacing: .06em; }
+  .kpi.alert .v { color: var(--danger-fg); }
+
+  /* tabs */
+  nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+  nav.tabs button {
+    background: none; border: none; border-bottom: 2.5px solid transparent; cursor: pointer;
+    color: var(--ink-soft); padding: 9px 15px 10px; font-size: 13.5px; font-weight: 600; font-family: inherit;
+  }
+  nav.tabs button.active { color: var(--ink); border-bottom-color: var(--coral); }
+  nav.tabs button:hover { color: var(--ink); }
+  nav.tabs button .n { font-size: 11px; color: var(--ink-soft); margin-left: 5px; }
+
+  /* filters */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .filters input[type="search"] { width: 240px; max-width: 100%; }
+  .filters .spacer { flex: 1; }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-soft); cursor: pointer; }
+  .projchips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .projchip {
+    border-radius: 999px; padding: 6px 14px; font-size: 12.5px; font-weight: 500; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+    display: inline-flex; align-items: center; gap: 7px; font-family: inherit;
+  }
+  .projchip .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .projchip.on { color: #fff; border-color: transparent; }
+  .projchip.on .dot { display: none; }
+
+  /* board */
+  .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; align-items: start; }
+  .col { padding: 15px 16px; border-top: 4px solid var(--line); }
+  .col h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em; }
+  .col .head { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
+  .rows { display: flex; flex-direction: column; gap: 10px; }
+  .row { display: flex; gap: 9px; align-items: flex-start; }
+  .row input[type="checkbox"] { margin-top: 3px; width: 15px; height: 15px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
+  .row .body { flex: 1; min-width: 0; }
+  .row .t { font-size: 13.5px; line-height: 1.42; }
+  .row.done .t { color: var(--ink-soft); text-decoration: line-through; }
+  .row .notes { font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
+  .row .src { font-size: 10.5px; color: var(--ink-soft); margin-top: 3px; font-style: italic; opacity: .85; }
+  .row .x {
+    background: none; border: none; cursor: pointer; color: var(--line); font-size: 13px;
+    padding: 0 2px; line-height: 1; margin-top: 3px; font-family: inherit;
+  }
+  .row .x:hover { color: var(--danger-fg); }
+  .empty { font-size: 12.5px; color: var(--ink-soft); }
+  .dashed { border: 1.5px dashed var(--line); border-radius: 16px; padding: 22px; text-align: center; color: var(--ink-soft); font-size: 13px; }
+
+  /* calendar */
+  .calbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 6px; }
+  .dow div { font-size: 10px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; text-align: center; }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .day {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 6px 6px 7px; min-height: 92px; text-align: left; cursor: pointer; overflow: hidden;
+    font-family: inherit; color: var(--ink);
+  }
+  .day.out { opacity: .42; background: var(--surface-2); }
+  .day.today { border-color: var(--amber); border-width: 2px; background: var(--today-bg); }
+  .day.sel { border-color: var(--teal); border-width: 2px; }
+  .day .n { font-size: 13px; font-weight: 700; }
+  .day .ev {
+    font-size: 9.5px; line-height: 1.3; border-left: 3px solid var(--ink-soft); padding-left: 4px;
+    margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .day .ev.past { opacity: .45; text-decoration: line-through; }
+  .day .allday {
+    font-size: 8.5px; border-radius: 5px; padding: 1px 4px; margin-top: 3px;
+    background: var(--warn-bg); color: var(--warn-fg);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .agenda { display: flex; flex-direction: column; gap: 8px; }
+  .agenda .item { padding: 10px 14px; display: flex; align-items: center; gap: 12px; border-left: 4px solid var(--ink-soft); }
+  .agenda .item.past { opacity: .5; }
+  .agenda .item .time { min-width: 132px; font-size: 12px; color: var(--ink-soft); }
+  .agenda .item .name { font-size: 13.5px; font-weight: 500; flex: 1; }
+  .agenda .item.past .name { text-decoration: line-through; color: var(--ink-soft); }
+
+  /* inbox */
+  .mail { display: flex; flex-direction: column; gap: 10px; }
+  .mail .item { padding: 13px 16px; border-left: 4px solid var(--line); }
+  .mail .item.handled { opacity: .5; }
+  .mail .line1 { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+  .mail .subj { font-size: 13.5px; font-weight: 600; flex: 1; min-width: 200px; }
+  .mail .meta { font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
+  .mail .why { font-size: 12.5px; color: var(--ink-soft); margin-top: 7px; }
+  .mail .acts { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+  .mail textarea { width: 100%; border-radius: 11px; border: 1px solid var(--line); padding: 11px; resize: vertical; line-height: 1.5; margin-top: 10px; }
+  .bucketnote { font-size: 12px; color: var(--ink-soft); margin-bottom: 12px; }
+
+  /* modal */
+  .scrim { position: fixed; inset: 0; background: rgba(20,22,26,.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+  .modal { width: 100%; max-width: 460px; padding: 22px; max-height: 86vh; overflow-y: auto; }
+  .modal h2 { font-size: 17px; }
+  .modal .mh { display: flex; align-items: center; margin-bottom: 14px; }
+  .modal .mh button { background: none; border: none; cursor: pointer; font-size: 18px; color: var(--ink-soft); font-family: inherit; }
+  label.lbl { font-size: 12px; color: var(--ink-soft); display: block; margin: 12px 0 5px; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  footer.note { margin-top: 30px; font-size: 11.5px; color: var(--ink-soft); line-height: 1.65; }
+  footer.note code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-size: 11px; }
+
+  #themeToggle { position: fixed; top: 12px; right: 14px; z-index: 50; }
+  @media (max-width: 620px) {
+    .day { min-height: 66px; }
+    .day .ev { display: none; }
+    .agenda .item { flex-wrap: wrap; }
+  }
+</style>
+
+<button id="themeToggle" class="btn btn-quiet btn-sm" title="Toggle dark mode">◐</button>
+<div class="wrap">
+  <header class="top">
+    <div class="titleblock">
+      <div class="eyebrow">EdgeConneX · Corporate Finance</div>
+      <h1 class="display">TaskFlow</h1>
+      <div class="stamp" id="stamp"></div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+  <main id="view"></main>
+
+  <footer class="note">
+    Your completions, new tasks, deletions and handled mail are stored in this browser only
+    (<code>localStorage</code>) and survive a data refresh. The dataset itself is regenerated by a
+    scheduled Claude Code session — see <code>REFRESH.md</code>. Nothing is ever sent from this page;
+    draft replies are copied into Outlook and sent by you.
+  </footer>
+</div>
+
+<script>
+/* =============================================================================
+ * TaskFlow dataset — ECX Corporate Finance desk
+ * =============================================================================
+ *
+ * This file is DATA ONLY. It is regenerated end-to-end by a scheduled Claude
+ * Code session (see REFRESH.md). `taskflow/index.html` is the viewer and must
+ * never need editing during a refresh.
+ *
+ * The site layers the user's own edits (completions, new tasks, deletions,
+ * handled email) on top of this file in localStorage. The rules that keep a
+ * refresh from clobbering those edits:
+ *
+ *   - Every task/inbox id must be STABLE across refreshes. A task that already
+ *     exists is matched by id; its title/notes/due are refreshed from here, but
+ *     its status and completedAt come from the user's local state.
+ *   - An id the user deleted locally is never resurrected.
+ *   - `seedVersion` only needs bumping if the id scheme itself changes.
+ *   - Bump `updateBatch` when you add entries to `taskUpdates` — those are
+ *     applied exactly once per browser, then remembered.
+ *
+ * TIME ZONES
+ *   Calendar events are stored as UTC instants (trailing "Z"). Microsoft Graph
+ *   returns this mailbox's events with timeZone "UTC", so the wall-clock string
+ *   it gives back IS the UTC time — do not re-interpret it as local. The viewer
+ *   renders everything in meta.timezone.
+ *
+ * SCHEMA
+ *   meta      { as_of, generated_at, timezone, owner, windows, sources, notes }
+ *   projects  [{ id, name, color }]
+ *   people    [{ email, name, short }]
+ *   tasks     [{ id, projectId, title, due, priority, assignee, status,
+ *                notes, source }]                 due/notes may be ""
+ *   taskUpdates [{ id, status?, note? }]          one-shot patches, see above
+ *   events    [{ id, title, startUtc, endUtc, allDay, tentative, organizer,
+ *                tag, webLink }]                  tag drives the colour stripe
+ *   inbox     [{ id, bucket, subject, from, fromName, receivedUtc, tag,
+ *                why, draft, webLink }]
+ *               bucket ∈ reply | action | waiting | fyi
+ *               why    = one line on why it is in that bucket
+ *               draft  = pre-written reply, or "" where a reply is not the ask
+ * ============================================================================= */
+
+window.TASKFLOW_DATA = {
+  meta: {
+    as_of: "2026-08-10",
+    generated_at: "2026-08-10T18:00:00Z",
+    timezone: "America/Denver",
+    owner: { name: "Aditya Iyengar", email: "aiyengar@edgeconnex.com", short: "Me" },
+    windows: {
+      calendar_from: "2026-08-10",
+      calendar_to: "2026-08-21",
+      inbox_from: "2026-08-07",
+    },
+    sources: [
+      "Outlook calendar — 40 events, 2026-08-10 → 2026-08-21",
+      "Outlook inbox — 50 most recent messages, 2026-08-07 → 2026-08-10 (167 in window)",
+      "Task backlog carried over from the TaskFlow artifact seed (updates through 8/10)",
+    ],
+    notes: [
+      "Inbox triage covers the 50 most recent messages in the window, not all 167 — high-volume FYI threads are represented by one grouped entry rather than one per message.",
+      "Draft replies are suggestions only. Nothing is ever sent from this site; you copy into Outlook and send yourself.",
+    ],
+  },
+
+  projects: [
+    { id: "proj-austin",    name: "Austin",     color: "#FF6B5E" },
+    { id: "proj-ashville",  name: "Ashville 1", color: "#0FA3A3" },
+    { id: "proj-ashville2", name: "Ashville 2", color: "#5B8DEF" },
+    { id: "proj-enigma",    name: "Enigma",     color: "#7C6FF0" },
+    { id: "proj-scioto",    name: "Scioto",     color: "#E0699B" },
+    { id: "proj-canyon",    name: "Canyon",     color: "#C2882F" },
+    { id: "proj-leroy",     name: "Leroy",      color: "#3FB86B" },
+    { id: "proj-ai",        name: "AI Projects", color: "#FFB020" },
+  ],
+
+  people: [
+    { email: "aiyengar@edgeconnex.com",  name: "Aditya Iyengar",   short: "Me" },
+    { email: "lgodschalx@edgeconnex.com", name: "Laura Godschalx", short: "Laura" },
+    { email: "rnistala@edgeconnex.com",  name: "Rithika Nistala",  short: "Rithika" },
+    { email: "ashockley@edgeconnex.com", name: "Amy Shockley",     short: "Amy" },
+    { email: "matthew.way@edgeconnex.com", name: "Matthew Way",    short: "Matthew" },
+    { email: "amartirosian@edgeconnex.com", name: "Alexis Martirosian", short: "Alexis" },
+    { email: "sgraff@edgeconnex.com",    name: "Scott Graff",      short: "Scott" },
+    { email: "cwenger@edgeconnex.com",   name: "Chris Wenger",     short: "Chris W" },
+    { email: "eholst@edgeconnex.com",    name: "Eelco Holst",      short: "Eelco" },
+    { email: "",                          name: "Turner & Townsend", short: "T&T" },
+  ],
+
+  /* --------------------------------------------------------------------------
+   * TASKS
+   * `source` is free text — where the item came from, so a refresh can tell a
+   * carried-over backlog item from one it just found in the mail.
+   * ------------------------------------------------------------------------ */
+  tasks: [
+    // ---- Austin ----
+    { id: "s-aus11", projectId: "proj-austin", title: "Send GS questions once Laura has reviewed", due: "2026-08-12", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Blocked on Laura's review of the question list first — tracked in the AUS10 DD Tracker.", source: "backlog" },
+    { id: "s-aus7", projectId: "proj-austin", title: "Finalize Austin structure chart", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Per Laura's handover, ahead of lender diligence.", source: "backlog" },
+    { id: "s-aus15", projectId: "proj-austin", title: "Finalize Austin 1 structure chart", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Drafted; flagged to Laura it may be too much detail for teaser stage — finalize for lender diligence.", source: "backlog" },
+    { id: "s-aus14", projectId: "proj-austin", title: "Review Randy's DD responses; check off and send to T&T & GS", due: "2026-08-12", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Randy (BCEI) came back 7/30 incl. AUS30 mass grading permit approval, EGU permit confirmation, Zone A floodplain. Confirm the full response set went to T&T and Goldman.", source: "backlog" },
+    { id: "t-aus20", projectId: "proj-austin", title: "Prep for Austin wastewater / road financing call (Tue 1:00 PM MT)", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Winstead's 8/10 read: tax-exempt bonds likely NOT available — tax base must include at least 10 independent taxpayers. Randy Scott confirmed he is not the MUD-law expert. Go in knowing the MUD financing route is the open question.", source: "email 8/10 — Winstead / BCEI thread" },
+    { id: "t-aus21", projectId: "proj-austin", title: "Track PUCT public meetings on the governor's directive (8/14 and 8/20)", due: "2026-08-14", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Laura Youngers 8/10: Texas PUCT holds public meetings Fri 8/14 and Thu 8/20 where process around the audit is expected. Chris Jenkins — Lisa leading consensus on the question set, consultant call held 8/10.", source: "email 8/10 — Austin campus (governor's directive)" },
+
+    // ---- Ashville 1 ----
+    { id: "s-ash13", projectId: "proj-ashville", title: "Go through the Ashville 1 OM and leave comments", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+      notes: "DPW circulated the revised Business section + full OM 7/29; checked in 8/5 asking for initial comments — now overdue on their clock. You and Rithika owe the pass; Eelco also asked to review.", source: "backlog" },
+    { id: "s-ash14", projectId: "proj-ashville", title: "Chase responders on the DPW diligence request", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Internal round sent 8/10. Laura added Albert Ivezaj for financials; Matthew Way handling VDR/KYC (3 executed LPAs uploaded to Box 8/10, still awaiting structure chart + consents/resolutions from the ECX side). Amy Shockley has open questions back to you.", source: "backlog" },
+    { id: "t-ash20", projectId: "proj-ashville", title: "Reply to Amy Shockley — Non-GAAP language + who the parent is", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Amy 8/10: is all the Non-GAAP language in the chain, or is more to be confirmed? And clarify who the parent is in this context so she can provide senior indebtedness. Gating the DPW financials response.", source: "email 8/10 — Ashville 1: Davis Polk Diligence Requests" },
+    { id: "t-ash21", projectId: "proj-ashville", title: "Send the executed Ashville contracts to Davis Polk", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Alexis Martirosian circulated them 8/10 and flagged them for you specifically; Jackson has already loaded them into the engine. Closes one of the DPW diligence gaps.", source: "email 8/10 — Executed Ashville contracts" },
+    { id: "s-ash15", projectId: "proj-ashville", title: "Follow up on signed construction contracts for the LTA report", due: "", priority: "medium", assignee: "T&T", status: "To Do",
+      notes: "LTA v7 delivered 8/5 with final comments incorporated — last open item is folding in the signed construction contracts once received.", source: "backlog" },
+    { id: "s-ash12", projectId: "proj-ashville", title: "Respond to Ares on the Ashville referendum", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Reply still owed to Ares on the referendum question.", source: "backlog" },
+    { id: "s-ash7", projectId: "proj-ashville", title: "Reply to Macy — technical advisor & rating agency meetings", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Scheduling Ashville 1 sessions with the technical advisor and rating agencies — confirm availability and preferred slots. Rithika confirmed to MS on 8/10 that the materials are OK to share with the rating agencies.", source: "backlog" },
+    { id: "s-ash2", projectId: "proj-ashville", title: "Revoke Newmark folder access & send updated RFS dates", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "From Laura's 'Ashville - Information' email. Two parts: confirm Newmark no longer has folder access, then share updated RFS dates.", source: "backlog" },
+    { id: "s-ash10", projectId: "proj-ashville", title: "Launch Ashville 1", due: "2026-08-14", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Launch was targeted 8/10 per the handover plan. LTA report (v7 in), OM comments, and the DPW diligence set all feed readiness — OM comments are the long pole.", source: "backlog" },
+    { id: "t-ash22", projectId: "proj-ashville", title: "Update the MOR financing board slides", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Rithika bumped this 8/10 — she needs an updated 'Board Presentation - Financing Update August 2026.pptx' ready by 8/11. Q2 CFO Update is 5:30 AM MT on 8/11.", source: "email 8/10 — MOR Financing Board Slides August 2026 Update" },
+
+    // ---- Scioto ----
+    { id: "t-sci1", projectId: "proj-scioto", title: "Prep for the Scioto financing options call", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "A&O Shearman (Dorina Yessios) coordinated with Laura on 8/10 to move this to Thursday 2:00 PM EST and asked Grace to reissue the invite — the Tue 8/11 and Wed 8/12 holds on your calendar are the stale versions.", source: "email 8/10 — Project Scioto preliminary call" },
+
+    // ---- Canyon ----
+    { id: "t-can1", projectId: "proj-canyon", title: "Review the Project Canyon credit agreement draft", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "King & Spalding (Brooke Jansen) circulated the initial draft 8/9, clean and marked against the precedent shared before the commitment papers were signed. ECX & EQT teams both on it.", source: "email 8/9 — Project Canyon | Credit Agreement" },
+
+    // ---- Enigma ----
+    { id: "s-eni3", projectId: "proj-enigma", title: "Engage counsel on scenario & consent analysis", due: "2026-08-14", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Kicks off once EQT's model lands — stableco & ECX cash/NOI timing plus proposed debt repayments, expected around 8/5.", source: "backlog" },
+
+    // ---- Leroy (post-closing) ----
+    { id: "t-ler10", projectId: "proj-leroy", title: "Get time with Clay (Blackstone) on the Leroy upsize / Austin addition", due: "2026-08-12", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Clay Macfarlane came back 8/10 — happy to cover the CA turn, MB/local counsel questions, and the Austin addition; Matt Martin separately asked for AUS time. Laura opened it, you are on the thread.", source: "email 8/10 — Project Leroy: Upsize" },
+    { id: "s-ler1", projectId: "proj-leroy", title: "Finland: reliance letters — environmental report & geotech", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Post-closing item following the 7/31 Finland closing/funding (Bx wired).", source: "backlog" },
+    { id: "s-ler2", projectId: "proj-leroy", title: "Norway: reliance letters — environmental report & geotech", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Same post-closing requirement as Finland.", source: "backlog" },
+    { id: "s-ler3", projectId: "proj-leroy", title: "Finland: send updated Exhibit A to Bx (post-closing)", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "NMRK appraisal comments for Finland already sent. Updated Exhibit A needed post-closing — valuation could change at the next draw.", source: "backlog" },
+    { id: "s-ler4", projectId: "proj-leroy", title: "Send request for updated Austin campus punch list", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "NMRK and T&T already engaged. ~2 weeks for the punch list; Bx to come back with questions after.", source: "backlog" },
+    { id: "s-ler5", projectId: "proj-leroy", title: "Austin campus: pull together diligence for the punch list", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Our side of the punch-list process while NMRK/T&T run their review.", source: "backlog" },
+    { id: "s-ler6", projectId: "proj-leroy", title: "Austin campus: Rithika to work through open items and revert", due: "", priority: "medium", assignee: "Rithika", status: "In Progress",
+      notes: "Rithika going through the open punch-list items to come back with a consolidated list.", source: "backlog" },
+
+    // ---- AI Projects ----
+    { id: "s-ai4", projectId: "proj-ai", title: "Reach out to Pradeep — bank relationship tracker", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Kick off the bank relationship tracker build.", source: "backlog" },
+    { id: "s-ai1", projectId: "proj-ai", title: "Bank relationship tracker", due: "", priority: "medium", assignee: "Me", status: "In Progress",
+      notes: "Lender relationships across deals — coverage contacts, past participations, recent touchpoints. First cut already live in this repo as the Bank Conversation Dashboard.", source: "backlog" },
+    { id: "s-ai2", projectId: "proj-ai", title: "Comps dashboard", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Live dashboard of data-center financing comps — pricing, structure, tenor, sponsor across recent deals.", source: "backlog" },
+    { id: "s-ai3", projectId: "proj-ai", title: "Legal agent", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "AI agent to first-pass legal documents — flag key terms, deviations from precedent, open issues for counsel.", source: "backlog" },
+  ],
+
+  /* One-shot patches applied exactly once per browser. Bump meta_updateBatch
+   * below whenever you append here. */
+  taskUpdates: [],
+  updateBatch: 3,
+  seedVersion: 6,
+
+  /* --------------------------------------------------------------------------
+   * CALENDAR — Outlook, 2026-08-10 → 2026-08-21. Instants are UTC.
+   * ------------------------------------------------------------------------ */
+  events: [
+    { id: "ev-denver-1", title: "Denver", startUtc: "2026-08-06T00:00:00Z", endUtc: "2026-08-17T00:00:00Z", allDay: true, tentative: false, organizer: "Me", tag: "location" },
+    { id: "ev-va-1", title: "Virginia", startUtc: "2026-08-17T00:00:00Z", endUtc: "2026-08-20T00:00:00Z", allDay: true, tentative: false, organizer: "Me", tag: "location" },
+    { id: "ev-herndon-1", title: "Aditya — Herndon", startUtc: "2026-08-18T00:00:00Z", endUtc: "2026-08-21T00:00:00Z", allDay: true, tentative: false, organizer: "Me", tag: "location" },
+    { id: "ev-denver-2", title: "Denver", startUtc: "2026-08-20T00:00:00Z", endUtc: "2026-08-31T00:00:00Z", allDay: true, tentative: false, organizer: "Me", tag: "location" },
+
+    { id: "ev-0810-1", title: "Rithika flying into work", startUtc: "2026-08-10T13:00:00Z", endUtc: "2026-08-10T15:30:00Z", allDay: false, tentative: false, organizer: "Rithika", tag: "internal" },
+    { id: "ev-0810-2", title: "Laura | Aditya Catch-up", startUtc: "2026-08-10T17:45:00Z", endUtc: "2026-08-10T18:15:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+    { id: "ev-0810-3", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-10T19:00:00Z", endUtc: "2026-08-10T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0811-1", title: "Q2 CFO Update hosted by Joe Harar", startUtc: "2026-08-11T11:30:00Z", endUtc: "2026-08-11T12:00:00Z", allDay: false, tentative: false, organizer: "Alexandra Capon", tag: "internal" },
+    { id: "ev-0811-2", title: "Project Scioto — call to discuss financing options", startUtc: "2026-08-11T16:00:00Z", endUtc: "2026-08-11T17:00:00Z", allDay: false, tentative: true, organizer: "Davis Polk", tag: "scioto" },
+    { id: "ev-0811-3", title: "Laura / Aditya bi-weekly", startUtc: "2026-08-11T18:00:00Z", endUtc: "2026-08-11T18:30:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0811-4", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-11T18:30:00Z", endUtc: "2026-08-11T19:00:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+    { id: "ev-0811-5", title: "Austin Development — Wastewater Structure and Road Financing", startUtc: "2026-08-11T19:00:00Z", endUtc: "2026-08-11T20:00:00Z", allDay: false, tentative: false, organizer: "Randy Scott (BCEI)", tag: "austin" },
+    { id: "ev-0811-6", title: "Real Estate / Liquidity Forecast Call", startUtc: "2026-08-11T19:00:00Z", endUtc: "2026-08-11T19:30:00Z", allDay: false, tentative: false, organizer: "Josh Bernstein", tag: "internal" },
+
+    { id: "ev-0812-1", title: "CF Pipeline", startUtc: "2026-08-12T12:00:00Z", endUtc: "2026-08-12T13:00:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0812-2", title: "Catch up ECX / HVG / AOS / K&S", startUtc: "2026-08-12T13:00:00Z", endUtc: "2026-08-12T13:30:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0812-3", title: "Project Ashville Weekly Sync", startUtc: "2026-08-12T14:30:00Z", endUtc: "2026-08-12T15:00:00Z", allDay: false, tentative: false, organizer: "Morgan Stanley", tag: "ashville" },
+    { id: "ev-0812-4", title: "Insurance — large campuses", startUtc: "2026-08-12T15:30:00Z", endUtc: "2026-08-12T16:00:00Z", allDay: false, tentative: true, organizer: "Laura", tag: "internal" },
+    { id: "ev-0812-5", title: "Project Scioto — preliminary call to discuss financing options", startUtc: "2026-08-12T16:00:00Z", endUtc: "2026-08-12T17:00:00Z", allDay: false, tentative: true, organizer: "Grace McLeish", tag: "scioto" },
+    { id: "ev-0812-6", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-12T19:00:00Z", endUtc: "2026-08-12T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0813-1", title: "Following: JJ off", startUtc: "2026-08-13T06:00:00Z", endUtc: "2026-08-13T06:15:00Z", allDay: false, tentative: false, organizer: "JJ Oui-Chaplain", tag: "internal" },
+    { id: "ev-0813-2", title: "Ashville — ECX Weekly Team Call", startUtc: "2026-08-13T13:30:00Z", endUtc: "2026-08-13T14:00:00Z", allDay: false, tentative: false, organizer: "Davis Polk", tag: "ashville" },
+    { id: "ev-0813-3", title: "Project Liverpool — Syndicated Facility — ICLA Weekly Call", startUtc: "2026-08-13T14:30:00Z", endUtc: "2026-08-13T15:15:00Z", allDay: false, tentative: false, organizer: "Natixis", tag: "liverpool" },
+    { id: "ev-0813-4", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-13T19:00:00Z", endUtc: "2026-08-13T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0814-1", title: "Cash Flow Call", startUtc: "2026-08-14T15:00:00Z", endUtc: "2026-08-14T15:30:00Z", allDay: false, tentative: false, organizer: "Josh Bernstein", tag: "internal" },
+    { id: "ev-0814-2", title: "Friday Lunch (Olive Garden)", startUtc: "2026-08-14T16:00:00Z", endUtc: "2026-08-14T17:00:00Z", allDay: false, tentative: true, organizer: "Sara Schultz", tag: "social" },
+    { id: "ev-0814-3", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-14T19:00:00Z", endUtc: "2026-08-14T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0817-1", title: "Chris Out of Office", startUtc: "2026-08-17T12:00:00Z", endUtc: "2026-08-17T12:05:00Z", allDay: false, tentative: false, organizer: "Chris Wenger", tag: "internal" },
+    { id: "ev-0817-2", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-17T19:00:00Z", endUtc: "2026-08-17T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0818-1", title: "Denver Wellness Month — Chair Massage Day", startUtc: "2026-08-18T19:00:00Z", endUtc: "2026-08-18T21:45:00Z", allDay: false, tentative: false, organizer: "Sara Schultz", tag: "social" },
+    { id: "ev-0818-2", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-18T19:00:00Z", endUtc: "2026-08-18T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0819-1", title: "CF Pipeline", startUtc: "2026-08-19T12:00:00Z", endUtc: "2026-08-19T13:00:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0819-2", title: "Catch up ECX / HVG / AOS / K&S", startUtc: "2026-08-19T13:00:00Z", endUtc: "2026-08-19T13:30:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0819-3", title: "Project Ashville Weekly Sync", startUtc: "2026-08-19T14:30:00Z", endUtc: "2026-08-19T15:00:00Z", allDay: false, tentative: false, organizer: "Morgan Stanley", tag: "ashville" },
+    { id: "ev-0819-4", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-19T19:00:00Z", endUtc: "2026-08-19T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0820-1", title: "Ashville — ECX Weekly Team Call", startUtc: "2026-08-20T13:30:00Z", endUtc: "2026-08-20T14:00:00Z", allDay: false, tentative: false, organizer: "Davis Polk", tag: "ashville" },
+    { id: "ev-0820-2", title: "Project Liverpool — Syndicated Facility — ICLA Weekly Call", startUtc: "2026-08-20T14:30:00Z", endUtc: "2026-08-20T15:15:00Z", allDay: false, tentative: false, organizer: "Natixis", tag: "liverpool" },
+    { id: "ev-0820-3", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-20T19:00:00Z", endUtc: "2026-08-20T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0821-1", title: "Cash Flow Call", startUtc: "2026-08-21T15:00:00Z", endUtc: "2026-08-21T15:30:00Z", allDay: false, tentative: false, organizer: "Josh Bernstein", tag: "internal" },
+    { id: "ev-0821-2", title: "Friday Lunch (Super Chicken)", startUtc: "2026-08-21T16:00:00Z", endUtc: "2026-08-21T17:00:00Z", allDay: false, tentative: true, organizer: "Sara Schultz", tag: "social" },
+    { id: "ev-0821-3", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-21T19:00:00Z", endUtc: "2026-08-21T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+  ],
+
+  /* --------------------------------------------------------------------------
+   * INBOX — triaged. `draft` is a suggested reply, never sent automatically.
+   * ------------------------------------------------------------------------ */
+  inbox: [
+    {
+      id: "in-amy-nongaap",
+      bucket: "reply",
+      subject: "Re: Ashville 1: Davis Polk Diligence Requests",
+      from: "ashockley@edgeconnex.com",
+      fromName: "Amy Shockley",
+      receivedUtc: "2026-08-10T12:59:52Z",
+      tag: "ashville",
+      why: "Two direct questions to you, and her answer gates the senior-indebtedness piece of the DPW financials response.",
+      draft:
+"Hi Amy,\n\n" +
+"On the Non-GAAP language — the chain below has what we've agreed so far; I'll confirm by end of day whether anything else still needs sign-off and flag it if so.\n\n" +
+"On the parent: for this request it's the issuer's direct parent, not the ECX topco. I'll send the entity name and the structure chart reference so the senior indebtedness figure is drawn at the right level.\n\n" +
+"Thanks,\nAditya",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoPAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-alexis-contracts",
+      bucket: "reply",
+      subject: "Executed Ashville contracts.",
+      from: "amartirosian@edgeconnex.com",
+      fromName: "Alexis Martirosian",
+      receivedUtc: "2026-08-10T16:30:48Z",
+      tag: "ashville",
+      why: "Alexis tagged you by name to push these to Davis Polk. Jackson has already loaded them into the engine.",
+      draft:
+"Thanks Alexis — I'll get these over to Davis Polk today and note them against the diligence list.\n\n" +
+"Jackson, thanks for loading them into the engine.\n\n" +
+"Best,\nAditya",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZorAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-rithika-boardslides",
+      bucket: "reply",
+      subject: "Re: MOR Financing Board Slides August 2026 Update",
+      from: "rnistala@edgeconnex.com",
+      fromName: "Rithika Nistala",
+      receivedUtc: "2026-08-10T10:52:29Z",
+      tag: "internal",
+      why: "Second ask from Rithika — she needs the updated deck by 8/11, and the Q2 CFO Update is 5:30 AM MT that morning.",
+      draft:
+"Hi Rithika,\n\n" +
+"Thanks for the bump — I'll get my sections of the financing update back to you today so you have a clean version for tomorrow.\n\n" +
+"If anything is still open by this evening I'll flag it rather than hold the deck.\n\n" +
+"Best,\nAditya",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZn9AAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-scott-google",
+      bucket: "reply",
+      subject: "Re: [Inputs requested] ECX - Google - valuation inputs",
+      from: "sgraff@edgeconnex.com",
+      fromName: "Scott Graff",
+      receivedUtc: "2026-08-10T11:29:50Z",
+      tag: "ashville",
+      why: "Scott is waiting on a date — he asked whether the near-final OM lands this week and said he'd rather wait for the final than take a draft.",
+      draft:
+"Hi Scott,\n\n" +
+"We're working through comments on the OM now — I'd expect a near-final version later this week, and I'll send it over as soon as it's clean rather than share the current draft.\n\n" +
+"If Google needs something sooner, let me know and we'll look at what we can share in the interim.\n\n" +
+"Best,\nAditya",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoBAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+
+    {
+      id: "in-canyon-ca",
+      bucket: "action",
+      subject: "Project Canyon | Credit Agreement",
+      from: "BJansen@kslaw.com",
+      fromName: "Brooke Jansen (King & Spalding)",
+      receivedUtc: "2026-08-09T21:32:38Z",
+      tag: "canyon",
+      why: "Initial credit agreement draft for ECX & EQT review — clean and marked against the pre-signing precedent. No reply owed yet; the review is the deliverable.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZn8AAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-winstead-mud",
+      bucket: "action",
+      subject: "RE: Austin Development - Wastewater Structure and Road Financing",
+      from: "jcox@winstead.com",
+      fromName: "Winstead (J. Cox)",
+      receivedUtc: "2026-08-10T14:40:45Z",
+      tag: "austin",
+      why: "Read before tomorrow's 1:00 PM call — tax-exempt bonds look unavailable (tax base needs 10+ independent taxpayers), and Randy Scott has confirmed he isn't the MUD-law expert.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZocAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-scioto-reschedule",
+      bucket: "action",
+      subject: "RE: Project Scioto- preliminary call to discuss financing options",
+      from: "dorina.yessios@aoshearman.com",
+      fromName: "Dorina Yessios (A&O Shearman)",
+      receivedUtc: "2026-08-10T13:01:27Z",
+      tag: "scioto",
+      why: "Call moved to Thursday 2:00 PM EST and Grace was asked to reissue the invite — the Tue 8/11 and Wed 8/12 Scioto holds still on your calendar are stale.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoRAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+
+    {
+      id: "in-clay-leroy",
+      bucket: "waiting",
+      subject: "RE: [External] Project Leroy: Upsize",
+      from: "Clay.Macfarlane@Blackstone.com",
+      fromName: "Clay Macfarlane (Blackstone)",
+      receivedUtc: "2026-08-10T16:58:20Z",
+      tag: "leroy",
+      why: "Clay is happy to take the call on the CA turn, MB/local counsel and the Austin addition — a time still needs to land. Matt Martin separately asked for AUS time.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZowAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-matthew-vdr",
+      bucket: "waiting",
+      subject: "Re: ECX - VDR Set Up and KYC/Lien Search",
+      from: "matthew.way@edgeconnex.com",
+      fromName: "Matthew Way",
+      receivedUtc: "2026-08-10T17:33:10Z",
+      tag: "ashville",
+      why: "Three executed LPAs are up on Box. Matthew is still waiting on the structure chart and consents/resolutions from the ECX side — that request lands partly on you.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZozAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-austin-directive",
+      bucket: "waiting",
+      subject: "Re: Austin - campus (impact of governor's directive)",
+      from: "lyoungers@edgeconnex.com",
+      fromName: "Lisa Youngers / Chris Jenkins",
+      receivedUtc: "2026-08-10T17:19:13Z",
+      tag: "austin",
+      why: "Intel still being gathered in Texas. PUCT public meetings Fri 8/14 and Thu 8/20; Lisa is leading consensus on the question set, consultant call held 8/10.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoyAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-dpw-regframework",
+      bucket: "waiting",
+      subject: "Re: Ashville - Regulatory Framework",
+      from: "lgodschalx@edgeconnex.com",
+      fromName: "Laura Godschalx → Dickinson Wright",
+      receivedUtc: "2026-08-10T13:39:21Z",
+      tag: "ashville",
+      why: "Laura chased Dickinson Wright on Elli Park's request; nothing back yet.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoVAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+
+    {
+      id: "in-ms-ratings",
+      bucket: "fyi",
+      subject: "RE: [EXTERNAL] Re: Project Ashville Weekly Sync",
+      from: "Maya.Matejcek@morganstanley.com",
+      fromName: "Maya Matejcek (Morgan Stanley)",
+      receivedUtc: "2026-08-10T13:56:11Z",
+      tag: "ashville",
+      why: "MS confirmed the executed docs went over last week and had no comments; Rithika cleared sharing with the rating agencies. Nothing owed from you.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoWAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-ppa-scale",
+      bucket: "fyi",
+      subject: "RE: Power agreement - Ashville PCX",
+      from: "peter.tolson@aoshearman.com",
+      fromName: "Peter Tolson (A&O Shearman) / Raj Chudgar",
+      receivedUtc: "2026-08-10T12:02:04Z",
+      tag: "ashville",
+      why: "A&O is sending Scale a redline of the version they already hold; Raj agreed to get it out ahead of the next round. Watch only — this is the PPA that still needs uploading for DPW.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoFAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-pm-reports",
+      bucket: "fyi",
+      subject: "PM / PMO status reports — 5 forwards from Laura",
+      from: "lgodschalx@edgeconnex.com",
+      fromName: "Laura Godschalx",
+      receivedUtc: "2026-08-10T15:25:08Z",
+      tag: "internal",
+      why: "Grouped: EDCATL11 BCEI weekly touchpoint (8/5), PCX PMO weekly (8/7), New Albany South touchpoint #86 (8/7), PHX11 and PHX12 project updates (8/4). Skim-when-you-can.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZokAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-market-updates",
+      bucket: "fyi",
+      subject: "Market updates — TD, Citi, SMBC, IG data centre biweekly",
+      from: "multiple",
+      fromName: "TD Securities / Citi / SMBC",
+      receivedUtc: "2026-08-10T12:39:06Z",
+      tag: "market",
+      why: "Grouped: TD ABS secondary levels + market commentary (8/10), TD data centre bond market update, Citi data centre monthly (July), SMBC digital infra ABS week of 8/7, IG data centre biweekly.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoMAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-ashville-dd-consents",
+      bucket: "fyi",
+      subject: "Re: Ashville Due Diligence",
+      from: "lgodschalx@edgeconnex.com",
+      fromName: "Laura Godschalx",
+      receivedUtc: "2026-08-10T11:45:24Z",
+      tag: "ashville",
+      why: "Laura confirmed to Eric Ramberg that the financing consents will be drafted and executed separately — resolves an open thread, no action.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoCAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+    {
+      id: "in-rbc-connect",
+      bucket: "fyi",
+      subject: "Re: EdgeConnex/RBC Connect",
+      from: "lgodschalx@edgeconnex.com",
+      fromName: "Laura Godschalx → RBC",
+      receivedUtc: "2026-08-10T13:09:06Z",
+      tag: "market",
+      why: "Laura is holding RBC for September and Sara is finding times — no action from you now, but it lands on the bank-relationship tracker.",
+      draft: "",
+      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoSAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+    },
+  ],
+};
+
+</script>
+<script>
+(function () {
+  "use strict";
+
+  var D = window.TASKFLOW_DATA;
+  if (!D) { document.getElementById("view").innerHTML = '<div class="dashed">Could not load <code>data/taskflow.js</code>.</div>'; return; }
+
+  var TZ = D.meta.timezone || "America/Denver";
+  var STORE_KEY = "ecx-taskflow-v1";
+
+  /* ---------------- local state (overlay on top of the dataset) ------------ */
+  var L = load();
+  function load() {
+    var base = { statuses: {}, deleted: [], custom: [], handled: {}, drafts: {}, updateBatch: 0 };
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        var s = JSON.parse(raw);
+        base.statuses = s.statuses || {};
+        base.deleted = s.deleted || [];
+        base.custom = s.custom || [];
+        base.handled = s.handled || {};
+        base.drafts = s.drafts || {};
+        base.updateBatch = s.updateBatch || 0;
+      }
+    } catch (e) { /* first run */ }
+    return base;
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(L)); }
+    catch (e) { console.error("Save failed", e); }
+  }
+
+  // One-shot status/note patches shipped with the dataset, applied once per browser.
+  if ((L.updateBatch || 0) < (D.updateBatch || 0)) {
+    (D.taskUpdates || []).forEach(function (u) {
+      if (!u || !u.id) return;
+      if (u.status) L.statuses[u.id] = { status: u.status, completedAt: u.status === "Done" ? todayISO() : null };
+    });
+    L.updateBatch = D.updateBatch || 0;
+    save();
+  }
+
+  /* ---------------- date helpers ------------------------------------------ */
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  // civil date string (YYYY-MM-DD) for an instant, rendered in the display tz
+  function isoInTZ(d) {
+    return new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+  }
+  function todayISO() { return isoInTZ(new Date()); }
+  function fmtTime(iso) {
+    return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: TZ });
+  }
+  // All-day events from Graph are [start, end) at UTC midnight — read the UTC parts directly.
+  function utcDateISO(iso) { return iso.slice(0, 10); }
+  function civil(y, m, d) { return new Date(Date.UTC(y, m, d)); }
+  function civilISO(dt) { return dt.getUTCFullYear() + "-" + pad(dt.getUTCMonth() + 1) + "-" + pad(dt.getUTCDate()); }
+  function parseISO(s) { var p = s.split("-"); return civil(+p[0], +p[1] - 1, +p[2]); }
+  function fmtDay(isoDate, opts) {
+    return parseISO(isoDate).toLocaleDateString("en-US",
+      Object.assign({ timeZone: "UTC" }, opts || { month: "short", day: "numeric" }));
+  }
+  function daysBetween(a, b) { return Math.round((parseISO(b) - parseISO(a)) / 86400000); }
+
+  /* ---------------- derived data ------------------------------------------ */
+  var TAG_COLOR = {
+    austin: "#FF6B5E", ashville: "#0FA3A3", scioto: "#E0699B", canyon: "#C2882F",
+    leroy: "#3FB86B", enigma: "#7C6FF0", liverpool: "#5B8DEF",
+    internal: "#8A93A3", market: "#8A93A3", social: "#B0A48A", location: "#FFB020"
+  };
+  function tagColor(t) { return TAG_COLOR[t] || "#8A93A3"; }
+  function projById(id) {
+    for (var i = 0; i < D.projects.length; i++) if (D.projects[i].id === id) return D.projects[i];
+    return { id: id, name: "Unfiled", color: "#8A93A3" };
+  }
+
+  // Tasks = dataset tasks (minus locally deleted) + locally added, with local status applied.
+  function allTasks() {
+    var out = [];
+    D.tasks.forEach(function (t) {
+      if (L.deleted.indexOf(t.id) !== -1) return;
+      var st = L.statuses[t.id];
+      out.push(Object.assign({}, t, {
+        status: st ? st.status : t.status,
+        completedAt: st ? st.completedAt : null
+      }));
+    });
+    L.custom.forEach(function (t) {
+      if (L.deleted.indexOf(t.id) !== -1) return;
+      var st = L.statuses[t.id];
+      out.push(Object.assign({}, t, {
+        status: st ? st.status : t.status,
+        completedAt: st ? st.completedAt : null,
+        custom: true
+      }));
+    });
+    return out;
+  }
+  function isOpen(t) { return t.status !== "Done"; }
+  function isOverdue(t) { return isOpen(t) && t.due && t.due < todayISO(); }
+
+  function inboxItems() {
+    return (D.inbox || []).map(function (m) {
+      return Object.assign({}, m, {
+        handled: !!L.handled[m.id],
+        draft: (L.drafts[m.id] !== undefined ? L.drafts[m.id] : m.draft) || ""
+      });
+    });
+  }
+
+  function upcomingEvents() {
+    var now = Date.now();
+    return D.events.filter(function (e) { return !e.allDay && new Date(e.endUtc).getTime() >= now; })
+      .sort(function (a, b) { return new Date(a.startUtc) - new Date(b.startUtc); });
+  }
+
+  /* ---------------- UI state ---------------------------------------------- */
+  var S = {
+    tab: "board",
+    project: "all",
+    q: "",
+    showDone: false,
+    bucket: "reply",
+    month: (function () { var t = parseISO(todayISO()); return civil(t.getUTCFullYear(), t.getUTCMonth(), 1); })(),
+    selDay: null,
+    openMail: {},
+    modal: null
+  };
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  /* ---------------- render ------------------------------------------------ */
+  function render() {
+    renderStamp();
+    renderKpis();
+    renderTabs();
+    var v = document.getElementById("view");
+    if (S.tab === "board") v.innerHTML = boardHTML();
+    else if (S.tab === "calendar") v.innerHTML = calendarHTML();
+    else v.innerHTML = inboxHTML();
+    renderModal();
+  }
+
+  function renderStamp() {
+    var next = upcomingEvents()[0];
+    var bits = ["Data as of " + fmtDay(D.meta.as_of, { month: "long", day: "numeric", year: "numeric" })];
+    bits.push("times in " + TZ.split("/")[1].replace("_", " "));
+    if (next) bits.push("next: " + next.title + " at " + fmtTime(next.startUtc));
+    document.getElementById("stamp").textContent = bits.join(" · ");
+  }
+
+  function renderKpis() {
+    var ts = allTasks(), open = ts.filter(isOpen);
+    var overdue = ts.filter(isOverdue).length;
+    var dueToday = open.filter(function (t) { return t.due === todayISO(); }).length;
+    var reply = inboxItems().filter(function (m) { return m.bucket === "reply" && !m.handled; }).length;
+    var waiting = open.filter(function (t) { return t.assignee && t.assignee !== "Me"; }).length;
+    var k = [
+      { v: open.length, l: "Open", alert: false },
+      { v: overdue, l: "Overdue", alert: overdue > 0 },
+      { v: dueToday, l: "Due today", alert: false },
+      { v: reply, l: "Needs reply", alert: reply > 0 },
+      { v: waiting, l: "On others", alert: false }
+    ];
+    document.getElementById("kpis").innerHTML = k.map(function (x) {
+      return '<div class="kpi' + (x.alert ? " alert" : "") + '"><div class="v">' + x.v + '</div><div class="l">' + x.l + "</div></div>";
+    }).join("");
+  }
+
+  function renderTabs() {
+    var open = allTasks().filter(isOpen).length;
+    var unhandled = inboxItems().filter(function (m) { return !m.handled; }).length;
+    var defs = [
+      { k: "board", label: "Board", n: open },
+      { k: "calendar", label: "Calendar", n: null },
+      { k: "inbox", label: "Inbox", n: unhandled }
+    ];
+    document.getElementById("tabs").innerHTML = defs.map(function (d) {
+      return '<button data-tab="' + d.k + '" class="' + (S.tab === d.k ? "active" : "") + '">' +
+        d.label + (d.n === null ? "" : '<span class="n">' + d.n + "</span>") + "</button>";
+    }).join("");
+  }
+
+  /* ---- board ---- */
+  function boardHTML() {
+    var ts = allTasks();
+    var q = S.q.trim().toLowerCase();
+    var filtered = ts.filter(function (t) {
+      if (S.project !== "all" && t.projectId !== S.project) return false;
+      if (!S.showDone && !isOpen(t)) return false;
+      if (q) {
+        var hay = (t.title + " " + (t.notes || "") + " " + (t.source || "") + " " + projById(t.projectId).name).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    var h = "";
+    h += '<div class="projchips">';
+    h += projChip("all", "All projects", "#232A35", ts.filter(isOpen).length);
+    D.projects.forEach(function (p) {
+      var n = ts.filter(function (t) { return t.projectId === p.id && isOpen(t); }).length;
+      h += projChip(p.id, p.name, p.color, n);
+    });
+    h += "</div>";
+
+    h += '<div class="filters">';
+    h += '<input type="search" class="field" id="q" placeholder="Search tasks…" value="' + esc(S.q) + '">';
+    h += '<label class="toggle"><input type="checkbox" id="showDone"' + (S.showDone ? " checked" : "") + '> show completed</label>';
+    h += '<div class="spacer"></div>';
+    h += '<button class="btn btn-primary" id="addTask">+ New task</button>';
+    h += "</div>";
+
+    // Attention strip: overdue + due today, across all projects
+    var att = filtered.filter(function (t) { return isOpen(t) && t.due && t.due <= todayISO(); })
+      .sort(function (a, b) { return (a.due || "").localeCompare(b.due || ""); });
+    if (att.length) {
+      h += '<div class="card col" style="border-top-color: var(--coral); margin-bottom:14px">';
+      h += '<div class="head"><h2 class="display">Needs attention</h2>' +
+           '<span class="chip" style="background:var(--danger-bg);color:var(--danger-fg)">' + att.length + " due or overdue</span></div>";
+      h += '<div class="rows">' + att.map(rowHTML).join("") + "</div></div>";
+    }
+
+    var groups = (S.project === "all" ? D.projects : D.projects.filter(function (p) { return p.id === S.project; }));
+    var body = groups.map(function (p) {
+      var rows = filtered.filter(function (t) { return t.projectId === p.id; }).sort(sortTasks);
+      if (!rows.length && S.project === "all") return "";
+      var openN = rows.filter(isOpen).length;
+      return '<div class="card col" style="border-top-color:' + p.color + '">' +
+        '<div class="head"><h2 class="display">' + esc(p.name) + "</h2>" +
+        '<span class="chip" style="background:var(--surface-2);color:var(--ink-soft)">' + openN + " open</span></div>" +
+        (rows.length ? '<div class="rows">' + rows.map(rowHTML).join("") + "</div>"
+                     : '<div class="empty">Nothing here.</div>') +
+        "</div>";
+    }).join("");
+
+    h += body.trim() ? '<div class="board">' + body + "</div>"
+                     : '<div class="dashed">No tasks match — clear the search or switch project.</div>';
+    return h;
+  }
+
+  function projChip(id, name, color, n) {
+    var on = S.project === id;
+    return '<button class="projchip' + (on ? " on" : "") + '" data-proj="' + id + '"' +
+      (on ? ' style="background:' + color + '"' : "") + ">" +
+      (on ? "" : '<span class="dot" style="background:' + color + '"></span>') +
+      esc(name) + (n ? ' <span style="opacity:.7">' + n + "</span>" : "") + "</button>";
+  }
+
+  function sortTasks(a, b) {
+    if (isOpen(a) !== isOpen(b)) return isOpen(a) ? -1 : 1;
+    var pr = { high: 0, medium: 1, low: 2 };
+    var ad = a.due || "9999-99-99", bd = b.due || "9999-99-99";
+    if (ad !== bd) return ad.localeCompare(bd);
+    return (pr[a.priority] || 1) - (pr[b.priority] || 1);
+  }
+
+  function rowHTML(t) {
+    var done = !done0(t), d0 = done0(t);
+    var over = isOverdue(t);
+    var today = isOpen(t) && t.due === todayISO();
+    var h = '<div class="row' + (d0 ? " done" : "") + '">';
+    h += '<input type="checkbox" data-toggle="' + t.id + '"' + (d0 ? " checked" : "") + ' aria-label="Toggle done">';
+    h += '<div class="body"><span class="t">' + esc(t.title) + "</span> ";
+    if (t.due && !d0) {
+      var lbl = over ? "⚠ " + fmtDay(t.due) : today ? "Today" : fmtDay(t.due);
+      var st = over ? "background:var(--danger-bg);color:var(--danger-fg)"
+             : today ? "background:var(--warn-bg);color:var(--warn-fg)"
+                     : "background:var(--surface-2);color:var(--ink-soft)";
+      h += '<span class="chip" style="' + st + '">' + lbl + "</span> ";
+    }
+    if (!d0 && t.priority === "high") h += '<span class="chip" style="background:var(--danger-bg);color:var(--danger-fg)">High</span> ';
+    if (!d0 && t.assignee && t.assignee !== "Me") h += '<span class="chip" style="background:var(--cool-bg);color:var(--cool-fg)">' + esc(t.assignee) + "</span> ";
+    if (t.notes && !d0) h += '<div class="notes">' + esc(t.notes) + "</div>";
+    if (t.source && t.source !== "backlog" && !d0) h += '<div class="src">' + esc(t.source) + "</div>";
+    h += "</div>";
+    h += '<button class="x" data-del="' + t.id + '" aria-label="Delete task">✕</button>';
+    return h + "</div>";
+  }
+  function done0(t) { return t.status === "Done"; }
+
+  /* ---- calendar ---- */
+  function calendarHTML() {
+    var y = S.month.getUTCFullYear(), m = S.month.getUTCMonth();
+    var first = civil(y, m, 1);
+    var start = civil(y, m, 1 - first.getUTCDay());
+    var cells = [];
+    for (var i = 0; i < 42; i++) {
+      var dt = civil(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate() + i);
+      cells.push({ iso: civilISO(dt), inMonth: dt.getUTCMonth() === m, n: dt.getUTCDate() });
+    }
+    while (cells.length > 35 && cells.slice(-7).every(function (c) { return !c.inMonth; })) cells.splice(-7);
+
+    var label = first.toLocaleDateString("en-US", { timeZone: "UTC", month: "long", year: "numeric" });
+    var h = '<div class="calbar">';
+    h += '<button class="btn btn-quiet btn-sm" data-mon="-1" aria-label="Previous month">‹</button>';
+    h += '<span class="display" style="font-size:16px;min-width:150px;text-align:center">' + label + "</span>";
+    h += '<button class="btn btn-quiet btn-sm" data-mon="1" aria-label="Next month">›</button>';
+    h += '<button class="btn btn-quiet btn-sm" data-mon="0">Today</button>';
+    h += '<div class="spacer" style="flex:1"></div>';
+    h += '<span style="font-size:11.5px;color:var(--ink-soft)">Outlook, ' +
+         fmtDay(D.meta.windows.calendar_from) + " – " + fmtDay(D.meta.windows.calendar_to) + "</span>";
+    h += "</div>";
+
+    h += '<div class="dow">' + ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(function (d) { return "<div>" + d + "</div>"; }).join("") + "</div>";
+    h += '<div class="grid">' + cells.map(function (c) {
+      var evs = timedOn(c.iso), bans = allDayOn(c.iso);
+      var cls = "day" + (c.inMonth ? "" : " out") + (c.iso === todayISO() ? " today" : "") + (S.selDay === c.iso ? " sel" : "");
+      var clash = evs.some(function (e) { return e.clash && !isPast(e); });
+      var s = '<button class="' + cls + '" data-day="' + c.iso + '">';
+      s += '<div class="n">' + c.n +
+           (clash ? ' <span title="Overlapping meetings" style="color:var(--danger-fg);font-size:11px">●</span>' : "") +
+           "</div>";
+      bans.forEach(function (b) { s += '<div class="allday">' + esc(b.title) + "</div>"; });
+      evs.slice(0, 3).forEach(function (e) {
+        s += '<div class="ev' + (isPast(e) ? " past" : "") + '" style="border-left-color:' + tagColor(e.tag) + '">' +
+             fmtTime(e.startUtc) + " " + esc(e.title) + "</div>";
+      });
+      if (evs.length > 3) s += '<div class="ev" style="border-left-color:transparent;color:var(--ink-soft)">+' + (evs.length - 3) + " more</div>";
+      return s + "</button>";
+    }).join("") + "</div>";
+
+    var day = S.selDay || todayISO();
+    var evs = timedOn(day), bans = allDayOn(day);
+    h += '<h2 class="display" style="font-size:15px;margin:20px 0 10px">' +
+         fmtDay(day, { weekday: "long", month: "long", day: "numeric" }) + "</h2>";
+    if (!evs.length && !bans.length) {
+      h += '<div class="dashed">No meetings.</div>';
+    } else {
+      h += '<div class="agenda">';
+      bans.forEach(function (b) {
+        h += '<div class="card item" style="border-left-color:var(--amber)">' +
+             '<div class="time">All day</div><div class="name">' + esc(b.title) + "</div></div>";
+      });
+      evs.forEach(function (e) {
+        var p = isPast(e);
+        h += '<div class="card item' + (p ? " past" : "") + '" style="border-left-color:' + tagColor(e.tag) + '">' +
+             '<div class="time">' + fmtTime(e.startUtc) + " – " + fmtTime(e.endUtc) + "</div>" +
+             '<div class="name">' + esc(e.title) + "</div>" +
+             (e.organizer ? '<span class="chip" style="background:var(--surface-2);color:var(--ink-soft)">' + esc(e.organizer) + "</span>" : "") +
+             (e.tentative && !p ? '<span class="chip" style="background:var(--warn-bg);color:var(--warn-fg)">Tentative</span>' : "") +
+             (e.clash && !p ? '<span class="chip" style="background:var(--danger-bg);color:var(--danger-fg)">Overlaps</span>' : "") +
+             (p ? '<span class="chip" style="background:var(--ok-bg);color:var(--ok-fg)">Done</span>' : "") +
+             "</div>";
+      });
+      h += "</div>";
+    }
+    return h;
+  }
+  // Timed events on a day, sorted, each flagged if it overlaps another on the same day.
+  function timedOn(iso) {
+    var list = D.events.filter(function (e) { return !e.allDay && isoInTZ(new Date(e.startUtc)) === iso; })
+      .sort(function (a, b) { return new Date(a.startUtc) - new Date(b.startUtc); })
+      .map(function (e) { return Object.assign({}, e); });
+    for (var i = 0; i < list.length; i++) {
+      for (var j = i + 1; j < list.length; j++) {
+        if (new Date(list[j].startUtc) < new Date(list[i].endUtc)) { list[i].clash = true; list[j].clash = true; }
+      }
+    }
+    return list;
+  }
+  function allDayOn(iso) {
+    return D.events.filter(function (e) { return e.allDay && utcDateISO(e.startUtc) <= iso && iso < utcDateISO(e.endUtc); });
+  }
+  function isPast(e) { return new Date(e.endUtc).getTime() < Date.now(); }
+
+  /* ---- inbox ---- */
+  var BUCKETS = [
+    { k: "reply",   label: "Needs reply", note: "Someone asked you a direct question. Each has a draft ready to edit and copy." },
+    { k: "action",  label: "Action",      note: "Something to do or read — no reply owed, but it does not clear itself." },
+    { k: "waiting", label: "Waiting on",  note: "You are owed something. Nothing to do but track it." },
+    { k: "fyi",     label: "FYI",         note: "Read or skim. High-volume threads are grouped into one entry." }
+  ];
+
+  function inboxHTML() {
+    var items = inboxItems();
+    var h = '<div class="projchips">';
+    BUCKETS.forEach(function (b) {
+      var n = items.filter(function (m) { return m.bucket === b.k && !m.handled; }).length;
+      var on = S.bucket === b.k;
+      var col = b.k === "reply" ? "#FF6B5E" : b.k === "action" ? "#FFB020" : b.k === "waiting" ? "#7C6FF0" : "#8A93A3";
+      h += '<button class="projchip' + (on ? " on" : "") + '" data-bucket="' + b.k + '"' +
+           (on ? ' style="background:' + col + '"' : "") + ">" +
+           (on ? "" : '<span class="dot" style="background:' + col + '"></span>') +
+           b.label + (n ? ' <span style="opacity:.7">' + n + "</span>" : "") + "</button>";
+    });
+    h += "</div>";
+
+    var def = BUCKETS.filter(function (b) { return b.k === S.bucket; })[0];
+    h += '<div class="bucketnote">' + def.note + "</div>";
+
+    var list = items.filter(function (m) { return m.bucket === S.bucket; })
+      .sort(function (a, b) { return (a.handled === b.handled) ? (b.receivedUtc || "").localeCompare(a.receivedUtc || "") : (a.handled ? 1 : -1); });
+
+    if (!list.length) return h + '<div class="dashed">Nothing in this bucket.</div>';
+
+    h += '<div class="mail">' + list.map(function (m) {
+      var open = !!S.openMail[m.id];
+      var s = '<div class="card item' + (m.handled ? " handled" : "") + '" style="border-left-color:' + tagColor(m.tag) + '">';
+      s += '<div class="line1"><div class="subj">' + esc(m.subject) + "</div>";
+      if (m.handled) s += '<span class="chip" style="background:var(--ok-bg);color:var(--ok-fg)">Handled</span>';
+      s += "</div>";
+      s += '<div class="meta">' + esc(m.fromName) + " · " +
+           new Date(m.receivedUtc).toLocaleString("en-US", { timeZone: TZ, month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + "</div>";
+      s += '<div class="why">' + esc(m.why) + "</div>";
+      s += '<div class="acts">';
+      if (m.draft) s += '<button class="btn btn-teal btn-sm" data-mailtoggle="' + m.id + '">' + (open ? "Hide draft" : "Draft reply") + "</button>";
+      s += '<button class="btn btn-quiet btn-sm" data-mailtask="' + m.id + '">→ Task</button>';
+      if (m.webLink) s += '<a class="btn btn-quiet btn-sm" href="' + esc(m.webLink) + '" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">Open in Outlook</a>';
+      s += '<button class="btn btn-quiet btn-sm" data-mailhandled="' + m.id + '">' + (m.handled ? "Reopen" : "Mark handled") + "</button>";
+      s += "</div>";
+      if (open && m.draft) {
+        s += '<textarea rows="8" data-draft="' + m.id + '">' + esc(m.draft) + "</textarea>";
+        s += '<div class="acts"><button class="btn btn-primary btn-sm" data-copy="' + m.id + '">Copy draft</button>' +
+             '<span style="font-size:11.5px;color:var(--ink-soft)">Copy into Outlook and send it yourself — nothing goes out from here.</span></div>';
+      }
+      return s + "</div>";
+    }).join("") + "</div>";
+    return h;
+  }
+
+  /* ---- modal ---- */
+  function renderModal() {
+    var old = document.querySelector(".scrim");
+    if (old) old.remove();
+    if (!S.modal) return;
+    var m = S.modal;
+    var el = document.createElement("div");
+    el.className = "scrim";
+    var opts = D.projects.map(function (p) {
+      return '<option value="' + p.id + '"' + (m.projectId === p.id ? " selected" : "") + ">" + esc(p.name) + "</option>";
+    }).join("");
+    el.innerHTML =
+      '<div class="card modal">' +
+        '<div class="mh"><h2 class="display" style="flex:1">' + (m.title ? "New task from email" : "New task") + "</h2>" +
+        '<button data-close="1" aria-label="Close">✕</button></div>' +
+        '<label class="lbl">Task</label>' +
+        '<input class="field" id="m-title" value="' + esc(m.title || "") + '" placeholder="What needs doing?">' +
+        '<div class="g2">' +
+          '<div><label class="lbl">Project</label><select class="field" id="m-proj">' + opts + "</select></div>" +
+          '<div><label class="lbl">Due</label><input class="field" type="date" id="m-due" value="' + esc(m.due || "") + '"></div>' +
+          '<div><label class="lbl">Priority</label><select class="field" id="m-pri">' +
+            '<option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option>' +
+          "</select></div>" +
+          '<div><label class="lbl">Owner</label><input class="field" id="m-who" value="Me"></div>' +
+        "</div>" +
+        '<label class="lbl">Notes</label>' +
+        '<textarea class="field" id="m-notes" rows="3">' + esc(m.notes || "") + "</textarea>" +
+        '<div style="margin-top:16px"><button class="btn btn-primary" id="m-save">Add task</button></div>' +
+      "</div>";
+    document.body.appendChild(el);
+    el.addEventListener("click", function (ev) { if (ev.target === el) { S.modal = null; renderModal(); } });
+    el.querySelector("[data-close]").addEventListener("click", function () { S.modal = null; renderModal(); });
+    el.querySelector("#m-save").addEventListener("click", function () {
+      var title = el.querySelector("#m-title").value.trim();
+      if (!title) return;
+      L.custom.push({
+        id: "u-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        projectId: el.querySelector("#m-proj").value,
+        title: title,
+        due: el.querySelector("#m-due").value || "",
+        priority: el.querySelector("#m-pri").value,
+        assignee: el.querySelector("#m-who").value.trim() || "Me",
+        status: "To Do",
+        notes: el.querySelector("#m-notes").value.trim(),
+        source: m.source || "added here"
+      });
+      save();
+      S.modal = null;
+      S.tab = "board";
+      render();
+    });
+    el.querySelector("#m-title").focus();
+  }
+
+  /* ---------------- events ------------------------------------------------ */
+  document.addEventListener("click", function (ev) {
+    var t = ev.target.closest("[data-tab],[data-proj],[data-day],[data-mon],[data-bucket]," +
+      "[data-toggle],[data-del],[data-mailtoggle],[data-mailhandled],[data-mailtask],[data-copy],#addTask");
+    if (!t) return;
+
+    if (t.dataset.tab) { S.tab = t.dataset.tab; render(); return; }
+    if (t.dataset.proj) { S.project = t.dataset.proj; render(); return; }
+    if (t.dataset.bucket) { S.bucket = t.dataset.bucket; render(); return; }
+    if (t.dataset.day) { S.selDay = (S.selDay === t.dataset.day ? null : t.dataset.day); render(); return; }
+    if (t.dataset.mon) {
+      var n = +t.dataset.mon;
+      if (n === 0) { var td = parseISO(todayISO()); S.month = civil(td.getUTCFullYear(), td.getUTCMonth(), 1); S.selDay = null; }
+      else S.month = civil(S.month.getUTCFullYear(), S.month.getUTCMonth() + n, 1);
+      render(); return;
+    }
+    if (t.id === "addTask") { S.modal = {}; renderModal(); return; }
+
+    if (t.dataset.toggle) {
+      var id = t.dataset.toggle;
+      var cur = allTasks().filter(function (x) { return x.id === id; })[0];
+      if (!cur) return;
+      var nowDone = cur.status !== "Done";
+      L.statuses[id] = { status: nowDone ? "Done" : "To Do", completedAt: nowDone ? todayISO() : null };
+      save(); render(); return;
+    }
+    if (t.dataset.del) {
+      if (L.deleted.indexOf(t.dataset.del) === -1) L.deleted.push(t.dataset.del);
+      save(); render(); return;
+    }
+    if (t.dataset.mailtoggle) {
+      var mid = t.dataset.mailtoggle;
+      S.openMail[mid] = !S.openMail[mid];
+      render(); return;
+    }
+    if (t.dataset.mailhandled) {
+      var hid = t.dataset.mailhandled;
+      if (L.handled[hid]) delete L.handled[hid]; else L.handled[hid] = true;
+      save(); render(); return;
+    }
+    if (t.dataset.mailtask) {
+      var m = inboxItems().filter(function (x) { return x.id === t.dataset.mailtask; })[0];
+      if (!m) return;
+      var guess = D.projects.filter(function (p) { return p.name.toLowerCase().indexOf(m.tag) === 0; })[0];
+      S.modal = {
+        title: (m.bucket === "reply" ? "Reply to " + m.fromName + " — " : "") + m.subject.replace(/^(Re|RE|Fw|FW):\s*/, ""),
+        projectId: guess ? guess.id : D.projects[0].id,
+        due: todayISO(),
+        notes: m.why,
+        source: "email " + fmtDay(isoInTZ(new Date(m.receivedUtc))) + " — " + m.fromName
+      };
+      renderModal(); return;
+    }
+    if (t.dataset.copy) {
+      var ta = document.querySelector('[data-draft="' + t.dataset.copy + '"]');
+      if (!ta) return;
+      var write = navigator.clipboard && navigator.clipboard.writeText
+        ? navigator.clipboard.writeText(ta.value)
+        : (ta.select(), Promise.resolve(document.execCommand("copy")));
+      Promise.resolve(write).then(function () {
+        t.textContent = "Copied ✓";
+        setTimeout(function () { t.textContent = "Copy draft"; }, 1600);
+      }).catch(function () { t.textContent = "Copy failed"; });
+      return;
+    }
+  });
+
+  document.addEventListener("input", function (ev) {
+    if (ev.target.id === "q") {
+      S.q = ev.target.value;
+      var v = document.getElementById("view");
+      v.innerHTML = boardHTML();
+      var q = document.getElementById("q");
+      if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+      renderKpis(); renderTabs();
+      return;
+    }
+    if (ev.target.dataset && ev.target.dataset.draft) {
+      L.drafts[ev.target.dataset.draft] = ev.target.value;
+      save();
+    }
+  });
+
+  document.addEventListener("change", function (ev) {
+    if (ev.target.id === "showDone") { S.showDone = ev.target.checked; render(); }
+  });
+
+  document.getElementById("themeToggle").addEventListener("click", function () {
+    var cur = document.documentElement.getAttribute("data-theme");
+    var next = cur === "dark" ? "light" : cur === "light" ? "dark"
+      : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark");
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("ecx-theme", next); } catch (e) {}
+  });
+  try {
+    var th = localStorage.getItem("ecx-theme");
+    if (th) document.documentElement.setAttribute("data-theme", th);
+  } catch (e) {}
+
+  render();
+})();
+</script>
