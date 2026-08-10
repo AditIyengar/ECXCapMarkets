@@ -1,7 +1,38 @@
-# ECX Capital Markets — Bank Conversation Dashboard
+# ECX Capital Markets — Corporate Finance dashboards
 
-A dynamic dashboard for the EdgeConneX Corporate Finance / Capital Markets team that tracks
-bank and lender relationships across the debt portfolio:
+Two static, self-contained dashboards for the EdgeConneX Corporate Finance / Capital Markets
+team. Both are plain HTML that read a committed data file — no build step, no server, no keys.
+
+| | What it is | Data refreshed by |
+|---|---|---|
+| [`index.html`](index.html) | **Bank Conversation Dashboard** — lender relationships, commitments, fees | Ad-hoc Claude session (SharePoint + Outlook) |
+| [`taskflow/index.html`](taskflow/index.html) | **TaskFlow** — to-do board, Outlook calendar, triaged inbox with draft replies | Scheduled Claude Code session — see [REFRESH.md](REFRESH.md) |
+
+---
+
+## TaskFlow — the desk site
+
+Successor to the TaskFlow Claude artifact, rebuilt as a real site. Three tabs:
+
+- **Board** — tasks grouped by project (Austin, Ashville, Scioto, Canyon, Leroy, Enigma, AI),
+  with due/overdue chips, a "needs attention" strip, search, and per-project filtering
+- **Calendar** — Outlook month grid + day agenda in Mountain Time, with all-day location holds,
+  tentative flags, and automatic detection of overlapping meetings
+- **Inbox** — mail triaged into *Needs reply / Action / Waiting on / FYI*, each with a one-line
+  reason and, where a reply is owed, a pre-written draft you can edit, copy, and send from Outlook
+
+**The architecture:** Claude Code is the backend. A scheduled session pulls Outlook, triages the
+inbox, writes the drafts, and pushes `data/taskflow.js`. The page is static and keyless. Your own
+edits — completions, new tasks, deletions, edited drafts, handled mail — live in `localStorage`
+keyed by item id, so a data refresh never clobbers them and never resurrects something you deleted.
+
+Nothing is ever sent from the page. Draft replies are copied into Outlook and sent by you.
+
+---
+
+## Bank Conversation Dashboard
+
+Tracks bank and lender relationships across the debt portfolio:
 
 - **Who we've spoken to** — every bank/lender conversation, with dates
 - **What was discussed** — call notes per meeting (appetite, pricing, structure, next steps)
@@ -28,14 +59,17 @@ Data is extracted from (as of 2026-07-23):
 ## Structure
 
 ```
-index.html      — the dashboard (single self-contained file, no external dependencies)
-data/data.js    — extracted dataset (banks, meetings, facilities, commitments, fees)
+index.html           — Bank Conversation Dashboard (self-contained, no dependencies)
+data/data.js         — its dataset (banks, meetings, facilities, commitments, fees)
+taskflow/index.html  — TaskFlow desk site (self-contained, no dependencies)
+data/taskflow.js     — its dataset (projects, tasks, calendar, triaged inbox, drafts)
+REFRESH.md           — the TaskFlow data-refresh contract and scheduling instructions
 ```
 
-Open `index.html` in a browser (or serve the repo with GitHub Pages) — the dashboard loads
-`data/data.js` and renders entirely client-side.
+Open either file in a browser, or serve the repo with GitHub Pages — both render entirely
+client-side from their data file.
 
-## Refreshing the data
+## Refreshing the bank data
 
 The dataset is a point-in-time extraction. To refresh, re-run a Claude session with access to
 the SharePoint folder and mailbox, and ask it to regenerate `data/data.js` following the schema
