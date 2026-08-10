@@ -6,7 +6,7 @@ team. Both are plain HTML that read a committed data file — no build step, no 
 | | What it is | Data refreshed by |
 |---|---|---|
 | [`index.html`](index.html) | **Bank Conversation Dashboard** — lender relationships, commitments, fees | Ad-hoc Claude session (SharePoint + Outlook) |
-| [`taskflow/index.html`](taskflow/index.html) | **TaskFlow** — to-do board, Outlook calendar, triaged inbox with draft replies | Scheduled Claude Code session — see [REFRESH.md](REFRESH.md) |
+| [`taskflow/index.html`](taskflow/index.html) | **TaskFlow** — to-do board, Outlook calendar, Outlook cleanup | Scheduled Claude Code session — see [REFRESH.md](REFRESH.md) |
 
 ---
 
@@ -18,15 +18,17 @@ Successor to the TaskFlow Claude artifact, rebuilt as a real site. Three tabs:
   with due/overdue chips, a "needs attention" strip, search, and per-project filtering
 - **Calendar** — Outlook month grid + day agenda in Mountain Time, with all-day location holds,
   tentative flags, and automatic detection of overlapping meetings
-- **Inbox** — mail triaged into *Needs reply / Action / Waiting on / FYI*, each with a one-line
-  reason and, where a reply is owed, a pre-written draft you can edit, copy, and send from Outlook
+- **Outlook cleanup** — one-button scan that finds the automated construction and PM status
+  reports loose in your Inbox and lists them against their destination folder, with an Outlook
+  deep link per message and a filing rule that stops them piling up again
 
-**The architecture:** Claude Code is the backend. A scheduled session pulls Outlook, triages the
-inbox, writes the drafts, and pushes `data/taskflow.js`. The page is static and keyless. Your own
-edits — completions, new tasks, deletions, edited drafts, handled mail — live in `localStorage`
-keyed by item id, so a data refresh never clobbers them and never resurrects something you deleted.
+**The architecture:** Claude Code is the backend. A scheduled session pulls the calendar, scans
+the inbox, and pushes `data/taskflow.js`. The page is static and keyless. Your own edits —
+completions, added tasks, deletions, filing tick-offs — live in `localStorage` keyed by item id,
+so a data refresh never clobbers them and never resurrects something you deleted.
 
-Nothing is ever sent from the page. Draft replies are copied into Outlook and sent by you.
+The page never sends mail, moves mail, or changes anything in Outlook — the Microsoft 365
+connector is read-only, so cleanup produces a worklist and a rule rather than executing moves.
 
 ---
 
@@ -62,7 +64,7 @@ Data is extracted from (as of 2026-07-23):
 index.html                       — Bank Conversation Dashboard (self-contained)
 data/data.js                     — its dataset (banks, meetings, facilities, commitments, fees)
 taskflow/index.html              — TaskFlow desk site (self-contained)
-data/taskflow.js                 — its dataset (projects, tasks, calendar, triaged inbox, drafts)
+data/taskflow.js                 — its dataset (projects, tasks, calendar, cleanup scans)
 tools/build-standalone.js        — inlines the dataset into one shareable file
 dist/taskflow-standalone.html    — generated; the exact page published to the artifact URL
 REFRESH.md                       — refresh contract, publishing steps, scheduling

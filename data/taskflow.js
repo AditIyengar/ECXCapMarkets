@@ -230,230 +230,86 @@ window.TASKFLOW_DATA = {
   ],
 
   /* --------------------------------------------------------------------------
-   * INBOX — triaged. `draft` is a suggested reply, never sent automatically.
+   * OUTLOOK CLEANUP
+   *
+   * Filing plans computed at refresh time. Each scan names a destination folder
+   * that must ALREADY EXIST in the mailbox, plus the messages sitting in the
+   * Inbox that belong in it.
+   *
+   * The page cannot move mail — it has no mailbox credentials, and the
+   * Microsoft 365 connector used at refresh time is read-only (search and read
+   * only; no move/update tool). So a scan produces a worklist and a filing
+   * rule, not an executed move. `rule` is the durable fix: set it once in
+   * Outlook and future reports file themselves.
+   *
+   * scan { id, title, blurb, destination, destinationExists, scannedAt,
+   *        rule: { from, subjectAny[], action },
+   *        items: [{ id, subject, fromName, receivedUtc, site, confidence,
+   *                  webLink }] }
+   *   confidence ∈ high | review   — "review" means eyeball it before filing
    * ------------------------------------------------------------------------ */
-  inbox: [
-    {
-      id: "in-amy-nongaap",
-      bucket: "reply",
-      subject: "Re: Ashville 1: Davis Polk Diligence Requests",
-      from: "ashockley@edgeconnex.com",
-      fromName: "Amy Shockley",
-      receivedUtc: "2026-08-10T12:59:52Z",
-      tag: "ashville",
-      why: "Two direct questions to you, and her answer gates the senior-indebtedness piece of the DPW financials response.",
-      draft:
-"Hi Amy,\n\n" +
-"On the Non-GAAP language — the chain below has what we've agreed so far; I'll confirm by end of day whether anything else still needs sign-off and flag it if so.\n\n" +
-"On the parent: for this request it's the issuer's direct parent, not the ECX topco. I'll send the entity name and the structure chart reference so the senior indebtedness figure is drawn at the right level.\n\n" +
-"Thanks,\nAditya",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoPAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-alexis-contracts",
-      bucket: "reply",
-      subject: "Executed Ashville contracts.",
-      from: "amartirosian@edgeconnex.com",
-      fromName: "Alexis Martirosian",
-      receivedUtc: "2026-08-10T16:30:48Z",
-      tag: "ashville",
-      why: "Alexis tagged you by name to push these to Davis Polk. Jackson has already loaded them into the engine.",
-      draft:
-"Thanks Alexis — I'll get these over to Davis Polk today and note them against the diligence list.\n\n" +
-"Jackson, thanks for loading them into the engine.\n\n" +
-"Best,\nAditya",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZorAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-rithika-boardslides",
-      bucket: "reply",
-      subject: "Re: MOR Financing Board Slides August 2026 Update",
-      from: "rnistala@edgeconnex.com",
-      fromName: "Rithika Nistala",
-      receivedUtc: "2026-08-10T10:52:29Z",
-      tag: "internal",
-      why: "Second ask from Rithika — she needs the updated deck by 8/11, and the Q2 CFO Update is 5:30 AM MT that morning.",
-      draft:
-"Hi Rithika,\n\n" +
-"Thanks for the bump — I'll get my sections of the financing update back to you today so you have a clean version for tomorrow.\n\n" +
-"If anything is still open by this evening I'll flag it rather than hold the deck.\n\n" +
-"Best,\nAditya",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZn9AAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-scott-google",
-      bucket: "reply",
-      subject: "Re: [Inputs requested] ECX - Google - valuation inputs",
-      from: "sgraff@edgeconnex.com",
-      fromName: "Scott Graff",
-      receivedUtc: "2026-08-10T11:29:50Z",
-      tag: "ashville",
-      why: "Scott is waiting on a date — he asked whether the near-final OM lands this week and said he'd rather wait for the final than take a draft.",
-      draft:
-"Hi Scott,\n\n" +
-"We're working through comments on the OM now — I'd expect a near-final version later this week, and I'll send it over as soon as it's clean rather than share the current draft.\n\n" +
-"If Google needs something sooner, let me know and we'll look at what we can share in the interim.\n\n" +
-"Best,\nAditya",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoBAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-
-    {
-      id: "in-canyon-ca",
-      bucket: "action",
-      subject: "Project Canyon | Credit Agreement",
-      from: "BJansen@kslaw.com",
-      fromName: "Brooke Jansen (King & Spalding)",
-      receivedUtc: "2026-08-09T21:32:38Z",
-      tag: "canyon",
-      why: "Initial credit agreement draft for ECX & EQT review — clean and marked against the pre-signing precedent. No reply owed yet; the review is the deliverable.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZn8AAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-winstead-mud",
-      bucket: "action",
-      subject: "RE: Austin Development - Wastewater Structure and Road Financing",
-      from: "jcox@winstead.com",
-      fromName: "Winstead (J. Cox)",
-      receivedUtc: "2026-08-10T14:40:45Z",
-      tag: "austin",
-      why: "Read before tomorrow's 1:00 PM call — tax-exempt bonds look unavailable (tax base needs 10+ independent taxpayers), and Randy Scott has confirmed he isn't the MUD-law expert.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZocAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-scioto-reschedule",
-      bucket: "action",
-      subject: "RE: Project Scioto- preliminary call to discuss financing options",
-      from: "dorina.yessios@aoshearman.com",
-      fromName: "Dorina Yessios (A&O Shearman)",
-      receivedUtc: "2026-08-10T13:01:27Z",
-      tag: "scioto",
-      why: "Call moved to Thursday 2:00 PM EST and Grace was asked to reissue the invite — the Tue 8/11 and Wed 8/12 Scioto holds still on your calendar are stale.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoRAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-
-    {
-      id: "in-clay-leroy",
-      bucket: "waiting",
-      subject: "RE: [External] Project Leroy: Upsize",
-      from: "Clay.Macfarlane@Blackstone.com",
-      fromName: "Clay Macfarlane (Blackstone)",
-      receivedUtc: "2026-08-10T16:58:20Z",
-      tag: "leroy",
-      why: "Clay is happy to take the call on the CA turn, MB/local counsel and the Austin addition — a time still needs to land. Matt Martin separately asked for AUS time.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZowAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-matthew-vdr",
-      bucket: "waiting",
-      subject: "Re: ECX - VDR Set Up and KYC/Lien Search",
-      from: "matthew.way@edgeconnex.com",
-      fromName: "Matthew Way",
-      receivedUtc: "2026-08-10T17:33:10Z",
-      tag: "ashville",
-      why: "Three executed LPAs are up on Box. Matthew is still waiting on the structure chart and consents/resolutions from the ECX side — that request lands partly on you.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZozAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-austin-directive",
-      bucket: "waiting",
-      subject: "Re: Austin - campus (impact of governor's directive)",
-      from: "lyoungers@edgeconnex.com",
-      fromName: "Lisa Youngers / Chris Jenkins",
-      receivedUtc: "2026-08-10T17:19:13Z",
-      tag: "austin",
-      why: "Intel still being gathered in Texas. PUCT public meetings Fri 8/14 and Thu 8/20; Lisa is leading consensus on the question set, consultant call held 8/10.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoyAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-dpw-regframework",
-      bucket: "waiting",
-      subject: "Re: Ashville - Regulatory Framework",
-      from: "lgodschalx@edgeconnex.com",
-      fromName: "Laura Godschalx → Dickinson Wright",
-      receivedUtc: "2026-08-10T13:39:21Z",
-      tag: "ashville",
-      why: "Laura chased Dickinson Wright on Elli Park's request; nothing back yet.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoVAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-
-    {
-      id: "in-ms-ratings",
-      bucket: "fyi",
-      subject: "RE: [EXTERNAL] Re: Project Ashville Weekly Sync",
-      from: "Maya.Matejcek@morganstanley.com",
-      fromName: "Maya Matejcek (Morgan Stanley)",
-      receivedUtc: "2026-08-10T13:56:11Z",
-      tag: "ashville",
-      why: "MS confirmed the executed docs went over last week and had no comments; Rithika cleared sharing with the rating agencies. Nothing owed from you.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoWAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-ppa-scale",
-      bucket: "fyi",
-      subject: "RE: Power agreement - Ashville PCX",
-      from: "peter.tolson@aoshearman.com",
-      fromName: "Peter Tolson (A&O Shearman) / Raj Chudgar",
-      receivedUtc: "2026-08-10T12:02:04Z",
-      tag: "ashville",
-      why: "A&O is sending Scale a redline of the version they already hold; Raj agreed to get it out ahead of the next round. Watch only — this is the PPA that still needs uploading for DPW.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoFAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-pm-reports",
-      bucket: "fyi",
-      subject: "PM / PMO status reports — 5 forwards from Laura",
-      from: "lgodschalx@edgeconnex.com",
-      fromName: "Laura Godschalx",
-      receivedUtc: "2026-08-10T15:25:08Z",
-      tag: "internal",
-      why: "Grouped: EDCATL11 BCEI weekly touchpoint (8/5), PCX PMO weekly (8/7), New Albany South touchpoint #86 (8/7), PHX11 and PHX12 project updates (8/4). Skim-when-you-can.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZokAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-market-updates",
-      bucket: "fyi",
-      subject: "Market updates — TD, Citi, SMBC, IG data centre biweekly",
-      from: "multiple",
-      fromName: "TD Securities / Citi / SMBC",
-      receivedUtc: "2026-08-10T12:39:06Z",
-      tag: "market",
-      why: "Grouped: TD ABS secondary levels + market commentary (8/10), TD data centre bond market update, Citi data centre monthly (July), SMBC digital infra ABS week of 8/7, IG data centre biweekly.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoMAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-ashville-dd-consents",
-      bucket: "fyi",
-      subject: "Re: Ashville Due Diligence",
-      from: "lgodschalx@edgeconnex.com",
-      fromName: "Laura Godschalx",
-      receivedUtc: "2026-08-10T11:45:24Z",
-      tag: "ashville",
-      why: "Laura confirmed to Eric Ramberg that the financing consents will be drafted and executed separately — resolves an open thread, no action.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoCAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-    {
-      id: "in-rbc-connect",
-      bucket: "fyi",
-      subject: "Re: EdgeConnex/RBC Connect",
-      from: "lgodschalx@edgeconnex.com",
-      fromName: "Laura Godschalx → RBC",
-      receivedUtc: "2026-08-10T13:09:06Z",
-      tag: "market",
-      why: "Laura is holding RBC for September and Sara is finding times — no action from you now, but it lands on the bank-relationship tracker.",
-      draft: "",
-      webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoSAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
-    },
-  ],
+  cleanup: {
+    folders: [
+      "Ashville", "Austin Series", "Bank Meetings", "Company", "Const. Updates",
+      "IT", "Project Canyon", "Project Etna", "Project Leroy", "Project Liverpool",
+      "Project Narwhal", "Sugar Admin"
+    ],
+    scans: [
+      {
+        id: "scan-const-updates",
+        title: "Construction reports → Const. Updates",
+        blurb: "Automated weekly construction and PM status reports, all forwarded by Laura. " +
+               "Const. Updates already holds 24 of these; these are the ones still loose in the Inbox.",
+        destination: "Inbox / Const. Updates",
+        destinationExists: true,
+        scannedAt: "2026-08-10T18:00:00Z",
+        rule: {
+          from: "lgodschalx@edgeconnex.com",
+          subjectAny: [
+            "Construction Weekly Review",
+            "Construction Status Report",
+            "Construction Report for",
+            "Weekly Construction Report",
+            "Weekly Touchpoint - PM Report",
+            "PM Touchpoint Report",
+            "PMO Weekly Status Update",
+            "Edge PHX"
+          ],
+          action: "Move to folder: Const. Updates  ·  Stop processing more rules"
+        },
+        items: [
+          { id: "cu-1", subject: "Fw: EDCATL11- BCEI + ECX Weekly Touchpoint - PM Report From 8/5/2026", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T15:25:08Z", site: "EDCATL11", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZokAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-2", subject: "Fw: PCX PMO Weekly Status Update 07-Aug-2026 - All Projects", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T15:02:27Z", site: "All projects", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZohAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-3", subject: "Fw: New Albany South _PM Touchpoint Report N°86 (Aug 7th, 2026)", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T15:00:37Z", site: "New Albany South", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZogAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-4", subject: "Fw: Edge PHX11 Project Update 8/4/26", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T14:46:32Z", site: "PHX11", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoeAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-5", subject: "Fw: Edge PHX12 Project Update 8/4/26", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T14:38:54Z", site: "PHX12", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZobAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-6", subject: "Fw: New Albany South _PM Touchpoint Report N°85 (July 31st, 2026)", fromName: "Laura Godschalx", receivedUtc: "2026-07-31T16:53:27Z", site: "New Albany South", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAYsLzzAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-7", subject: "Fw: EDCATL11- BCEI + ECX Weekly Touchpoint - PM Report From 7/29/2026", fromName: "Laura Godschalx", receivedUtc: "2026-07-31T16:39:41Z", site: "EDCATL11", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAYsLzvAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-8", subject: "Fw: EDCAUS11/16_ ECX/BCEI Construction Weekly Review_07.30.2026", fromName: "Laura Godschalx", receivedUtc: "2026-07-31T16:36:25Z", site: "EDCAUS11/16", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAYsLzuAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-9", subject: "Fw: EDCATL12&13 - BCEI + ECX Weekly Touchpoint - PM Report (7/29/2026)", fromName: "Laura Godschalx", receivedUtc: "2026-07-31T16:32:29Z", site: "EDCATL12/13", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAYsLzsAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-10", subject: "Fw: EDCAUS11/16_ ECX/BCEI Construction Weekly Review_07.23.2026", fromName: "Laura Godschalx", receivedUtc: "2026-07-27T23:41:03Z", site: "EDCAUS11/16", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAVeawGAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-11", subject: "Fw: New Albany South _PM Touchpoint Report N°84 (July 24th, 2026)", fromName: "Laura Godschalx", receivedUtc: "2026-07-24T20:59:13Z", site: "New Albany South", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAATZQncAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-12", subject: "Fw: AUS02 ECX/BCEI Construction Weekly Review-07/22", fromName: "Laura Godschalx", receivedUtc: "2026-07-24T20:58:24Z", site: "AUS02", confidence: "high",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAATZQnbAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
+          { id: "cu-13", subject: "Fw: Austin GW Campus - Coordination Call - AGENDA 8-5-26", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T12:19:19Z", site: "Austin GW", confidence: "review",
+            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoLAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" }
+        ],
+        notes: [
+          "Three identical copies of the Austin GW Campus agenda arrived on 8/10 (12:00, 12:09, 12:19). Only the last is listed — the other two are duplicates.",
+          "The Austin GW agenda is marked 'review': it is a coordination-call agenda rather than a construction status report, so the rule below deliberately does not catch it."
+        ]
+      }
+    ]
+  }
 };
