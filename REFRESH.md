@@ -14,7 +14,11 @@ network access beyond GitHub Pages.
                                         your browser ─────┴──► + your local edits
 ```
 
-## The one rule
+## The rules
+
+Repo-wide working conventions live in **[CLAUDE.md](CLAUDE.md)** — read it first. The one that
+bites hardest on a refresh: **always combine like items.** Merge a new task into an existing one
+when it is the same workstream, keeping the oldest id, rather than appending a near-duplicate.
 
 **Never edit `taskflow/index.html` during a data refresh.** Only `data/taskflow.js` changes.
 If the viewer genuinely needs a change, that is a separate commit.
@@ -55,7 +59,12 @@ Paste this into a Claude Code session on this repo (or let the scheduled Routine
 > 3. **New deals** — when a codename shows up in the mail or calendar that has no entry, add both
 >    a `projects` row and a `projectMeta` row for it rather than filing its tasks under an
 >    existing deal.
-> 4. **Tasks** — carry the existing backlog forward by id. Give every task a
+> 4. **Merge before you add** — for each candidate new task, check the project's existing tasks
+>    first and MERGE if it is the same workstream (same counterparty and artefact, two directions
+>    of one exchange, a task and its own follow-up step). Keep the oldest id so the user's
+>    completions stay attached, fold both descriptions into `notes`, record the retired id in
+>    `source`, and take the earlier due date and higher priority. See CLAUDE.md for the full rule.
+> 5. **Tasks** — carry the existing backlog forward by id. Give every task a
 >    `summary` and a `group`. The summary is what shows on the board: write the
 >    POINT of the item in under ~55 characters ("Waiting on Laura's review before
 >    it can go out"), not the opening words of the note clipped short — the
@@ -65,9 +74,9 @@ Paste this into a Claude Code session on this repo (or let the scheduled Routine
 >    moved something. Add tasks for genuinely new commitments found in mail, with a `source`
 >    naming the message. Do not silently delete backlog items; if something looks done, add it to
 >    `taskUpdates` with `status: "Done"` and bump `updateBatch`.
-> 5. Update `meta.as_of`, `meta.generated_at`, `meta.windows` and `meta.sources`, keep
+> 6. Update `meta.as_of`, `meta.generated_at`, `meta.windows` and `meta.sources`, keep
 >    `meta.notes` honest about anything you could not verify.
-> 6. Render-test the page (see below), rebuild and republish the shareable artifact to the
+> 7. Render-test the page (see below), rebuild and republish the shareable artifact to the
 >    existing URL, then commit and push — including `dist/`.
 
 ## Publishing the shareable page
