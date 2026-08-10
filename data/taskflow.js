@@ -103,6 +103,8 @@ window.TASKFLOW_DATA = {
       notes: "Drafted; flagged to Laura it may be too much detail for teaser stage — finalize for lender diligence.", source: "backlog" },
     { id: "s-aus14", projectId: "proj-austin", title: "Review Randy's DD responses; check off and send to T&T & GS", due: "2026-08-12", priority: "high", assignee: "Me", status: "To Do",
       notes: "Randy (BCEI) came back 7/30 incl. AUS30 mass grading permit approval, EGU permit confirmation, Zone A floodplain. Confirm the full response set went to T&T and Goldman.", source: "backlog" },
+    { id: "t-aus23", projectId: "proj-austin", title: "Updated AUS10 draft email", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Which email was not specified. Context if it is the lender thread: the original outreach note was drafted for Laura and sent w/o 7/31 with the teaser and model, and Eelco added Morgan Stanley to the bank list on 8/6 — so a follow-up or a re-send to the added names is the likely subject.", source: "added by request 2026-08-10" },
     { id: "t-aus22", projectId: "proj-austin", title: "Send the GS DD questions back over to the team", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Circulate Goldman's diligence questions internally so the owners can answer them. Sits next to two existing AUS10 DD items — 'Send GS questions once Laura has reviewed' (outbound to GS, blocked on Laura) and 'Review Randy's DD responses… send to T&T & GS'. Merge them if this is the same pass.", source: "added by request 2026-08-10" },
     { id: "t-aus20", projectId: "proj-austin", title: "Prep for Austin wastewater / road financing call (Tue 1:00 PM MT)", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
