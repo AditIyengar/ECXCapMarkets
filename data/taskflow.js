@@ -103,6 +103,8 @@ window.TASKFLOW_DATA = {
       notes: "Drafted; flagged to Laura it may be too much detail for teaser stage — finalize for lender diligence.", source: "backlog" },
     { id: "s-aus14", projectId: "proj-austin", title: "Review Randy's DD responses; check off and send to T&T & GS", due: "2026-08-12", priority: "high", assignee: "Me", status: "To Do",
       notes: "Randy (BCEI) came back 7/30 incl. AUS30 mass grading permit approval, EGU permit confirmation, Zone A floodplain. Confirm the full response set went to T&T and Goldman.", source: "backlog" },
+    { id: "t-aus24", projectId: "proj-austin", title: "Review the Austin v2 LTA report", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Turner & Townsend (Allison Oldfield) issued 'AUS Campus Land Financing LTA Report v2' on 8/6; Rithika forwarded it to you 8/10. Randy's latest DD context still needs folding in, and on Ashville 1 the equivalent report only closed out at v7 — so expect a comment round rather than a read-through.", source: "email 8/10 — Fw: AUS Campus Land Financing LTA Report v2" },
     { id: "t-aus23", projectId: "proj-austin", title: "Updated AUS10 draft email", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Which email was not specified. Context if it is the lender thread: the original outreach note was drafted for Laura and sent w/o 7/31 with the teaser and model, and Eelco added Morgan Stanley to the bank list on 8/6 — so a follow-up or a re-send to the added names is the likely subject.", source: "added by request 2026-08-10" },
     { id: "t-aus22", projectId: "proj-austin", title: "Send the GS DD questions back over to the team", due: "", priority: "medium", assignee: "Me", status: "To Do",
