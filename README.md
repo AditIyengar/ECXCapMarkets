@@ -6,7 +6,7 @@ team. Both are plain HTML that read a committed data file — no build step, no 
 | | What it is | Data refreshed by |
 |---|---|---|
 | [`index.html`](index.html) | **Bank Conversation Dashboard** — lender relationships, commitments, fees | Ad-hoc Claude session (SharePoint + Outlook) |
-| [`taskflow/index.html`](taskflow/index.html) | **TaskFlow** — to-do board, Outlook calendar, Outlook cleanup | Scheduled Claude Code session — see [REFRESH.md](REFRESH.md) |
+| [`taskflow/index.html`](taskflow/index.html) | **TaskFlow** — to-do board, project deal sheet, Outlook calendar | Scheduled Claude Code session — see [REFRESH.md](REFRESH.md) |
 
 ---
 
@@ -14,21 +14,27 @@ team. Both are plain HTML that read a committed data file — no build step, no 
 
 Successor to the TaskFlow Claude artifact, rebuilt as a real site. Three tabs:
 
+
 - **Board** — tasks grouped by project (Austin, Ashville, Scioto, Canyon, Leroy, Enigma, AI),
   with due/overdue chips, a "needs attention" strip, search, and per-project filtering
 - **Calendar** — Outlook month grid + day agenda in Mountain Time, with all-day location holds,
   tentative flags, and automatic detection of overlapping meetings
-- **Outlook cleanup** — one-button scan that finds the automated construction and PM status
-  reports loose in your Inbox and lists them against their destination folder, with an Outlook
-  deep link per message and a filing rule that stops them piling up again
+- **Projects** — a deal sheet: stage, size, financing type, key counterparties and open
+  workstream count per project, with an expandable row for the full counterparty list, the live
+  workstreams and the sourcing behind every fact
 
-**The architecture:** Claude Code is the backend. A scheduled session pulls the calendar, scans
-the inbox, and pushes `data/taskflow.js`. The page is static and keyless. Your own edits —
-completions, added tasks, deletions, filing tick-offs — live in `localStorage` keyed by item id,
-so a data refresh never clobbers them and never resurrects something you deleted.
+**The architecture:** Claude Code is the backend. A scheduled session pulls the calendar,
+researches the deal sheet, and pushes `data/taskflow.js`. The page is static and keyless. Your
+own edits — completions, added tasks, deletions — live in `localStorage` keyed by item id, so a
+data refresh never clobbers them and never resurrects something you deleted.
 
-The page never sends mail, moves mail, or changes anything in Outlook — the Microsoft 365
-connector is read-only, so cleanup produces a worklist and a rule rather than executing moves.
+Every fact on the Projects tab carries a `sources` line naming where it came from. Anything not
+evidenced is shown as **not captured** rather than estimated — 6 of the 8 deals currently have no
+size on file. Open workstream counts are derived from the board rather than stored, so the deal
+sheet cannot drift from the task list.
+
+The page is read-only against Outlook: it never sends or moves mail, and never changes your
+calendar.
 
 ---
 
@@ -64,10 +70,11 @@ Data is extracted from (as of 2026-07-23):
 index.html                       — Bank Conversation Dashboard (self-contained)
 data/data.js                     — its dataset (banks, meetings, facilities, commitments, fees)
 taskflow/index.html              — TaskFlow desk site (self-contained)
-data/taskflow.js                 — its dataset (projects, tasks, calendar, cleanup scans)
+data/taskflow.js                 — its dataset (projects, project meta, tasks, calendar)
 tools/build-standalone.js        — inlines the dataset into one shareable file
 dist/taskflow-standalone.html    — generated; the exact page published to the artifact URL
 REFRESH.md                       — refresh contract, publishing steps, scheduling
+archive/                         — shelved features, with notes on restoring them
 ```
 
 Open either file in a browser, or serve the repo with GitHub Pages — both render entirely

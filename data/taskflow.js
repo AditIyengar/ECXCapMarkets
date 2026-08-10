@@ -70,6 +70,7 @@ window.TASKFLOW_DATA = {
     { id: "proj-scioto",    name: "Scioto",     color: "#E0699B" },
     { id: "proj-canyon",    name: "Canyon",     color: "#C2882F" },
     { id: "proj-leroy",     name: "Leroy",      color: "#3FB86B" },
+    { id: "proj-liverpool", name: "Liverpool",  color: "#5B8DEF" },
     { id: "proj-ai",        name: "AI Projects", color: "#FFB020" },
   ],
 
@@ -230,86 +231,210 @@ window.TASKFLOW_DATA = {
   ],
 
   /* --------------------------------------------------------------------------
-   * OUTLOOK CLEANUP
+   * PROJECT META — the deal sheet behind the Projects tab.
    *
-   * Filing plans computed at refresh time. Each scan names a destination folder
-   * that must ALREADY EXIST in the mailbox, plus the messages sitting in the
-   * Inbox that belong in it.
+   * Every field here must be SOURCED. `sources` names where each fact came
+   * from; anything not evidenced is left as "" and shown on the page as "not
+   * captured" rather than guessed. Sizes especially: a plausible-looking
+   * number nobody can trace is worse than a blank.
    *
-   * The page cannot move mail — it has no mailbox credentials, and the
-   * Microsoft 365 connector used at refresh time is read-only (search and read
-   * only; no move/update tool). So a scan produces a worklist and a filing
-   * rule, not an executed move. `rule` is the durable fix: set it once in
-   * Outlook and future reports file themselves.
+   * Active workstreams are NOT stored here — they are derived live from the
+   * open tasks on each project, so the table cannot drift from the board.
    *
-   * scan { id, title, blurb, destination, destinationExists, scannedAt,
-   *        rule: { from, subjectAny[], action },
-   *        items: [{ id, subject, fromName, receivedUtc, site, confidence,
-   *                  webLink }] }
-   *   confidence ∈ high | review   — "review" means eyeball it before filing
+   * meta { projectId, codename, stage, stageKind, size, sizeNote, type,
+   *        counterparties: [{ name, role }], notes[], sources[] }
+   *   stageKind ∈ live | market | docs | closed | early   (drives the chip colour)
    * ------------------------------------------------------------------------ */
-  cleanup: {
-    folders: [
-      "Ashville", "Austin Series", "Bank Meetings", "Company", "Const. Updates",
-      "IT", "Project Canyon", "Project Etna", "Project Leroy", "Project Liverpool",
-      "Project Narwhal", "Sugar Admin"
-    ],
-    scans: [
-      {
-        id: "scan-const-updates",
-        title: "Construction reports → Const. Updates",
-        blurb: "Automated weekly construction and PM status reports, all forwarded by Laura. " +
-               "Const. Updates already holds 24 of these; these are the ones still loose in the Inbox.",
-        destination: "Inbox / Const. Updates",
-        destinationExists: true,
-        scannedAt: "2026-08-10T18:00:00Z",
-        rule: {
-          from: "lgodschalx@edgeconnex.com",
-          subjectAny: [
-            "Construction Weekly Review",
-            "Construction Status Report",
-            "Construction Report for",
-            "Weekly Construction Report",
-            "Weekly Touchpoint - PM Report",
-            "PM Touchpoint Report",
-            "PMO Weekly Status Update",
-            "Edge PHX"
-          ],
-          action: "Move to folder: Const. Updates  ·  Stop processing more rules"
-        },
-        items: [
-          { id: "cu-1", subject: "Fw: EDCATL11- BCEI + ECX Weekly Touchpoint - PM Report From 8/5/2026", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T15:25:08Z", site: "EDCATL11", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZokAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-2", subject: "Fw: PCX PMO Weekly Status Update 07-Aug-2026 - All Projects", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T15:02:27Z", site: "All projects", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZohAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-3", subject: "Fw: New Albany South _PM Touchpoint Report N°86 (Aug 7th, 2026)", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T15:00:37Z", site: "New Albany South", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZogAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-4", subject: "Fw: Edge PHX11 Project Update 8/4/26", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T14:46:32Z", site: "PHX11", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoeAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-5", subject: "Fw: Edge PHX12 Project Update 8/4/26", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T14:38:54Z", site: "PHX12", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZobAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-6", subject: "Fw: New Albany South _PM Touchpoint Report N°85 (July 31st, 2026)", fromName: "Laura Godschalx", receivedUtc: "2026-07-31T16:53:27Z", site: "New Albany South", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAYsLzzAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-7", subject: "Fw: EDCATL11- BCEI + ECX Weekly Touchpoint - PM Report From 7/29/2026", fromName: "Laura Godschalx", receivedUtc: "2026-07-31T16:39:41Z", site: "EDCATL11", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAYsLzvAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-8", subject: "Fw: EDCAUS11/16_ ECX/BCEI Construction Weekly Review_07.30.2026", fromName: "Laura Godschalx", receivedUtc: "2026-07-31T16:36:25Z", site: "EDCAUS11/16", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAYsLzuAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-9", subject: "Fw: EDCATL12&13 - BCEI + ECX Weekly Touchpoint - PM Report (7/29/2026)", fromName: "Laura Godschalx", receivedUtc: "2026-07-31T16:32:29Z", site: "EDCATL12/13", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAYsLzsAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-10", subject: "Fw: EDCAUS11/16_ ECX/BCEI Construction Weekly Review_07.23.2026", fromName: "Laura Godschalx", receivedUtc: "2026-07-27T23:41:03Z", site: "EDCAUS11/16", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAVeawGAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-11", subject: "Fw: New Albany South _PM Touchpoint Report N°84 (July 24th, 2026)", fromName: "Laura Godschalx", receivedUtc: "2026-07-24T20:59:13Z", site: "New Albany South", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAATZQncAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-12", subject: "Fw: AUS02 ECX/BCEI Construction Weekly Review-07/22", fromName: "Laura Godschalx", receivedUtc: "2026-07-24T20:58:24Z", site: "AUS02", confidence: "high",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAATZQnbAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" },
-          { id: "cu-13", subject: "Fw: Austin GW Campus - Coordination Call - AGENDA 8-5-26", fromName: "Laura Godschalx", receivedUtc: "2026-08-10T12:19:19Z", site: "Austin GW", confidence: "review",
-            webLink: "https://outlook.office365.com/owa/?ItemID=AAMkAGRiZTVlNjlmLTBhZGYtNDRhYi05NzMzLWRmNzIyOGJmN2Y3NABGAAAAAAAcqWuLqEZVSqb1h236JFxbBwBiG54edwtBTKT4tXRW1gjnAAAAAAEMAABiG54edwtBTKT4tXRW1gjnAAAeGZoLAAA%3D&exvsurl=1&viewmodel=ReadMessageItem" }
-        ],
-        notes: [
-          "Three identical copies of the Austin GW Campus agenda arrived on 8/10 (12:00, 12:09, 12:19). Only the last is listed — the other two are duplicates.",
-          "The Austin GW agenda is marked 'review': it is a coordination-call agenda rather than a construction status report, so the rule below deliberately does not catch it."
-        ]
-      }
-    ]
-  }
+  projectMeta: [
+    {
+      projectId: "proj-austin",
+      codename: "Austin campus / AUS10 series",
+      stage: "Lender outreach live",
+      stageKind: "market",
+      size: "",
+      sizeNote: "Campus size not captured. Goldman floated a $2bn Leroy upsize as an alternative home for Austin rather than financing the AUS10 series standalone; the campus was described as 6 individual buildings.",
+      type: "Project finance — campus land + data centre / energy centre. Bridge via Goldman under discussion; MUFG treating the Energy Center as development + tolling rather than partly merchant.",
+      counterparties: [
+        { name: "Goldman Sachs", role: "Lead / bridge + diligence" },
+        { name: "MUFG", role: "Energy Center financing" },
+        { name: "SMBC", role: "Austin PF interest" },
+        { name: "Blackstone", role: "Leroy upsize / Austin addition" },
+        { name: "BCEI", role: "Developer (Randy Scott)" },
+        { name: "Turner & Townsend", role: "Technical advisor / LTA" },
+        { name: "Winstead", role: "MUD & wastewater counsel" },
+        { name: "Newmark", role: "Appraisal" }
+      ],
+      notes: [
+        "Teaser and lender model finalised and distributed w/o 8/3; bank list signed off by Eelco, Joe and Johan, with Morgan Stanley added 8/6.",
+        "Winstead's 8/10 read: tax-exempt bonds likely unavailable — the tax base must include at least 10 independent taxpayers. The MUD financing route is the live question.",
+        "Texas PUCT holds public meetings on the governor's directive 8/14 and 8/20; Lisa Youngers leading the consensus on ECX's question set."
+      ],
+      sources: [
+        "CF Pipeline / GS call notes 2026-04-22 (AUS10 series / Leroy)",
+        "MUFG call notes 2026-07-21 (Austin development financing)",
+        "SMBC call notes 2026-07-22",
+        "Email 2026-08-10 — Winstead / BCEI wastewater thread"
+      ]
+    },
+    {
+      projectId: "proj-ashville",
+      codename: "Ashville 1",
+      stage: "Pre-launch — OM in comments",
+      stageKind: "docs",
+      size: "",
+      sizeNote: "Deal size not captured in the sources read so far.",
+      type: "High-yield / 144A bond. Morgan Stanley's 7/28 market read had it pricing in the low 7s; rating agency and technical-advisor sessions being scheduled.",
+      counterparties: [
+        { name: "Morgan Stanley", role: "Lead / bookrunner" },
+        { name: "Davis Polk", role: "ECX counsel" },
+        { name: "Cahill Gordon", role: "Underwriter counsel" },
+        { name: "SMBC", role: "HY market dialogue" },
+        { name: "Dickinson Wright", role: "Regulatory framework" },
+        { name: "Tatusko / Greenberg Traurig", role: "Local counsel" },
+        { name: "Turner & Townsend", role: "LTA report" }
+      ],
+      notes: [
+        "Launch was targeted 8/10 per the handover plan; the OM comment pass is the long pole and is now overdue on Davis Polk's clock (they chased 8/5).",
+        "LTA report v7 delivered 8/5 with final comments incorporated — only the signed construction contracts remain to fold in.",
+        "Rithika confirmed to Morgan Stanley on 8/10 that materials are cleared to share with the rating agencies."
+      ],
+      sources: [
+        "SMBC call notes 2026-07-22 (Ashville HY market)",
+        "Email 2026-08-10 — Project Ashville Weekly Sync thread",
+        "Email 2026-08-10 — Ashville 1: Davis Polk Diligence Requests"
+      ]
+    },
+    {
+      projectId: "proj-ashville2",
+      codename: "Ashville 2 — Ashville Energy Center Phase 2 (\"Unwrapped\")",
+      stage: "Anchor investor sounding",
+      stageKind: "market",
+      size: "$500m+ anchor ticket",
+      sizeNote: "Apterra indicated a minimum $500m anchor ticket with upside — that is a ticket, not the deal size. Total size not captured.",
+      type: "Unwrapped backleverage / private placement to an anchor investor. Apterra's read: ANT paper priced at 8.5% unwrapped for Big Sky, and ECX screens better on balance sheet and sponsor.",
+      counterparties: [
+        { name: "Barclays", role: "Advising on backleverage & anchors" },
+        { name: "Apterra", role: "Anchor investor candidate" },
+        { name: "Apollo", role: "Term sheet" },
+        { name: "Blackstone", role: "Term sheet" },
+        { name: "Ares / Brookfield / Blue Owl / HPS", role: "Potential anchors (Barclays list)" },
+        { name: "Santander / Deutsche Bank", role: "Backleverage — less liquid, more bespoke" },
+        { name: "EQT", role: "Sponsor (Johan Hylander)" }
+      ],
+      notes: [
+        "Apterra flagged mild pricing concern against another deal in the mid-500s.",
+        "Technical walkthrough of the Energy Center held 7/20 with Apterra's Chief Risk Officer — power load swing solution (UIG microgrid control scheme) and plot plan."
+      ],
+      sources: [
+        "Barclays call notes 2026-07-23 (Ashville 2 unwrapped)",
+        "Apterra call notes 2026-07-15 and 2026-07-20"
+      ]
+    },
+    {
+      projectId: "proj-scioto",
+      codename: "Scioto",
+      stage: "Financing options",
+      stageKind: "early",
+      size: "",
+      sizeNote: "Not captured — the deal is still at the options stage.",
+      type: "Structure and financing options under review; Barclays has produced a targeted investor list (the \"Big Sky\" deck) for Scioto 2.",
+      counterparties: [
+        { name: "A&O Shearman", role: "Counsel (Dorina Yessios, Peter Tolson)" },
+        { name: "Davis Polk", role: "Counsel" },
+        { name: "Barclays", role: "Targeted investor list" },
+        { name: "EQT", role: "Sponsor (Johan Hylander)" }
+      ],
+      notes: [
+        "The preliminary financing-options call moved to Thursday 2:00 PM EST on 8/10; the Tue 8/11 and Wed 8/12 holds still sitting on the calendar are the stale invites."
+      ],
+      sources: [
+        "Email 2026-08-10 — Project Scioto preliminary call",
+        "Barclays call notes 2026-07-23"
+      ]
+    },
+    {
+      projectId: "proj-canyon",
+      codename: "Canyon",
+      stage: "Credit agreement drafting",
+      stageKind: "docs",
+      size: "",
+      sizeNote: "Not captured.",
+      type: "Committed facility — commitment papers already signed; King & Spalding circulated the initial credit agreement 8/9, marked against the pre-signing precedent.",
+      counterparties: [
+        { name: "King & Spalding", role: "Drafting counsel (Brooke Jansen)" },
+        { name: "EQT", role: "Sponsor" }
+      ],
+      notes: [
+        "Clean and marked versions both circulated to the ECX and EQT teams for review."
+      ],
+      sources: [
+        "Email 2026-08-09 — Project Canyon | Credit Agreement"
+      ]
+    },
+    {
+      projectId: "proj-enigma",
+      codename: "Enigma",
+      stage: "Structuring",
+      stageKind: "early",
+      size: "",
+      sizeNote: "Not captured.",
+      type: "Forward sale. EQT ranked the structure options; the scenario work turns on stableco and ECX cash/NOI timing plus proposed debt repayments.",
+      counterparties: [
+        { name: "EQT", role: "Sponsor — structure rankings (Abbey)" },
+        { name: "Counsel", role: "To be engaged on scenario & consent analysis" }
+      ],
+      notes: [
+        "Forward Sale Structure Options call held 7/30; Eelco deferred to AMS on timing.",
+        "Counsel engagement waits on EQT's model, expected around 8/5."
+      ],
+      sources: [
+        "Calendar 2026-07-30 — Project Enigma | Forward Sale Structure Options",
+        "Task backlog carried from the CF Pipeline notes"
+      ]
+    },
+    {
+      projectId: "proj-leroy",
+      codename: "Leroy",
+      stage: "Closed — upsize in negotiation",
+      stageKind: "closed",
+      size: "$1,000m",
+      sizeNote: "Facility size per the Q2 2026 Commitments workbook (see the Bank Conversation Dashboard). A further upsize is live, and Goldman floated a $2bn increase as a way to house Austin.",
+      type: "Land / early-stage facility with Blackstone. Post-closing obligations running on Finland and Norway; upsize negotiation covers power percentages and caps.",
+      counterparties: [
+        { name: "Blackstone", role: "Lender (Clay Macfarlane, Matt Martin)" },
+        { name: "Wells Fargo", role: "Upsize negotiation" },
+        { name: "Newmark", role: "Appraisal" },
+        { name: "Turner & Townsend", role: "Punch list review" }
+      ],
+      notes: [
+        "Finland closed and funded 7/31 (Blackstone wired); reliance letters and an updated Exhibit A are the open post-closing items, with Norway on the same pattern.",
+        "Clay came back 8/10 offering time on the CA turn, MB/local counsel questions and the Austin addition."
+      ],
+      sources: [
+        "Q2 2026 Commitments workbook via data/data.js facilities",
+        "Wells Fargo call notes 2026-04-15 (Leroy upsize / ATL12)",
+        "Email 2026-08-10 — Project Leroy: Upsize"
+      ]
+    },
+    {
+      projectId: "proj-liverpool",
+      codename: "Liverpool",
+      stage: "Syndicated — in life",
+      stageKind: "closed",
+      size: "",
+      sizeNote: "Not captured in the datasets read so far; the facility does not appear under this codename in the Q2 2026 commitments extract.",
+      type: "Syndicated facility, administered through a weekly ICLA lender call.",
+      counterparties: [
+        { name: "Natixis", role: "Agent / organiser (Jorge Bravo)" },
+        { name: "Société Générale", role: "Lender" },
+        { name: "BBVA", role: "Lender" }
+      ],
+      notes: [
+        "Weekly ICLA call every Thursday, 8:30 AM MT."
+      ],
+      sources: [
+        "Calendar — Project Liverpool Syndicated Facility ICLA Weekly Call"
+      ]
+    }
+  ]
 };
