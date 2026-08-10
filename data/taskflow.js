@@ -72,6 +72,7 @@ window.TASKFLOW_DATA = {
     { id: "proj-leroy",     name: "Leroy",      color: "#3FB86B" },
     { id: "proj-liverpool", name: "Liverpool",  color: "#5B8DEF" },
     { id: "proj-ai",        name: "AI Projects", color: "#FFB020" },
+    { id: "proj-internal", name: "Internal",   color: "#8A93A3" },
   ],
 
   people: [
@@ -166,6 +167,10 @@ window.TASKFLOW_DATA = {
     { id: "s-ler6", projectId: "proj-leroy", title: "Austin campus: Rithika to work through open items and revert", due: "", priority: "medium", assignee: "Rithika", status: "In Progress",
       notes: "Rithika going through the open punch-list items to come back with a consolidated list.", source: "backlog" },
 
+    // ---- Internal ----
+    { id: "t-int1", projectId: "proj-internal", title: "Set up 30\u201360 min with Eelco to organise his to-dos", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Working session with Eelco Holst rather than a status update \u2014 walk his open items and get them into order. He is across Austin (teaser and bank-list sign-off), Ashville 1 (asked to review the OM) and Enigma (deferred to AMS on forward-sale timing), so those are the likely agenda. There is a standing Catch Eelco / Aditya slot on the calendar if a separate hold is not wanted.", source: "added by request 2026-08-10" },
+
     // ---- AI Projects ----
     { id: "s-ai4", projectId: "proj-ai", title: "Reach out to Pradeep — bank relationship tracker", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Kick off the bank relationship tracker build.", source: "backlog" },
@@ -173,8 +178,10 @@ window.TASKFLOW_DATA = {
       notes: "Lender relationships across deals — coverage contacts, past participations, recent touchpoints. First cut already live in this repo as the Bank Conversation Dashboard.", source: "backlog" },
     { id: "s-ai2", projectId: "proj-ai", title: "Comps dashboard", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Live dashboard of data-center financing comps — pricing, structure, tenor, sponsor across recent deals.", source: "backlog" },
-    { id: "t-ai5", projectId: "proj-ai", title: "Due diligence agent — answer DD questions with AI", due: "", priority: "high", assignee: "Me", status: "To Do",
-      notes: "The same diligence questions keep coming back deal by deal: the AUS10 DD Tracker with GS and T&T, Davis Polk's 11-item Ashville request, Randy's BCEI responses, and the rating-agency and technical-advisor Q&A. Shape: index the already-answered sets alongside the source documents (OMs, LTA reports, PPAs, org charts, financials, permits) and draft first-pass answers that cite the source, for a human to check before it goes out. Highest value where one question is answered repeatedly across deals. Pairs with the Legal agent item — same corpus, opposite direction.", source: "added by request 2026-08-10" },
+    { id: "t-ai5", projectId: "proj-ai", title: "DD question & answer database — stop answering the same question twice", due: "", priority: "high", assignee: "Me", status: "To Do",
+      notes: "A searchable store of every DD question we have been asked and the answer we gave, so a repeat question is retrieved rather than re-answered. Answers get re-grounded against the latest source before reuse — emails, the current teaser and lender model, the newest LTA report — so a stale answer is never served as current. SEED ALREADY EXISTS: 'EdgeConneX - AUS land - T&T-Q&A June 2026 - v1.xlsx' is in the right shape already (Category / # / Question / Priority / Response / Status, grouped by topic — Power first), under Corporate Finance_Team > Project Leroy > 10. Post-closing > 02. Amendments > 10. Austin Campus > Austin SeriesCampus > 03. Due Diligence > 01. Technical DD > T&T. That '03. Due Diligence' tree also holds the AUS Campus Land Financing LTA Report v2, and the '01. Technical DD' numbering implies further DD subfolders to sweep. Add Davis Polk's Ashville request, Randy's BCEI responses, and the rating-agency and technical-advisor Q&A. Answers must cite their source document so a human can check before anything goes out.", source: "added by request 2026-08-10; SharePoint paths verified" },
+    { id: "t-ai6", projectId: "proj-ai", title: "Ask corp dev (Scott / Aaron / Alex) about their DD answer database", due: "", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Corp dev has answered a large volume of DD questions for equity investors and is already using AI on it. Worth understanding what they built before starting a parallel one — the question sets overlap heavily on the asset and the sponsor even where debt vs equity diverges. Ask: what is the store, how is it kept current, can we point at theirs or fork it. Scott is most likely Scott Graff (sgraff@edgeconnex.com), who is already on the Google valuation-inputs thread; Aaron's and Alex's surnames are not confirmed — check the corp dev distribution list first.", source: "added by request 2026-08-10" },
     { id: "s-ai3", projectId: "proj-ai", title: "Legal agent", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "AI agent to first-pass legal documents — flag key terms, deviations from precedent, open issues for counsel.", source: "backlog" },
   ],
