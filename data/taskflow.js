@@ -84,6 +84,7 @@ window.TASKFLOW_DATA = {
     { email: "sgraff@edgeconnex.com",    name: "Scott Graff",      short: "Scott" },
     { email: "cwenger@edgeconnex.com",   name: "Chris Wenger",     short: "Chris W" },
     { email: "eholst@edgeconnex.com",    name: "Eelco Holst",      short: "Eelco" },
+    { email: "szheng@edgeconnex.com",    name: "Shelly Zheng",     short: "Shelly" },
     { email: "",                          name: "Turner & Townsend", short: "T&T" },
   ],
 
@@ -118,6 +119,8 @@ window.TASKFLOW_DATA = {
       notes: "Alexis Martirosian circulated them 8/10 and flagged them for you specifically; Jackson has already loaded them into the engine. Closes one of the DPW diligence gaps.", source: "email 8/10 — Executed Ashville contracts" },
     { id: "s-ash15", projectId: "proj-ashville", title: "Follow up on signed construction contracts for the LTA report", due: "", priority: "medium", assignee: "T&T", status: "To Do",
       notes: "LTA v7 delivered 8/5 with final comments incorporated — last open item is folding in the signed construction contracts once received.", source: "backlog" },
+    { id: "t-ash23", projectId: "proj-ashville", title: "Check with Shelly on the Ashville 1 power contracts", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Shelly Zheng (szheng@edgeconnex.com) sits on the PowerConneX side — she is on the PCX entity discussion thread and the PCXCMH11 Ashville Phase 1 VG Turbines SRA payment (LM6000s). Feeds the diligence set: the latest PPA is still owed to Davis Polk, and A&O are sending Scale a redline of the power agreement.", source: "added by request 2026-08-10" },
     { id: "s-ash12", projectId: "proj-ashville", title: "Respond to Ares on the Ashville referendum", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Reply still owed to Ares on the referendum question.", source: "backlog" },
     { id: "s-ash7", projectId: "proj-ashville", title: "Reply to Macy — technical advisor & rating agency meetings", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
