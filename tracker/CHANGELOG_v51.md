@@ -197,3 +197,39 @@ No lender card was created — Winstead and BCEI are counsel and a development p
 **Still open from v65/v66, unchanged:** Project Canyon (Copia Bridge) has an executed commitment letter and a first Credit Agreement draft but no project card; Barclays, NordLB and Wells Fargo have no lender cards; the dead `AIAssistant` component is still in the file.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright smoke test green — zero console/page errors, zero external requests, 56 lenders / 24 active / 18 closed / 13 market entries, title unchanged, stamp reads v67, and the Ask tab returns the new MUD and tax-exempt-bond language when queried. Archived to `tracker/versions/ECX_Tracker_v67.html`.
+
+---
+
+## v68 Changelog (8/10/26) — new "LC Syndication" tab
+
+Released **8/10/26, 1:05 PM ET**. Feature release built from a supplied source file, no Outlook sweep. Title unchanged.
+
+**New tab: "LC Syndication"** (between Lender Commitments and Global Cap Table). Full transcription of *ECX — Letter of Credit Facility: Syndication Tracker v8.06, August 6, 2026* into the tracker's own data model and visual language.
+
+**Source figures, verbatim.** Facility $2,500m · Approved $900m · Net to raise $1,600m · Probability-weighted subscription 0.46x. Column totals tie out exactly to the file: participation $2,250.0m, probability-weighted $1,632.5m, fronting $1,800.0m.
+
+**Three tables.**
+
+- **Active syndication list (17)** — #, institution, coverage bank, participation, probability, probability-weighted, fronting, timing, the three tick columns (bilat issuer / VDR access / KYC on time) and the full status comment with its as-of tag. BBVA, Natixis and SocGen carry a JLA badge and an APPROVED chip; each is $300m participation plus $600m fronting under an executed ICLA. Sort toggle for source order, probability-weighted, or participation.
+- **Accordion candidates (3)** — Bank of Montreal, BNP Paribas, Credit Agricole, all at 0% for this close and targeted at the accordion, with their reasons.
+- **Declined (7)** — ABN AMRO, Bank of America, LBBW, Mizuho, NAB, TD Bank, Unicredit, each with the decline reason captured for the next raise.
+
+The tick columns were recovered positionally from the PDF (layout-preserving extraction, then each ✓ assigned to the nearest column centre) rather than guessed from the order they appear in the text stream. KYC on time is ticked only for the three JLAs; bilat issuer is ticked for Barclays, ING, MUFG, Rabobank, SMBC and Standard Chartered.
+
+**Derived analysis, computed in-page and labelled as derived** so it is never confused with source data:
+
+- **Coverage bar** showing approved $900m, probability-weighted syndication $732.5m, and the residual gap, with the arithmetic behind the 0.46x spelled out — excluding the approved JLAs, weighted commitments cover 46% of the $1,600m still to raise, leaving ~$868m to find.
+- **By probability band** (100 / 75 / 50 / 15 / 0%) with bank counts, participation and weighted totals — the 75% band (ING, Rabobank, SMBC) is where the real money sits.
+- **By coverage bank**, showing how the relationships split across Natixis, BBVA, SocGen and the JLAs directly.
+- **Fronting summary**: $1,800m committed by the three JLAs; ING and SMBC would also front; Barclays, MUFG and Rabobank participate without fronting.
+- **Milestones**: Bank Meeting 7/14 (marked held), CLA commitments due 8/10 (highlighted as due on the tracker's own refresh date), JLA commitments due 8/17.
+
+**Lockstep with the lender cards.** Every institution resolves to its tracker lender card where one exists — SocGen, Citibank→CitiBank, ING→ING Bank, Standard Chartered→SCB, Credit Agricole→CACIB, Bank of Montreal→BMO, TD Bank→TD Securities — and the name is clickable, jumping to that card. The eight names with no card (Barclays Bank, NBC, Wells Fargo, ABN AMRO Bank, Bank of America, LBBW, NAB, Unicredit) are flagged both inline and in a lockstep panel.
+
+**Also surfaced: the orphaned bilateral LC book.** `LC_SURETY_DATA` — the closed bilateral LC facilities and surety bonds — was in the file but its tab was never wired into the tab bar. It now renders as a secondary section at the bottom of this tab, as context for the syndicated facility. Clearly separated with its own source note.
+
+**Ask tab extended.** The syndication rows are indexed, and a new intent handles LC questions: "What is left to raise on the LC facility?" returns the facility summary, conviction tiers, accordion, declines and milestones; "What is SMBC doing on the LC facility?" returns that bank's row; "Who is fronting on the LC facility?" and "Who declined the LC facility?" both answer directly. A new "LC facility" chip group was added to the suggestions.
+
+**Fixed:** `LCS_m` was dropping the thousands separator on fractional values, rendering the $1,632.5m total as "$1632.5m".
+
+QC: all 5 script blocks pass `node --check`; offline Playwright run confirms every source figure ties out on screen, all three tables render at 17/3/7 rows, the sort toggle works, clicking SMBC lands on the SMBC lender card, and all four LC questions answer correctly through the Ask tab — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v68.html`.
