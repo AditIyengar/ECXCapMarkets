@@ -74,7 +74,7 @@
     font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     font-size: 14px; line-height: 1.5;
   }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 22px 16px 80px; }
+  .wrap { max-width: 1220px; margin: 0 auto; padding: 20px 16px 70px; }
   .display { font-family: 'Sora', ui-sans-serif, system-ui, sans-serif; font-weight: 700; letter-spacing: -0.01em; }
   a { color: inherit; }
 
@@ -99,7 +99,7 @@
   }
   .chip {
     display: inline-flex; align-items: center; gap: 5px; border-radius: 999px;
-    padding: 2px 9px; font-size: 11px; font-weight: 600; white-space: nowrap;
+    padding: 1px 8px; font-size: 10.5px; font-weight: 600; white-space: nowrap;
   }
 
   /* header */
@@ -126,13 +126,13 @@
   nav.tabs button .n { font-size: 11px; color: var(--ink-soft); margin-left: 5px; }
 
   /* filters */
-  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 11px; }
   .filters input[type="search"] { width: 240px; max-width: 100%; }
   .filters .spacer { flex: 1; }
   .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-soft); cursor: pointer; }
-  .projchips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .projchips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 11px; }
   .projchip {
-    border-radius: 999px; padding: 6px 14px; font-size: 12.5px; font-weight: 500; cursor: pointer;
+    border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 500; cursor: pointer;
     background: var(--surface); border: 1px solid var(--line); color: var(--ink);
     display: inline-flex; align-items: center; gap: 7px; font-family: inherit;
   }
@@ -141,7 +141,7 @@
   .projchip.on .dot { display: none; }
 
   /* quick add */
-  .quickadd { padding: 11px 14px 12px; margin-bottom: 14px; }
+  .quickadd { padding: 9px 13px 10px; margin-bottom: 11px; }
   .qarow { display: flex; align-items: center; gap: 10px; }
   .qaplus { color: var(--teal); font-size: 19px; font-weight: 700; line-height: 1; }
   #qa {
@@ -160,17 +160,30 @@
   .btn:disabled:hover { transform: none; }
 
   /* board */
-  .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; align-items: start; }
-  .col { padding: 15px 16px; border-top: 4px solid var(--line); }
-  .col h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em; }
-  .col .head { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
-  .rows { display: flex; flex-direction: column; gap: 10px; }
-  .row { display: flex; gap: 9px; align-items: flex-start; }
-  .row input[type="checkbox"] { margin-top: 3px; width: 15px; height: 15px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
+  /* Masonry-style packing: a grid left tall gaps under short projects. */
+  .board { columns: 330px; column-gap: 10px; }
+  .col { break-inside: avoid; -webkit-column-break-inside: avoid; width: 100%; display: inline-block; margin: 0 0 10px; }
+  .col { padding: 11px 13px 12px; border-top: 3px solid var(--line); }
+  .col { vertical-align: top; }
+  .col h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; }
+  .col .head { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+  .rows { display: flex; flex-direction: column; gap: 1px; }
+  .row {
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 5px 5px 5px 4px; margin: 0 -5px; border-radius: 7px;
+  }
+  .row:hover { background: var(--surface-2); }
+  .row input[type="checkbox"] { margin-top: 2px; width: 14px; height: 14px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
   .row .body { flex: 1; min-width: 0; }
-  .row .t { font-size: 13.5px; line-height: 1.42; }
+  .row .t { font-size: 13px; font-weight: 500; line-height: 1.33; }
+
+  /* workstream groups inside a project */
+  .grp { display: flex; align-items: center; gap: 7px; margin: 11px 0 4px; }
+  .grp:first-child { margin-top: 2px; }
+  .grp span { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); white-space: nowrap; }
+  .grp i { flex: 1; height: 1px; background: var(--line); }
   .row.done .t { color: var(--ink-soft); text-decoration: line-through; }
-  .row .notes { font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
+  .row .notes { font-size: 11.5px; color: var(--ink-soft); margin-top: 1px; line-height: 1.4; }
   .row .x {
     background: none; border: none; cursor: pointer; color: var(--line); font-size: 13px;
     padding: 0 2px; line-height: 1; margin-top: 3px; font-family: inherit;
@@ -373,8 +386,16 @@
  *   meta      { as_of, generated_at, timezone, owner, windows, sources, notes }
  *   projects  [{ id, name, color }]
  *   people    [{ email, name, short }]
- *   tasks     [{ id, projectId, title, due, priority, assignee, status,
- *                notes, source }]                 due/notes may be ""
+ *   tasks     [{ id, projectId, title, summary, group, due, priority,
+ *                assignee, status, notes, source }]
+ *               summary = an AUTHORED one-liner shown on the board. Summarise
+ *                         the point of the item; do NOT just clip the first
+ *                         words of `notes`. Aim under ~55 chars.
+ *               group   = workstream heading within the project ("Diligence",
+ *                         "Post-closing"). Reuse existing names; headers only
+ *                         render on projects with 4+ tasks and 2+ groups.
+ *               notes   = the full detail, shown only on hover.
+ *               due/notes/summary/group may be ""
  *   taskUpdates [{ id, status?, note? }]          one-shot patches, see above
  *   events    [{ id, title, startUtc, endUtc, allDay, tentative, organizer,
  *                tag, webLink }]                  tag drives the colour stripe
@@ -442,103 +463,103 @@ window.TASKFLOW_DATA = {
    * ------------------------------------------------------------------------ */
   tasks: [
     // ---- Austin ----
-    { id: "s-aus11", projectId: "proj-austin", title: "Send GS questions once Laura has reviewed", due: "2026-08-12", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-aus11", projectId: "proj-austin", title: "Send GS questions once Laura has reviewed", summary: "Waiting on Laura's review before it can go out", group: "Diligence", due: "2026-08-12", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Blocked on Laura's review of the question list first — tracked in the AUS10 DD Tracker.", source: "backlog" },
-    { id: "s-aus7", projectId: "proj-austin", title: "Finalize Austin structure chart", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-aus7", projectId: "proj-austin", title: "Finalize Austin structure chart", summary: "Handover item, needed before lender diligence", group: "Structuring", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Per Laura's handover, ahead of lender diligence.", source: "backlog" },
-    { id: "s-aus15", projectId: "proj-austin", title: "Finalize Austin 1 structure chart", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-aus15", projectId: "proj-austin", title: "Finalize Austin 1 structure chart", summary: "Drafted, but may be too detailed for the teaser", group: "Structuring", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Drafted; flagged to Laura it may be too much detail for teaser stage — finalize for lender diligence.", source: "backlog" },
-    { id: "s-aus14", projectId: "proj-austin", title: "Review Randy's DD responses; check off and send to T&T & GS", due: "2026-08-12", priority: "high", assignee: "Me", status: "To Do",
+    { id: "s-aus14", projectId: "proj-austin", title: "Review Randy's DD responses; check off and send to T&T & GS", summary: "Randy answered 7/30 — check off and forward", group: "Diligence", due: "2026-08-12", priority: "high", assignee: "Me", status: "To Do",
       notes: "Randy (BCEI) came back 7/30 incl. AUS30 mass grading permit approval, EGU permit confirmation, Zone A floodplain. Confirm the full response set went to T&T and Goldman.", source: "backlog" },
-    { id: "t-aus25", projectId: "proj-austin", title: "Ask Goldman for their models", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-aus25", projectId: "proj-austin", title: "Ask Goldman for their models", summary: "Sits with the other open GS diligence items", group: "Diligence", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Request GS's models. Sits alongside the open GS diligence items — the question list waiting on Laura's review and Randy's BCEI responses going back to T&T and Goldman.", source: "added by request 2026-08-10" },
-    { id: "t-aus26", projectId: "proj-austin", title: "Send Goldman a teaser with the last page removed", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-aus26", projectId: "proj-austin", title: "Send Goldman a teaser with the last page removed", summary: "Goldman only; everyone else keeps the full deck", group: "Lender materials", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Goldman ONLY — every other bank keeps the full teaser. The RAP can be built off that trimmed version. 'RAP' was not spelled out; read as the rating agency presentation, worth confirming before anyone works to it. Note the teaser already went out to the full bank list w/o 7/31, so this is a re-send of an amended deck to GS rather than a first send.", source: "added by request 2026-08-10" },
-    { id: "t-aus24", projectId: "proj-austin", title: "Review the Austin v2 LTA report", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-aus24", projectId: "proj-austin", title: "Review the Austin v2 LTA report", summary: "T&T issued v2 on 8/6 — expect a comment round", group: "Diligence", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Turner & Townsend (Allison Oldfield) issued 'AUS Campus Land Financing LTA Report v2' on 8/6; Rithika forwarded it to you 8/10. Randy's latest DD context still needs folding in, and on Ashville 1 the equivalent report only closed out at v7 — so expect a comment round rather than a read-through.", source: "email 8/10 — Fw: AUS Campus Land Financing LTA Report v2" },
-    { id: "t-aus23", projectId: "proj-austin", title: "Updated AUS10 draft email", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-aus23", projectId: "proj-austin", title: "Updated AUS10 draft email", summary: "Which email wasn't specified — confirm first", group: "Lender materials", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Which email was not specified. Context if it is the lender thread: the original outreach note was drafted for Laura and sent w/o 7/31 with the teaser and model, and Eelco added Morgan Stanley to the bank list on 8/6 — so a follow-up or a re-send to the added names is the likely subject.", source: "added by request 2026-08-10" },
-    { id: "t-aus22", projectId: "proj-austin", title: "Send the GS DD questions back over to the team", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-aus22", projectId: "proj-austin", title: "Send the GS DD questions back over to the team", summary: "Goldman's questions, inbound for the team to answer", group: "Diligence", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Circulate Goldman's diligence questions internally so the owners can answer them. Sits next to two existing AUS10 DD items — 'Send GS questions once Laura has reviewed' (outbound to GS, blocked on Laura) and 'Review Randy's DD responses… send to T&T & GS'. Merge them if this is the same pass.", source: "added by request 2026-08-10" },
-    { id: "t-aus20", projectId: "proj-austin", title: "Prep for Austin wastewater / road financing call (Tue 1:00 PM MT)", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+    { id: "t-aus20", projectId: "proj-austin", title: "Prep for Austin wastewater / road financing call (Tue 1:00 PM MT)", summary: "MUD route open; tax-exempt bonds look unavailable", group: "Power & permitting", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "Winstead's 8/10 read: tax-exempt bonds likely NOT available — tax base must include at least 10 independent taxpayers. Randy Scott confirmed he is not the MUD-law expert. Go in knowing the MUD financing route is the open question.", source: "email 8/10 — Winstead / BCEI thread" },
-    { id: "t-aus21", projectId: "proj-austin", title: "Track PUCT public meetings on the governor's directive (8/14 and 8/20)", due: "2026-08-14", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-aus21", projectId: "proj-austin", title: "Track PUCT public meetings on the governor's directive (8/14 and 8/20)", summary: "PUCT meets 8/14 and 8/20 on the audit process", group: "Power & permitting", due: "2026-08-14", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Laura Youngers 8/10: Texas PUCT holds public meetings Fri 8/14 and Thu 8/20 where process around the audit is expected. Chris Jenkins — Lisa leading consensus on the question set, consultant call held 8/10.", source: "email 8/10 — Austin campus (governor's directive)" },
 
     // ---- Ashville 1 ----
-    { id: "s-ash13", projectId: "proj-ashville", title: "Go through the Ashville 1 OM and leave comments", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+    { id: "s-ash13", projectId: "proj-ashville", title: "Go through the Ashville 1 OM and leave comments", summary: "Overdue on Davis Polk's clock since their 8/5 chase", group: "OM & launch", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "DPW circulated the revised Business section + full OM 7/29; checked in 8/5 asking for initial comments — now overdue on their clock. You and Rithika owe the pass; Eelco also asked to review.", source: "backlog" },
-    { id: "s-ash14", projectId: "proj-ashville", title: "Chase responders on the DPW diligence request", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+    { id: "s-ash14", projectId: "proj-ashville", title: "Chase responders on the DPW diligence request", summary: "Internal round out 8/10; Amy has questions back", group: "Diligence", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "Internal round sent 8/10. Laura added Albert Ivezaj for financials; Matthew Way handling VDR/KYC (3 executed LPAs uploaded to Box 8/10, still awaiting structure chart + consents/resolutions from the ECX side). Amy Shockley has open questions back to you.", source: "backlog" },
-    { id: "t-ash20", projectId: "proj-ashville", title: "Reply to Amy Shockley — Non-GAAP language + who the parent is", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+    { id: "t-ash20", projectId: "proj-ashville", title: "Reply to Amy Shockley — Non-GAAP language + who the parent is", summary: "Her answer gates the senior indebtedness figure", group: "Diligence", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "Amy 8/10: is all the Non-GAAP language in the chain, or is more to be confirmed? And clarify who the parent is in this context so she can provide senior indebtedness. Gating the DPW financials response.", source: "email 8/10 — Ashville 1: Davis Polk Diligence Requests" },
-    { id: "t-ash21", projectId: "proj-ashville", title: "Send the executed Ashville contracts to Davis Polk", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+    { id: "t-ash21", projectId: "proj-ashville", title: "Send the executed Ashville contracts to Davis Polk", summary: "Alexis flagged them for you; DPW still needs them", group: "Diligence", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "Alexis Martirosian circulated them 8/10 and flagged them for you specifically; Jackson has already loaded them into the engine. Closes one of the DPW diligence gaps.", source: "email 8/10 — Executed Ashville contracts" },
-    { id: "s-ash15", projectId: "proj-ashville", title: "Follow up on signed construction contracts for the LTA report", due: "", priority: "medium", assignee: "T&T", status: "To Do",
+    { id: "s-ash15", projectId: "proj-ashville", title: "Follow up on signed construction contracts for the LTA report", summary: "Last open item on the LTA report", group: "Diligence", due: "", priority: "medium", assignee: "T&T", status: "To Do",
       notes: "LTA v7 delivered 8/5 with final comments incorporated — last open item is folding in the signed construction contracts once received.", source: "backlog" },
-    { id: "t-ash23", projectId: "proj-ashville", title: "Check with Shelly on the Ashville 1 power contracts", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-ash23", projectId: "proj-ashville", title: "Check with Shelly on the Ashville 1 power contracts", summary: "PowerConneX side; feeds the PPA still owed to DPW", group: "Power", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Shelly Zheng (szheng@edgeconnex.com) sits on the PowerConneX side — she is on the PCX entity discussion thread and the PCXCMH11 Ashville Phase 1 VG Turbines SRA payment (LM6000s). Feeds the diligence set: the latest PPA is still owed to Davis Polk, and A&O are sending Scale a redline of the power agreement.", source: "added by request 2026-08-10" },
-    { id: "s-ash12", projectId: "proj-ashville", title: "Respond to Ares on the Ashville referendum", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ash12", projectId: "proj-ashville", title: "Respond to Ares on the Ashville referendum", summary: "Reply still owed on the referendum question", group: "Scheduling & admin", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Reply still owed to Ares on the referendum question.", source: "backlog" },
-    { id: "s-ash7", projectId: "proj-ashville", title: "Reply to Macy — technical advisor & rating agency meetings", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ash7", projectId: "proj-ashville", title: "Reply to Macy — technical advisor & rating agency meetings", summary: "Confirm slots for the TA and rating agency sessions", group: "Scheduling & admin", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Scheduling Ashville 1 sessions with the technical advisor and rating agencies — confirm availability and preferred slots. Rithika confirmed to MS on 8/10 that the materials are OK to share with the rating agencies.", source: "backlog" },
-    { id: "s-ash2", projectId: "proj-ashville", title: "Revoke Newmark folder access & send updated RFS dates", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ash2", projectId: "proj-ashville", title: "Revoke Newmark folder access & send updated RFS dates", summary: "Two parts: revoke access, then send the RFS dates", group: "Scheduling & admin", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
       notes: "From Laura's 'Ashville - Information' email. Two parts: confirm Newmark no longer has folder access, then share updated RFS dates.", source: "backlog" },
-    { id: "s-ash10", projectId: "proj-ashville", title: "Launch Ashville 1", due: "2026-08-14", priority: "high", assignee: "Me", status: "To Do",
+    { id: "s-ash10", projectId: "proj-ashville", title: "Launch Ashville 1", summary: "Slipped from 8/10; OM comments are the long pole", group: "OM & launch", due: "2026-08-14", priority: "high", assignee: "Me", status: "To Do",
       notes: "Launch was targeted 8/10 per the handover plan. LTA report (v7 in), OM comments, and the DPW diligence set all feed readiness — OM comments are the long pole.", source: "backlog" },
-    { id: "t-ash22", projectId: "proj-ashville", title: "Update the MOR financing board slides", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
+    { id: "t-ash22", projectId: "proj-ashville", title: "Update the MOR financing board slides", summary: "Rithika needs it by 8/11 for the CFO update", group: "Reporting", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "Rithika bumped this 8/10 — she needs an updated 'Board Presentation - Financing Update August 2026.pptx' ready by 8/11. Q2 CFO Update is 5:30 AM MT on 8/11.", source: "email 8/10 — MOR Financing Board Slides August 2026 Update" },
 
     // ---- Scioto ----
-    { id: "t-sci1", projectId: "proj-scioto", title: "Prep for the Scioto financing options call", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-sci1", projectId: "proj-scioto", title: "Prep for the Scioto financing options call", summary: "Moved to Thu 2pm EST; the calendar holds are stale", group: "Financing options", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
       notes: "A&O Shearman (Dorina Yessios) coordinated with Laura on 8/10 to move this to Thursday 2:00 PM EST and asked Grace to reissue the invite — the Tue 8/11 and Wed 8/12 holds on your calendar are the stale versions.", source: "email 8/10 — Project Scioto preliminary call" },
 
     // ---- Canyon ----
-    { id: "t-can1", projectId: "proj-canyon", title: "Review the Project Canyon credit agreement draft", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-can1", projectId: "proj-canyon", title: "Review the Project Canyon credit agreement draft", summary: "K&S draft landed 8/9, clean and marked", group: "Documentation", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
       notes: "King & Spalding (Brooke Jansen) circulated the initial draft 8/9, clean and marked against the precedent shared before the commitment papers were signed. ECX & EQT teams both on it.", source: "email 8/9 — Project Canyon | Credit Agreement" },
 
     // ---- Enigma ----
-    { id: "s-eni3", projectId: "proj-enigma", title: "Engage counsel on scenario & consent analysis", due: "2026-08-14", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-eni3", projectId: "proj-enigma", title: "Engage counsel on scenario & consent analysis", summary: "Waits on EQT's model before counsel goes on", group: "Structuring", due: "2026-08-14", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Kicks off once EQT's model lands — stableco & ECX cash/NOI timing plus proposed debt repayments, expected around 8/5.", source: "backlog" },
 
     // ---- Leroy (post-closing) ----
-    { id: "t-ler10", projectId: "proj-leroy", title: "Get time with Clay (Blackstone) on the Leroy upsize / Austin addition", due: "2026-08-12", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-ler10", projectId: "proj-leroy", title: "Get time with Clay (Blackstone) on the Leroy upsize / Austin addition", summary: "Clay offered time; a slot still needs booking", group: "Upsize", due: "2026-08-12", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Clay Macfarlane came back 8/10 — happy to cover the CA turn, MB/local counsel questions, and the Austin addition; Matt Martin separately asked for AUS time. Laura opened it, you are on the thread.", source: "email 8/10 — Project Leroy: Upsize" },
-    { id: "s-ler1", projectId: "proj-leroy", title: "Finland: reliance letters — environmental report & geotech", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ler1", projectId: "proj-leroy", title: "Finland: reliance letters — environmental report & geotech", summary: "Post-closing item from the 7/31 Finland funding", group: "Post-closing", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Post-closing item following the 7/31 Finland closing/funding (Bx wired).", source: "backlog" },
-    { id: "s-ler2", projectId: "proj-leroy", title: "Norway: reliance letters — environmental report & geotech", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ler2", projectId: "proj-leroy", title: "Norway: reliance letters — environmental report & geotech", summary: "Same post-closing pattern as Finland", group: "Post-closing", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Same post-closing requirement as Finland.", source: "backlog" },
-    { id: "s-ler3", projectId: "proj-leroy", title: "Finland: send updated Exhibit A to Bx (post-closing)", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ler3", projectId: "proj-leroy", title: "Finland: send updated Exhibit A to Bx (post-closing)", summary: "Valuation could move at the next draw", group: "Post-closing", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "NMRK appraisal comments for Finland already sent. Updated Exhibit A needed post-closing — valuation could change at the next draw.", source: "backlog" },
-    { id: "s-ler4", projectId: "proj-leroy", title: "Send request for updated Austin campus punch list", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ler4", projectId: "proj-leroy", title: "Send request for updated Austin campus punch list", summary: "NMRK and T&T engaged; about two weeks expected", group: "Austin campus punch list", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
       notes: "NMRK and T&T already engaged. ~2 weeks for the punch list; Bx to come back with questions after.", source: "backlog" },
-    { id: "s-ler5", projectId: "proj-leroy", title: "Austin campus: pull together diligence for the punch list", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ler5", projectId: "proj-leroy", title: "Austin campus: pull together diligence for the punch list", summary: "Our side while NMRK and T&T run their review", group: "Austin campus punch list", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Our side of the punch-list process while NMRK/T&T run their review.", source: "backlog" },
-    { id: "s-ler6", projectId: "proj-leroy", title: "Austin campus: Rithika to work through open items and revert", due: "", priority: "medium", assignee: "Rithika", status: "In Progress",
+    { id: "s-ler6", projectId: "proj-leroy", title: "Austin campus: Rithika to work through open items and revert", summary: "Rithika consolidating the open items", group: "Austin campus punch list", due: "", priority: "medium", assignee: "Rithika", status: "In Progress",
       notes: "Rithika going through the open punch-list items to come back with a consolidated list.", source: "backlog" },
 
     // ---- Stabilization (Laura, 8/10) ----
-    { id: "t-stab1", projectId: "proj-stab", title: "Build the stabilization model (and options)", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-stab1", projectId: "proj-stab", title: "Build the stabilization model (and options)", summary: "Laura's longer-term ask, not competing with this week", group: "Model & options", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Laura flagged this on Teams 8/10 at 1:10 PM as a longer-term project, so it is background work rather than anything competing with the Austin and Ashville deadlines this week. Pairs with the stabilized financing options item \u2014 the model should carry the options rather than being a single case.", source: "Teams \u2014 Laura Godschalx, 8/10 1:10 PM" },
-    { id: "t-stab2", projectId: "proj-stab", title: "Work up stabilized financing options", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-stab2", projectId: "proj-stab", title: "Work up stabilized financing options", summary: "Follows once the model has a first cut", group: "Model & options", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Second half of Laura's 8/10 longer-term ask: what the financing looks like once assets are stabilized. Runs off the stabilization model \u2014 expect to sequence it after that has a first cut.", source: "Teams \u2014 Laura Godschalx, 8/10 1:10 PM" },
 
     // ---- Internal ----
-    { id: "t-int1", projectId: "proj-internal", title: "Set up 30\u201360 min with Eelco to organise his to-dos", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "t-int1", projectId: "proj-internal", title: "Set up 30\u201360 min with Eelco to organise his to-dos", summary: "A working session, not a status update", group: "Team", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Working session with Eelco Holst rather than a status update \u2014 walk his open items and get them into order. He is across Austin (teaser and bank-list sign-off), Ashville 1 (asked to review the OM) and Enigma (deferred to AMS on forward-sale timing), so those are the likely agenda. There is a standing Catch Eelco / Aditya slot on the calendar if a separate hold is not wanted.", source: "added by request 2026-08-10" },
 
     // ---- AI Projects ----
-    { id: "s-ai4", projectId: "proj-ai", title: "Reach out to Pradeep — bank relationship tracker", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ai4", projectId: "proj-ai", title: "Reach out to Pradeep — bank relationship tracker", summary: "Kick the tracker build off with Pradeep", group: "Dashboards", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Kick off the bank relationship tracker build.", source: "backlog" },
-    { id: "s-ai1", projectId: "proj-ai", title: "Bank relationship tracker", due: "", priority: "medium", assignee: "Me", status: "In Progress",
+    { id: "s-ai1", projectId: "proj-ai", title: "Bank relationship tracker", summary: "First cut already live as the bank dashboard", group: "Dashboards", due: "", priority: "medium", assignee: "Me", status: "In Progress",
       notes: "Lender relationships across deals — coverage contacts, past participations, recent touchpoints. First cut already live in this repo as the Bank Conversation Dashboard.", source: "backlog" },
-    { id: "s-ai2", projectId: "proj-ai", title: "Comps dashboard", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ai2", projectId: "proj-ai", title: "Comps dashboard", summary: "Pricing, structure, tenor and sponsor by deal", group: "Dashboards", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Live dashboard of data-center financing comps — pricing, structure, tenor, sponsor across recent deals.", source: "backlog" },
-    { id: "t-ai5", projectId: "proj-ai", title: "DD question & answer database — stop answering the same question twice", due: "", priority: "high", assignee: "Me", status: "To Do",
+    { id: "t-ai5", projectId: "proj-ai", title: "DD question & answer database — stop answering the same question twice", summary: "A seed sheet already exists in SharePoint", group: "Due diligence", due: "", priority: "high", assignee: "Me", status: "To Do",
       notes: "A searchable store of every DD question we have been asked and the answer we gave, so a repeat question is retrieved rather than re-answered. Answers get re-grounded against the latest source before reuse — emails, the current teaser and lender model, the newest LTA report — so a stale answer is never served as current. SEED ALREADY EXISTS: 'EdgeConneX - AUS land - T&T-Q&A June 2026 - v1.xlsx' is in the right shape already (Category / # / Question / Priority / Response / Status, grouped by topic — Power first), under Corporate Finance_Team > Project Leroy > 10. Post-closing > 02. Amendments > 10. Austin Campus > Austin SeriesCampus > 03. Due Diligence > 01. Technical DD > T&T. That '03. Due Diligence' tree also holds the AUS Campus Land Financing LTA Report v2, and the '01. Technical DD' numbering implies further DD subfolders to sweep. Add Davis Polk's Ashville request, Randy's BCEI responses, and the rating-agency and technical-advisor Q&A. Answers must cite their source document so a human can check before anything goes out.", source: "added by request 2026-08-10; SharePoint paths verified" },
-    { id: "t-ai6", projectId: "proj-ai", title: "Ask corp dev (Scott / Aaron / Alex) about their DD answer database", due: "", priority: "high", assignee: "Me", status: "To Do",
+    { id: "t-ai6", projectId: "proj-ai", title: "Ask corp dev (Scott / Aaron / Alex) about their DD answer database", summary: "They already use AI on equity DD — ask before building", group: "Due diligence", due: "", priority: "high", assignee: "Me", status: "To Do",
       notes: "Corp dev has answered a large volume of DD questions for equity investors and is already using AI on it. Worth understanding what they built before starting a parallel one — the question sets overlap heavily on the asset and the sponsor even where debt vs equity diverges. Ask: what is the store, how is it kept current, can we point at theirs or fork it. Scott is most likely Scott Graff (sgraff@edgeconnex.com), who is already on the Google valuation-inputs thread; Aaron's and Alex's surnames are not confirmed — check the corp dev distribution list first.", source: "added by request 2026-08-10" },
-    { id: "s-ai3", projectId: "proj-ai", title: "Legal agent", due: "", priority: "medium", assignee: "Me", status: "To Do",
+    { id: "s-ai3", projectId: "proj-ai", title: "Legal agent", summary: "First-pass legal review, same corpus as DD", group: "Due diligence", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "AI agent to first-pass legal documents — flag key terms, deviations from precedent, open issues for counsel.", source: "backlog" },
   ],
 
@@ -627,6 +648,7 @@ window.TASKFLOW_DATA = {
       stageKind: "market",
       size: "",
       sizeNote: "Campus size not captured. Goldman floated a $2bn Leroy upsize as an alternative home for Austin rather than financing the AUS10 series standalone; the campus was described as 6 individual buildings.",
+      typeShort: "Project finance — campus land + energy centre",
       type: "Project finance — campus land + data centre / energy centre. Bridge via Goldman under discussion; MUFG treating the Energy Center as development + tolling rather than partly merchant.",
       counterparties: [
         { name: "Goldman Sachs", role: "Lead / bridge + diligence" },
@@ -657,6 +679,7 @@ window.TASKFLOW_DATA = {
       stageKind: "docs",
       size: "",
       sizeNote: "Deal size not captured in the sources read so far.",
+      typeShort: "High-yield / 144A bond",
       type: "High-yield / 144A bond. Morgan Stanley's 7/28 market read had it pricing in the low 7s; rating agency and technical-advisor sessions being scheduled.",
       counterparties: [
         { name: "Morgan Stanley", role: "Lead / bookrunner" },
@@ -685,6 +708,7 @@ window.TASKFLOW_DATA = {
       stageKind: "market",
       size: "$500m+ anchor ticket",
       sizeNote: "Apterra indicated a minimum $500m anchor ticket with upside — that is a ticket, not the deal size. Total size not captured.",
+      typeShort: "Unwrapped backleverage to an anchor investor",
       type: "Unwrapped backleverage / private placement to an anchor investor. Apterra's read: ANT paper priced at 8.5% unwrapped for Big Sky, and ECX screens better on balance sheet and sponsor.",
       counterparties: [
         { name: "Barclays", role: "Advising on backleverage & anchors" },
@@ -711,6 +735,7 @@ window.TASKFLOW_DATA = {
       stageKind: "early",
       size: "",
       sizeNote: "Not captured — the deal is still at the options stage.",
+      typeShort: "Options stage — structure under review",
       type: "Structure and financing options under review; Barclays has produced a targeted investor list (the \"Big Sky\" deck) for Scioto 2.",
       counterparties: [
         { name: "A&O Shearman", role: "Counsel (Dorina Yessios, Peter Tolson)" },
@@ -733,6 +758,7 @@ window.TASKFLOW_DATA = {
       stageKind: "docs",
       size: "",
       sizeNote: "Not captured.",
+      typeShort: "Committed facility; credit agreement drafting",
       type: "Committed facility — commitment papers already signed; King & Spalding circulated the initial credit agreement 8/9, marked against the pre-signing precedent.",
       counterparties: [
         { name: "King & Spalding", role: "Drafting counsel (Brooke Jansen)" },
@@ -752,6 +778,7 @@ window.TASKFLOW_DATA = {
       stageKind: "early",
       size: "",
       sizeNote: "Not captured.",
+      typeShort: "Forward sale",
       type: "Forward sale. EQT ranked the structure options; the scenario work turns on stableco and ECX cash/NOI timing plus proposed debt repayments.",
       counterparties: [
         { name: "EQT", role: "Sponsor — structure rankings (Abbey)" },
@@ -773,6 +800,7 @@ window.TASKFLOW_DATA = {
       stageKind: "closed",
       size: "$1,000m",
       sizeNote: "Facility size per the Q2 2026 Commitments workbook (see the Bank Conversation Dashboard). A further upsize is live, and Goldman floated a $2bn increase as a way to house Austin.",
+      typeShort: "Land / early-stage facility with Blackstone",
       type: "Land / early-stage facility with Blackstone. Post-closing obligations running on Finland and Norway; upsize negotiation covers power percentages and caps.",
       counterparties: [
         { name: "Blackstone", role: "Lender (Clay Macfarlane, Matt Martin)" },
@@ -797,6 +825,7 @@ window.TASKFLOW_DATA = {
       stageKind: "closed",
       size: "",
       sizeNote: "Not captured in the datasets read so far; the facility does not appear under this codename in the Q2 2026 commitments extract.",
+      typeShort: "Syndicated facility, weekly ICLA call",
       type: "Syndicated facility, administered through a weekly ICLA lender call.",
       counterparties: [
         { name: "Natixis", role: "Agent / organiser (Jorge Bravo)" },
@@ -1145,8 +1174,7 @@ window.TASKFLOW_DATA = {
       return '<div class="card col" style="border-top-color:' + p.color + '">' +
         '<div class="head"><h2 class="display">' + esc(p.name) + "</h2>" +
         '<span class="chip" style="background:var(--surface-2);color:var(--ink-soft)">' + openN + " open</span></div>" +
-        (rows.length ? '<div class="rows">' + rows.map(rowHTML).join("") + "</div>"
-                     : '<div class="empty">Nothing here.</div>') +
+        (rows.length ? groupedRowsHTML(rows) : '<div class="empty">Nothing here.</div>') +
         "</div>";
     }).join("");
 
@@ -1204,6 +1232,25 @@ window.TASKFLOW_DATA = {
     if (el) el.focus();
   }
 
+  // Group headers only earn their space on a busy project — below these
+  // thresholds a single flat list reads better than a header per item.
+  function groupedRowsHTML(rows) {
+    var order = [], buckets = {};
+    rows.forEach(function (t) {
+      var g = t.group || "Other";
+      if (!buckets[g]) { buckets[g] = []; order.push(g); }
+      buckets[g].push(t);
+    });
+    if (rows.length < 4 || order.length < 2) {
+      return '<div class="rows">' + rows.map(rowHTML).join("") + "</div>";
+    }
+    order.sort(function (a, b) { return buckets[b].length - buckets[a].length; });
+    return order.map(function (g) {
+      return '<div class="grp"><span>' + esc(g) + "</span><i></i></div>" +
+             '<div class="rows">' + buckets[g].map(rowHTML).join("") + "</div>";
+    }).join("");
+  }
+
   function projChip(id, name, color, n) {
     var on = S.project === id;
     return '<button class="projchip' + (on ? " on" : "") + '" data-proj="' + id + '"' +
@@ -1236,11 +1283,13 @@ window.TASKFLOW_DATA = {
     }
     if (!d0 && t.priority === "high") h += '<span class="chip" style="background:var(--danger-bg);color:var(--danger-fg)">High</span> ';
     if (!d0 && t.assignee && t.assignee !== "Me") h += '<span class="chip" style="background:var(--cool-bg);color:var(--cool-fg)">' + esc(t.assignee) + "</span> ";
-    if (t.notes && !d0) {
-      var full = t.notes + (t.source && t.source !== "backlog" ? "\n\nSource: " + t.source : "");
-      var shortNote = brief(t.notes, 68);
-      var needsTip = full.length > shortNote.length + 2;
-      h += '<div class="notes"' + (needsTip ? ' data-tip="' + esc(full) + '"' : "") + ">" + esc(shortNote) + "</div>";
+    // `summary` is an authored one-liner; brief() is only the fallback for a
+    // task that has not been given one yet.
+    if ((t.summary || t.notes) && !d0) {
+      var line = t.summary || brief(t.notes, 68);
+      var full = (t.notes || "") + (t.source && t.source !== "backlog" ? "\n\nSource: " + t.source : "");
+      var needsTip = full.trim().length > line.length + 2;
+      h += '<div class="notes"' + (needsTip ? ' data-tip="' + esc(full.trim()) + '"' : "") + ">" + esc(line) + "</div>";
     }
     h += "</div>";
     h += '<button class="x" data-del="' + t.id + '" aria-label="Delete task">✕</button>';
@@ -1380,7 +1429,7 @@ window.TASKFLOW_DATA = {
       h += '<td class="num">' + (m.size
              ? '<b data-tip="' + esc(m.sizeNote || m.size) + '">' + esc(m.size) + "</b>"
              : '<span class="na" data-tip="' + esc(m.sizeNote || "No size on file.") + '">not captured</span>') + "</td>";
-      h += '<td data-tip="' + esc(m.type) + '">' + esc(truncate(m.type, 96)) + "</td>";
+      h += '<td data-tip="' + esc(m.type) + '">' + esc(m.typeShort || truncate(m.type, 96)) + "</td>";
       h += "<td>" + cps.slice(0, 3).map(function (c) {
              return '<span class="chip cp">' + esc(c.name) + "</span>";
            }).join(" ") + (cps.length > 3

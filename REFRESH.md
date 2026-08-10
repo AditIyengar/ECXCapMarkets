@@ -47,14 +47,21 @@ Paste this into a Claude Code session on this repo (or let the scheduled Routine
 >    (austin, ashville, scioto, canyon, leroy, enigma, liverpool, internal, market, social, location).
 >    All-day location holds ("Denver", "Virginia") use `tag: "location"`.
 > 2. **Project meta** — keep `projectMeta` current: stage, size, financing type and
->    counterparties per deal. Every field must be SOURCED — add the reference to that project's
+>    counterparties per deal, plus a `typeShort` (a few words) for the table cell,
+>    with the full `type` reserved for the hover tooltip. Every field must be SOURCED — add the reference to that project's
 >    `sources` array. If you cannot evidence a figure, leave it `""` so the page renders "not
 >    captured"; never estimate a deal size. Do NOT store workstreams here — the page derives them
 >    from open tasks so the table cannot drift from the board.
 > 3. **New deals** — when a codename shows up in the mail or calendar that has no entry, add both
 >    a `projects` row and a `projectMeta` row for it rather than filing its tasks under an
 >    existing deal.
-> 4. **Tasks** — carry the existing backlog forward by id. Update `notes`/`due` where the mail
+> 4. **Tasks** — carry the existing backlog forward by id. Give every task a
+>    `summary` and a `group`. The summary is what shows on the board: write the
+>    POINT of the item in under ~55 characters ("Waiting on Laura's review before
+>    it can go out"), not the opening words of the note clipped short — the
+>    viewer falls back to mechanical truncation only when `summary` is missing,
+>    and it reads badly. `group` is the workstream heading within the project;
+>    reuse the names already in use rather than inventing near-duplicates. Update `notes`/`due` where the mail
 >    moved something. Add tasks for genuinely new commitments found in mail, with a `source`
 >    naming the message. Do not silently delete backlog items; if something looks done, add it to
 >    `taskUpdates` with `status: "Done"` and bump `updateBatch`.

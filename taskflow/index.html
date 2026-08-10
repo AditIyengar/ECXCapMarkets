@@ -80,7 +80,7 @@
     font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     font-size: 14px; line-height: 1.5;
   }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 22px 16px 80px; }
+  .wrap { max-width: 1220px; margin: 0 auto; padding: 20px 16px 70px; }
   .display { font-family: 'Sora', ui-sans-serif, system-ui, sans-serif; font-weight: 700; letter-spacing: -0.01em; }
   a { color: inherit; }
 
@@ -105,7 +105,7 @@
   }
   .chip {
     display: inline-flex; align-items: center; gap: 5px; border-radius: 999px;
-    padding: 2px 9px; font-size: 11px; font-weight: 600; white-space: nowrap;
+    padding: 1px 8px; font-size: 10.5px; font-weight: 600; white-space: nowrap;
   }
 
   /* header */
@@ -132,13 +132,13 @@
   nav.tabs button .n { font-size: 11px; color: var(--ink-soft); margin-left: 5px; }
 
   /* filters */
-  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 11px; }
   .filters input[type="search"] { width: 240px; max-width: 100%; }
   .filters .spacer { flex: 1; }
   .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-soft); cursor: pointer; }
-  .projchips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .projchips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 11px; }
   .projchip {
-    border-radius: 999px; padding: 6px 14px; font-size: 12.5px; font-weight: 500; cursor: pointer;
+    border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 500; cursor: pointer;
     background: var(--surface); border: 1px solid var(--line); color: var(--ink);
     display: inline-flex; align-items: center; gap: 7px; font-family: inherit;
   }
@@ -147,7 +147,7 @@
   .projchip.on .dot { display: none; }
 
   /* quick add */
-  .quickadd { padding: 11px 14px 12px; margin-bottom: 14px; }
+  .quickadd { padding: 9px 13px 10px; margin-bottom: 11px; }
   .qarow { display: flex; align-items: center; gap: 10px; }
   .qaplus { color: var(--teal); font-size: 19px; font-weight: 700; line-height: 1; }
   #qa {
@@ -166,17 +166,30 @@
   .btn:disabled:hover { transform: none; }
 
   /* board */
-  .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; align-items: start; }
-  .col { padding: 15px 16px; border-top: 4px solid var(--line); }
-  .col h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em; }
-  .col .head { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
-  .rows { display: flex; flex-direction: column; gap: 10px; }
-  .row { display: flex; gap: 9px; align-items: flex-start; }
-  .row input[type="checkbox"] { margin-top: 3px; width: 15px; height: 15px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
+  /* Masonry-style packing: a grid left tall gaps under short projects. */
+  .board { columns: 330px; column-gap: 10px; }
+  .col { break-inside: avoid; -webkit-column-break-inside: avoid; width: 100%; display: inline-block; margin: 0 0 10px; }
+  .col { padding: 11px 13px 12px; border-top: 3px solid var(--line); }
+  .col { vertical-align: top; }
+  .col h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; }
+  .col .head { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+  .rows { display: flex; flex-direction: column; gap: 1px; }
+  .row {
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 5px 5px 5px 4px; margin: 0 -5px; border-radius: 7px;
+  }
+  .row:hover { background: var(--surface-2); }
+  .row input[type="checkbox"] { margin-top: 2px; width: 14px; height: 14px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
   .row .body { flex: 1; min-width: 0; }
-  .row .t { font-size: 13.5px; line-height: 1.42; }
+  .row .t { font-size: 13px; font-weight: 500; line-height: 1.33; }
+
+  /* workstream groups inside a project */
+  .grp { display: flex; align-items: center; gap: 7px; margin: 11px 0 4px; }
+  .grp:first-child { margin-top: 2px; }
+  .grp span { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); white-space: nowrap; }
+  .grp i { flex: 1; height: 1px; background: var(--line); }
   .row.done .t { color: var(--ink-soft); text-decoration: line-through; }
-  .row .notes { font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
+  .row .notes { font-size: 11.5px; color: var(--ink-soft); margin-top: 1px; line-height: 1.4; }
   .row .x {
     background: none; border: none; cursor: pointer; color: var(--line); font-size: 13px;
     padding: 0 2px; line-height: 1; margin-top: 3px; font-family: inherit;
@@ -682,8 +695,7 @@
       return '<div class="card col" style="border-top-color:' + p.color + '">' +
         '<div class="head"><h2 class="display">' + esc(p.name) + "</h2>" +
         '<span class="chip" style="background:var(--surface-2);color:var(--ink-soft)">' + openN + " open</span></div>" +
-        (rows.length ? '<div class="rows">' + rows.map(rowHTML).join("") + "</div>"
-                     : '<div class="empty">Nothing here.</div>') +
+        (rows.length ? groupedRowsHTML(rows) : '<div class="empty">Nothing here.</div>') +
         "</div>";
     }).join("");
 
@@ -741,6 +753,25 @@
     if (el) el.focus();
   }
 
+  // Group headers only earn their space on a busy project — below these
+  // thresholds a single flat list reads better than a header per item.
+  function groupedRowsHTML(rows) {
+    var order = [], buckets = {};
+    rows.forEach(function (t) {
+      var g = t.group || "Other";
+      if (!buckets[g]) { buckets[g] = []; order.push(g); }
+      buckets[g].push(t);
+    });
+    if (rows.length < 4 || order.length < 2) {
+      return '<div class="rows">' + rows.map(rowHTML).join("") + "</div>";
+    }
+    order.sort(function (a, b) { return buckets[b].length - buckets[a].length; });
+    return order.map(function (g) {
+      return '<div class="grp"><span>' + esc(g) + "</span><i></i></div>" +
+             '<div class="rows">' + buckets[g].map(rowHTML).join("") + "</div>";
+    }).join("");
+  }
+
   function projChip(id, name, color, n) {
     var on = S.project === id;
     return '<button class="projchip' + (on ? " on" : "") + '" data-proj="' + id + '"' +
@@ -773,11 +804,13 @@
     }
     if (!d0 && t.priority === "high") h += '<span class="chip" style="background:var(--danger-bg);color:var(--danger-fg)">High</span> ';
     if (!d0 && t.assignee && t.assignee !== "Me") h += '<span class="chip" style="background:var(--cool-bg);color:var(--cool-fg)">' + esc(t.assignee) + "</span> ";
-    if (t.notes && !d0) {
-      var full = t.notes + (t.source && t.source !== "backlog" ? "\n\nSource: " + t.source : "");
-      var shortNote = brief(t.notes, 68);
-      var needsTip = full.length > shortNote.length + 2;
-      h += '<div class="notes"' + (needsTip ? ' data-tip="' + esc(full) + '"' : "") + ">" + esc(shortNote) + "</div>";
+    // `summary` is an authored one-liner; brief() is only the fallback for a
+    // task that has not been given one yet.
+    if ((t.summary || t.notes) && !d0) {
+      var line = t.summary || brief(t.notes, 68);
+      var full = (t.notes || "") + (t.source && t.source !== "backlog" ? "\n\nSource: " + t.source : "");
+      var needsTip = full.trim().length > line.length + 2;
+      h += '<div class="notes"' + (needsTip ? ' data-tip="' + esc(full.trim()) + '"' : "") + ">" + esc(line) + "</div>";
     }
     h += "</div>";
     h += '<button class="x" data-del="' + t.id + '" aria-label="Delete task">✕</button>';
@@ -917,7 +950,7 @@
       h += '<td class="num">' + (m.size
              ? '<b data-tip="' + esc(m.sizeNote || m.size) + '">' + esc(m.size) + "</b>"
              : '<span class="na" data-tip="' + esc(m.sizeNote || "No size on file.") + '">not captured</span>') + "</td>";
-      h += '<td data-tip="' + esc(m.type) + '">' + esc(truncate(m.type, 96)) + "</td>";
+      h += '<td data-tip="' + esc(m.type) + '">' + esc(m.typeShort || truncate(m.type, 96)) + "</td>";
       h += "<td>" + cps.slice(0, 3).map(function (c) {
              return '<span class="chip cp">' + esc(c.name) + "</span>";
            }).join(" ") + (cps.length > 3
