@@ -72,6 +72,7 @@ window.TASKFLOW_DATA = {
     { id: "proj-leroy",     name: "Leroy",      color: "#3FB86B" },
     { id: "proj-liverpool", name: "Liverpool",  color: "#5B8DEF" },
     { id: "proj-ai",        name: "AI Projects", color: "#FFB020" },
+    { id: "proj-stab",     name: "Stabilization", color: "#7A9E3F" },
     { id: "proj-internal", name: "Internal",   color: "#8A93A3" },
   ],
 
@@ -170,6 +171,12 @@ window.TASKFLOW_DATA = {
       notes: "Our side of the punch-list process while NMRK/T&T run their review.", source: "backlog" },
     { id: "s-ler6", projectId: "proj-leroy", title: "Austin campus: Rithika to work through open items and revert", due: "", priority: "medium", assignee: "Rithika", status: "In Progress",
       notes: "Rithika going through the open punch-list items to come back with a consolidated list.", source: "backlog" },
+
+    // ---- Stabilization (Laura, 8/10) ----
+    { id: "t-stab1", projectId: "proj-stab", title: "Build the stabilization model (and options)", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Laura flagged this on Teams 8/10 at 1:10 PM as a longer-term project, so it is background work rather than anything competing with the Austin and Ashville deadlines this week. Pairs with the stabilized financing options item \u2014 the model should carry the options rather than being a single case.", source: "Teams \u2014 Laura Godschalx, 8/10 1:10 PM" },
+    { id: "t-stab2", projectId: "proj-stab", title: "Work up stabilized financing options", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Second half of Laura's 8/10 longer-term ask: what the financing looks like once assets are stabilized. Runs off the stabilization model \u2014 expect to sequence it after that has a first cut.", source: "Teams \u2014 Laura Godschalx, 8/10 1:10 PM" },
 
     // ---- Internal ----
     { id: "t-int1", projectId: "proj-internal", title: "Set up 30\u201360 min with Eelco to organise his to-dos", due: "", priority: "medium", assignee: "Me", status: "To Do",
