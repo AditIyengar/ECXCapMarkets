@@ -33,6 +33,29 @@ separate: different artefacts, not different halves of the same one.
 
 When it is genuinely ambiguous, merge and note the doubt rather than leaving two rows.
 
+## Titles carry the workstream
+
+Every task title is `<workstream> — <punchy action>`, and the viewer renders the workstream in
+bold so the board can be scanned by workstream without reading each line:
+
+```
+LTA report — review Austin v2
+DD questions — GS, both directions
+Rating agency — confirm slots with Macy
+Model — ask Goldman for theirs
+```
+
+Name the workstream by its **artefact or counterparty** — LTA report, DD questions, DD responses,
+Teaser, OM, Model, Structure chart, Board slides, Rating agency, Power contracts, Ground lease,
+Punch list, Reliance letters, Credit agreement, Lease, Amort & sizing. Reuse an existing label
+rather than coining a synonym; `Model` and `Financing model` splitting the same workstream defeats
+the point. Keep the whole title under ~48 characters — if it will not fit, the action is doing too
+much and probably wants splitting or the detail belongs in `notes`.
+
+This is deliberately finer-grained than `group`, which is the broad heading tasks sit under
+(Diligence, Structuring, Post-closing). A title reading "DD questions" under a "Diligence" header
+is right, not redundant.
+
 ## Summaries are written, not clipped
 
 Every task carries a `summary` — an authored one-liner under ~55 characters saying what the item

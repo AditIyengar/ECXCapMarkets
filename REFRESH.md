@@ -65,7 +65,9 @@ Paste this into a Claude Code session on this repo (or let the scheduled Routine
 >    completions stay attached, fold both descriptions into `notes`, record the retired id in
 >    `source`, and take the earlier due date and higher priority. See CLAUDE.md for the full rule.
 > 5. **Tasks** — carry the existing backlog forward by id. Give every task a
->    `summary` and a `group`. The summary is what shows on the board: write the
+>    `title`, a `summary` and a `group`. Titles are `<workstream> — <punchy action>` naming the
+>    artefact or counterparty ("LTA report — review Austin v2"), under ~48 chars, reusing existing
+>    workstream labels rather than coining synonyms. The summary is what shows below it: write the
 >    POINT of the item in under ~55 characters ("Waiting on Laura's review before
 >    it can go out"), not the opening words of the note clipped short — the
 >    viewer falls back to mechanical truncation only when `summary` is missing,
