@@ -408,23 +408,24 @@
 
 window.TASKFLOW_DATA = {
   meta: {
-    as_of: "2026-08-10",
-    generated_at: "2026-08-10T18:00:00Z",
+    as_of: "2026-08-11",
+    generated_at: "2026-08-11T16:10:00Z",
     timezone: "America/Denver",
     owner: { name: "Aditya Iyengar", email: "aiyengar@edgeconnex.com", short: "Me" },
     windows: {
-      calendar_from: "2026-08-10",
-      calendar_to: "2026-08-21",
-      inbox_from: "2026-08-07",
+      calendar_from: "2026-08-11",
+      calendar_to: "2026-08-26",
+      inbox_from: "2026-08-10",
     },
     sources: [
-      "Outlook calendar — 40 events, 2026-08-10 → 2026-08-21",
-      "Outlook inbox — 50 most recent messages, 2026-08-07 → 2026-08-10 (167 in window)",
-      "Task backlog carried over from the TaskFlow artifact seed (updates through 8/10)",
+      "Outlook calendar — 48 events, 2026-08-11 → 2026-08-26",
+      "Outlook inbox — 25 most recent messages since the last refresh, 2026-08-10 18:00Z → 2026-08-11 16:00Z (69 in window)",
+      "Task backlog carried forward by id from the 2026-08-10 dataset",
     ],
     notes: [
-      "Inbox triage covers the 50 most recent messages in the window, not all 167 — high-volume FYI threads are represented by one grouped entry rather than one per message.",
-      "Draft replies are suggestions only. Nothing is ever sent from this site; you copy into Outlook and send yourself.",
+      "Inbox scan covered the 25 most recent of 69 messages since the last refresh, newest first — enough to catch what moved, not the full window.",
+      "Three Scioto holds sit on the calendar for 8/11, 8/12 and 8/13. Only the 8/13 12:00 MT one is live; A&O reissued it as 'UPDATED TIME' and the two earlier holds were never withdrawn.",
+      "Ashville 1 launch date not restated by anyone since it slipped from 8/10 — the 8/14 on the task is inference, not a stated target.",
     ],
   },
 
@@ -487,8 +488,8 @@ window.TASKFLOW_DATA = {
     // ---- Ashville 1 ----
     { id: "s-ash13", projectId: "proj-ashville", title: "Go through the Ashville 1 OM and leave comments", summary: "Overdue on Davis Polk's clock since their 8/5 chase", group: "OM & launch", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "DPW circulated the revised Business section + full OM 7/29; checked in 8/5 asking for initial comments — now overdue on their clock. You and Rithika owe the pass; Eelco also asked to review.", source: "backlog" },
-    { id: "s-ash14", projectId: "proj-ashville", title: "Chase responders on the DPW diligence request", summary: "Internal round out 8/10; Amy has questions back", group: "Diligence", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
-      notes: "Internal round sent 8/10. Laura added Albert Ivezaj for financials; Matthew Way handling VDR/KYC (3 executed LPAs uploaded to Box 8/10, still awaiting structure chart + consents/resolutions from the ECX side). Amy Shockley has open questions back to you.", source: "backlog" },
+    { id: "s-ash14", projectId: "proj-ashville", title: "Chase responders on the DPW diligence request", summary: "O&M request drafted; confirm it before it goes", group: "Diligence", due: "2026-08-12", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Internal round sent 8/10. Laura added Albert Ivezaj for financials; Matthew Way handling VDR/KYC (3 executed LPAs on Box, still awaiting the structure chart and consents/resolutions from the ECX side). NEW 8/11: Rithika drafted the O&M / O&M playbook status request to Keith and flagged it LAURA/ADITYA TO CONFIRM \u2014 merged here rather than tracked separately, since the O&M playbook is one of the DPW gaps this task already chases. Her note also records an outstanding RFI raised with BCEI / PCX / ECX that Josh C picked up, and that the LTA report does not carry the percentages. On resolutions: A&O sent the Herndon/Beluga precedent set on 8/11 for Laura to pick from.", source: "backlog; absorbed the 8/11 O&M request confirmation" },
     { id: "t-ash20", projectId: "proj-ashville", title: "Reply to Amy Shockley — Non-GAAP language + who the parent is", summary: "Her answer gates the senior indebtedness figure", group: "Diligence", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "Amy 8/10: is all the Non-GAAP language in the chain, or is more to be confirmed? And clarify who the parent is in this context so she can provide senior indebtedness. Gating the DPW financials response.", source: "email 8/10 — Ashville 1: Davis Polk Diligence Requests" },
     { id: "t-ash21", projectId: "proj-ashville", title: "Send the executed Ashville contracts to Davis Polk", summary: "Alexis flagged them for you; DPW still needs them", group: "Diligence", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
@@ -497,20 +498,22 @@ window.TASKFLOW_DATA = {
       notes: "LTA v7 delivered 8/5 with final comments incorporated — last open item is folding in the signed construction contracts once received.", source: "backlog" },
     { id: "t-ash23", projectId: "proj-ashville", title: "Check with Shelly on the Ashville 1 power contracts", summary: "PowerConneX side; feeds the PPA still owed to DPW", group: "Power", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Shelly Zheng (szheng@edgeconnex.com) sits on the PowerConneX side — she is on the PCX entity discussion thread and the PCXCMH11 Ashville Phase 1 VG Turbines SRA payment (LM6000s). Feeds the diligence set: the latest PPA is still owed to Davis Polk, and A&O are sending Scale a redline of the power agreement.", source: "added by request 2026-08-10" },
+    { id: "t-ash24", projectId: "proj-ashville", title: "Track the energy centre ground lease for the bond acreage", summary: "Blocked until BCEI gives the legal description", group: "Diligence", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "On the ECX Bond \u2014 Acreage thread 8/11, Tatusko (J. Bilyeu) confirmed the ground lease for the energy centre is not in place yet and can only be put in place once BCEI provides its legal description. Elli Park at Davis Polk is copied. Laura confirmed propco = properties 1. A gating item for the bond acreage disclosure, and outside our control until BCEI moves.", source: "email 8/11 \u2014 ECX Bond - Acreage" },
     { id: "s-ash12", projectId: "proj-ashville", title: "Respond to Ares on the Ashville referendum", summary: "Reply still owed on the referendum question", group: "Scheduling & admin", due: "", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Reply still owed to Ares on the referendum question.", source: "backlog" },
     { id: "s-ash7", projectId: "proj-ashville", title: "Reply to Macy — technical advisor & rating agency meetings", summary: "Confirm slots for the TA and rating agency sessions", group: "Scheduling & admin", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
       notes: "Scheduling Ashville 1 sessions with the technical advisor and rating agencies — confirm availability and preferred slots. Rithika confirmed to MS on 8/10 that the materials are OK to share with the rating agencies.", source: "backlog" },
     { id: "s-ash2", projectId: "proj-ashville", title: "Revoke Newmark folder access & send updated RFS dates", summary: "Two parts: revoke access, then send the RFS dates", group: "Scheduling & admin", due: "2026-08-11", priority: "medium", assignee: "Me", status: "To Do",
       notes: "From Laura's 'Ashville - Information' email. Two parts: confirm Newmark no longer has folder access, then share updated RFS dates.", source: "backlog" },
-    { id: "s-ash10", projectId: "proj-ashville", title: "Launch Ashville 1", summary: "Slipped from 8/10; OM comments are the long pole", group: "OM & launch", due: "2026-08-14", priority: "high", assignee: "Me", status: "To Do",
-      notes: "Launch was targeted 8/10 per the handover plan. LTA report (v7 in), OM comments, and the DPW diligence set all feed readiness — OM comments are the long pole.", source: "backlog" },
+    { id: "s-ash10", projectId: "proj-ashville", title: "Launch Ashville 1", summary: "OM now with DPW; no new launch date stated", group: "OM & launch", due: "", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Launch was targeted 8/10 per the handover plan and slipped. The OM comments went to Davis Polk on 8/11 and Elli Park confirmed receipt, so the long pole has moved. Due date cleared on the 8/11 refresh: nobody has restated a launch date since the slip, and the previous 8/14 was inference rather than a stated target.", source: "backlog" },
     { id: "t-ash22", projectId: "proj-ashville", title: "Update the MOR financing board slides", summary: "Rithika needs it by 8/11 for the CFO update", group: "Reporting", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "Rithika bumped this 8/10 — she needs an updated 'Board Presentation - Financing Update August 2026.pptx' ready by 8/11. Q2 CFO Update is 5:30 AM MT on 8/11.", source: "email 8/10 — MOR Financing Board Slides August 2026 Update" },
 
     // ---- Scioto ----
-    { id: "t-sci1", projectId: "proj-scioto", title: "Prep for the Scioto financing options call", summary: "Moved to Thu 2pm EST; the calendar holds are stale", group: "Financing options", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
-      notes: "A&O Shearman (Dorina Yessios) coordinated with Laura on 8/10 to move this to Thursday 2:00 PM EST and asked Grace to reissue the invite — the Tue 8/11 and Wed 8/12 holds on your calendar are the stale versions.", source: "email 8/10 — Project Scioto preliminary call" },
+    { id: "t-sci1", projectId: "proj-scioto", title: "Prep for the Scioto financing options call", summary: "Thu 12:00 MT confirmed; two stale holds remain", group: "Financing options", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "CONFIRMED 8/11: A&O reissued the invite as 'UPDATED TIME' for Thu 8/13 at 12:00 PM MT (2:00 PM ET). Dorina is now writing from an AllenOvery.com address and Johan has added Kerstin Fuerntrath from EQT. The 8/11 and 8/12 Scioto holds still on your calendar were never withdrawn \u2014 ignore both.", source: "email 8/11 \u2014 UPDATED TIME Project Scioto preliminary call" },
 
     // ---- Canyon ----
     { id: "t-can1", projectId: "proj-canyon", title: "Review the Project Canyon credit agreement draft", summary: "K&S draft landed 8/9, clean and marked", group: "Documentation", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
@@ -563,8 +566,12 @@ window.TASKFLOW_DATA = {
 
   /* One-shot patches applied exactly once per browser. Bump meta_updateBatch
    * below whenever you append here. */
-  taskUpdates: [],
-  updateBatch: 3,
+  taskUpdates: [
+    { id: "s-ash13", status: "Done", note: "Update 8/11: OM comments went to Davis Polk \u2014 Elli Park acknowledged receipt at 7:40 AM MT (\"Great thank you Aditya! We will take a look\")." },
+    { id: "t-ash20", status: "Done", note: "Update 8/11: resolved in-thread. Laura pressed the GAAP question 6:37 AM MT and Amy answered 7:05 \u2014 operating income is not formally defined under US GAAP. Amy then sent additional FR documents to you at 8:15 for the bottom request." },
+    { id: "t-ler10", status: "Done", note: "Update 8/11: booked. Clay reissued the Leroy Upsize Sync for Wed 8/12 2:30 PM MT and Caitlin confirmed Blackstone can do 4:30\u20135:30 PM ET." },
+  ],
+  updateBatch: 4,
   seedVersion: 6,
 
   /* --------------------------------------------------------------------------
@@ -576,28 +583,27 @@ window.TASKFLOW_DATA = {
     { id: "ev-herndon-1", title: "Aditya — Herndon", startUtc: "2026-08-18T00:00:00Z", endUtc: "2026-08-21T00:00:00Z", allDay: true, tentative: false, organizer: "Me", tag: "location" },
     { id: "ev-denver-2", title: "Denver", startUtc: "2026-08-20T00:00:00Z", endUtc: "2026-08-31T00:00:00Z", allDay: true, tentative: false, organizer: "Me", tag: "location" },
 
-    { id: "ev-0810-1", title: "Rithika flying into work", startUtc: "2026-08-10T13:00:00Z", endUtc: "2026-08-10T15:30:00Z", allDay: false, tentative: false, organizer: "Rithika", tag: "internal" },
-    { id: "ev-0810-2", title: "Laura | Aditya Catch-up", startUtc: "2026-08-10T17:45:00Z", endUtc: "2026-08-10T18:15:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
-    { id: "ev-0810-3", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-10T19:00:00Z", endUtc: "2026-08-10T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
-
-    { id: "ev-0811-1", title: "Q2 CFO Update hosted by Joe Harar", startUtc: "2026-08-11T11:30:00Z", endUtc: "2026-08-11T12:00:00Z", allDay: false, tentative: false, organizer: "Alexandra Capon", tag: "internal" },
-    { id: "ev-0811-2", title: "Project Scioto — call to discuss financing options", startUtc: "2026-08-11T16:00:00Z", endUtc: "2026-08-11T17:00:00Z", allDay: false, tentative: true, organizer: "Davis Polk", tag: "scioto" },
+    { id: "ev-0811-1", title: "Q2 CFO Update hosted by Joe Harar", startUtc: "2026-08-11T11:30:00Z", endUtc: "2026-08-11T12:00:00Z", allDay: false, tentative: false, organizer: "Angela Capon", tag: "internal" },
+    { id: "ev-0811-2", title: "Project Scioto — call to discuss financing options (STALE HOLD)", startUtc: "2026-08-11T16:00:00Z", endUtc: "2026-08-11T17:00:00Z", allDay: false, tentative: true, organizer: "Davis Polk", tag: "scioto" },
     { id: "ev-0811-3", title: "Laura / Aditya bi-weekly", startUtc: "2026-08-11T18:00:00Z", endUtc: "2026-08-11T18:30:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
     { id: "ev-0811-4", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-11T18:30:00Z", endUtc: "2026-08-11T19:00:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
     { id: "ev-0811-5", title: "Austin Development — Wastewater Structure and Road Financing", startUtc: "2026-08-11T19:00:00Z", endUtc: "2026-08-11T20:00:00Z", allDay: false, tentative: false, organizer: "Randy Scott (BCEI)", tag: "austin" },
     { id: "ev-0811-6", title: "Real Estate / Liquidity Forecast Call", startUtc: "2026-08-11T19:00:00Z", endUtc: "2026-08-11T19:30:00Z", allDay: false, tentative: false, organizer: "Josh Bernstein", tag: "internal" },
 
-    { id: "ev-0812-1", title: "CF Pipeline", startUtc: "2026-08-12T12:00:00Z", endUtc: "2026-08-12T13:00:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0812-0", title: "CF team call", startUtc: "2026-08-12T12:00:00Z", endUtc: "2026-08-12T12:30:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0812-1", title: "CF Pipeline", startUtc: "2026-08-12T12:30:00Z", endUtc: "2026-08-12T13:00:00Z", allDay: false, tentative: true, organizer: "Laura", tag: "internal" },
     { id: "ev-0812-2", title: "Catch up ECX / HVG / AOS / K&S", startUtc: "2026-08-12T13:00:00Z", endUtc: "2026-08-12T13:30:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
     { id: "ev-0812-3", title: "Project Ashville Weekly Sync", startUtc: "2026-08-12T14:30:00Z", endUtc: "2026-08-12T15:00:00Z", allDay: false, tentative: false, organizer: "Morgan Stanley", tag: "ashville" },
     { id: "ev-0812-4", title: "Insurance — large campuses", startUtc: "2026-08-12T15:30:00Z", endUtc: "2026-08-12T16:00:00Z", allDay: false, tentative: true, organizer: "Laura", tag: "internal" },
-    { id: "ev-0812-5", title: "Project Scioto — preliminary call to discuss financing options", startUtc: "2026-08-12T16:00:00Z", endUtc: "2026-08-12T17:00:00Z", allDay: false, tentative: true, organizer: "Grace McLeish", tag: "scioto" },
+    { id: "ev-0812-5", title: "Project Scioto — preliminary call (STALE HOLD)", startUtc: "2026-08-12T16:00:00Z", endUtc: "2026-08-12T17:00:00Z", allDay: false, tentative: true, organizer: "Grace McLeish", tag: "scioto" },
     { id: "ev-0812-6", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-12T19:00:00Z", endUtc: "2026-08-12T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+    { id: "ev-0812-7", title: "ECX / BX — Project Leroy Upsize Sync", startUtc: "2026-08-12T20:30:00Z", endUtc: "2026-08-12T21:30:00Z", allDay: false, tentative: true, organizer: "Clay Macfarlane (Blackstone)", tag: "leroy" },
 
     { id: "ev-0813-1", title: "Following: JJ off", startUtc: "2026-08-13T06:00:00Z", endUtc: "2026-08-13T06:15:00Z", allDay: false, tentative: false, organizer: "JJ Oui-Chaplain", tag: "internal" },
     { id: "ev-0813-2", title: "Ashville — ECX Weekly Team Call", startUtc: "2026-08-13T13:30:00Z", endUtc: "2026-08-13T14:00:00Z", allDay: false, tentative: false, organizer: "Davis Polk", tag: "ashville" },
     { id: "ev-0813-3", title: "Project Liverpool — Syndicated Facility — ICLA Weekly Call", startUtc: "2026-08-13T14:30:00Z", endUtc: "2026-08-13T15:15:00Z", allDay: false, tentative: false, organizer: "Natixis", tag: "liverpool" },
-    { id: "ev-0813-4", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-13T19:00:00Z", endUtc: "2026-08-13T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+    { id: "ev-0813-4", title: "Project Scioto — preliminary call (UPDATED TIME — this is the live one)", startUtc: "2026-08-13T18:00:00Z", endUtc: "2026-08-13T19:00:00Z", allDay: false, tentative: true, organizer: "Dorina Yessios (A&O)", tag: "scioto" },
+    { id: "ev-0813-5", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-13T19:00:00Z", endUtc: "2026-08-13T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
 
     { id: "ev-0814-1", title: "Cash Flow Call", startUtc: "2026-08-14T15:00:00Z", endUtc: "2026-08-14T15:30:00Z", allDay: false, tentative: false, organizer: "Josh Bernstein", tag: "internal" },
     { id: "ev-0814-2", title: "Friday Lunch (Olive Garden)", startUtc: "2026-08-14T16:00:00Z", endUtc: "2026-08-14T17:00:00Z", allDay: false, tentative: true, organizer: "Sara Schultz", tag: "social" },
@@ -621,6 +627,17 @@ window.TASKFLOW_DATA = {
     { id: "ev-0821-1", title: "Cash Flow Call", startUtc: "2026-08-21T15:00:00Z", endUtc: "2026-08-21T15:30:00Z", allDay: false, tentative: false, organizer: "Josh Bernstein", tag: "internal" },
     { id: "ev-0821-2", title: "Friday Lunch (Super Chicken)", startUtc: "2026-08-21T16:00:00Z", endUtc: "2026-08-21T17:00:00Z", allDay: false, tentative: true, organizer: "Sara Schultz", tag: "social" },
     { id: "ev-0821-3", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-21T19:00:00Z", endUtc: "2026-08-21T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0824-1", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-24T19:00:00Z", endUtc: "2026-08-24T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0825-1", title: "Laura / Aditya bi-weekly", startUtc: "2026-08-25T18:00:00Z", endUtc: "2026-08-25T18:30:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0825-2", title: "Real Estate / Liquidity Forecast Call", startUtc: "2026-08-25T19:00:00Z", endUtc: "2026-08-25T19:30:00Z", allDay: false, tentative: false, organizer: "Josh Bernstein", tag: "internal" },
+    { id: "ev-0825-3", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-25T19:00:00Z", endUtc: "2026-08-25T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
+
+    { id: "ev-0826-1", title: "CF Pipeline", startUtc: "2026-08-26T12:00:00Z", endUtc: "2026-08-26T13:00:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0826-2", title: "Catch up ECX / HVG / AOS / K&S", startUtc: "2026-08-26T13:00:00Z", endUtc: "2026-08-26T13:30:00Z", allDay: false, tentative: false, organizer: "Laura", tag: "internal" },
+    { id: "ev-0826-3", title: "Project Ashville Weekly Sync", startUtc: "2026-08-26T14:30:00Z", endUtc: "2026-08-26T15:00:00Z", allDay: false, tentative: false, organizer: "Morgan Stanley", tag: "ashville" },
+    { id: "ev-0826-4", title: "Aditya | Rithika: Standing Call", startUtc: "2026-08-26T19:00:00Z", endUtc: "2026-08-26T19:30:00Z", allDay: false, tentative: false, organizer: "Me", tag: "internal" },
   ],
 
   /* --------------------------------------------------------------------------
@@ -673,7 +690,7 @@ window.TASKFLOW_DATA = {
     {
       projectId: "proj-ashville",
       codename: "Ashville 1",
-      stage: "Pre-launch — OM in comments",
+      stage: "OM with Davis Polk",
       stageKind: "docs",
       size: "",
       sizeNote: "Deal size not captured in the sources read so far.",
@@ -689,9 +706,10 @@ window.TASKFLOW_DATA = {
         { name: "Turner & Townsend", role: "LTA report" }
       ],
       notes: [
-        "Launch was targeted 8/10 per the handover plan; the OM comment pass is the long pole and is now overdue on Davis Polk's clock (they chased 8/5).",
-        "LTA report v7 delivered 8/5 with final comments incorporated — only the signed construction contracts remain to fold in.",
-        "Rithika confirmed to Morgan Stanley on 8/10 that materials are cleared to share with the rating agencies."
+        "OM comments went to Davis Polk on 8/11 and Elli Park confirmed receipt — the long pole has moved. Rithika is running a further OM pass with Laura.",
+        "No launch date has been restated since 8/10 slipped, so the task now carries no due date rather than an invented one.",
+        "Open dependency outside our control: the energy centre ground lease cannot be put in place until BCEI provides its legal description (Tatusko, 8/11).",
+        "LTA v7 delivered 8/5; only the signed construction contracts remain to fold in.",
       ],
       sources: [
         "SMBC call notes 2026-07-22 (Ashville HY market)",
@@ -742,7 +760,8 @@ window.TASKFLOW_DATA = {
         { name: "EQT", role: "Sponsor (Johan Hylander)" }
       ],
       notes: [
-        "The preliminary financing-options call moved to Thursday 2:00 PM EST on 8/10; the Tue 8/11 and Wed 8/12 holds still sitting on the calendar are the stale invites."
+        "Confirmed 8/11: A&O reissued the call as 'UPDATED TIME' for Thu 8/13, 12:00 PM MT. The 8/11 and 8/12 holds were never withdrawn and should be ignored.",
+        "Kerstin Fuerntrath (EQT) added by Johan; Dorina now writing from an AllenOvery.com address."
       ],
       sources: [
         "Email 2026-08-10 — Project Scioto preliminary call",
@@ -807,8 +826,8 @@ window.TASKFLOW_DATA = {
         { name: "Turner & Townsend", role: "Punch list review" }
       ],
       notes: [
+        "Upsize Sync booked for Wed 8/12 at 2:30 PM MT — Clay reissued the invite 8/11 and Caitlin confirmed Blackstone's 4:30–5:30 PM ET window.",
         "Finland closed and funded 7/31 (Blackstone wired); reliance letters and an updated Exhibit A are the open post-closing items, with Norway on the same pattern.",
-        "Clay came back 8/10 offering time on the CA turn, MB/local counsel questions and the Austin addition."
       ],
       sources: [
         "Q2 2026 Commitments workbook via data/data.js facilities",
