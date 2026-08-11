@@ -233,3 +233,41 @@ The tick columns were recovered positionally from the PDF (layout-preserving ext
 **Fixed:** `LCS_m` was dropping the thousands separator on fractional values, rendering the $1,632.5m total as "$1632.5m".
 
 QC: all 5 script blocks pass `node --check`; offline Playwright run confirms every source figure ties out on screen, all three tables render at 17/3/7 rows, the sort toggle works, clicking SMBC lands on the SMBC lender card, and all four LC questions answer correctly through the Ask tab — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v68.html`.
+
+---
+
+## v69 Changelog (8/11/26)
+
+Released **8/11/26, 10:30 AM ET**. Sweep window: mailbox-wide since the v67 data cut (8/10, ~12:09 PM ET) plus the "Bank Meetings" folder read unfiltered. 65 messages in the window; 6 bank-relevant threads folded in. Title unchanged.
+
+**Ares / Narwhal IV — the hold is lifted.** Johan Hylander 8/11: "TS looks good. Minor questions below. Otherwise happy for it to go across assuming Laura is ok." The 8/6 hold pending the ~$800m repayment and possible call-protection reduction is cleared, so the term sheet and updated Credit Agreement can go to Latham / Ares on Laura's sign-off. Three EQT questions remain: supplemental facility availability (EQT wants it pushed to 12 months); whether the revised covenant and restricted-payment package works for them, including read-across from **Project Enigma and Project Faraday**; and confirmation that the voluntary-repayment non-call is fixed, plus why A4/B4 carry make-whole to June 2027 while Supplemental A4/B4 run to February 2028. Card note, `projects{}`, `nextSteps`, the HoldCo workstream and the Ares outreach entry all updated. `lastContact` held at 2/10/26 — email only.
+
+**Blackstone — first Leroy upsize engagement since January.** Caitlin Santiago 8/10: "Wednesday is best for us", offering 2–3pm, 3:30–4pm or 4:30–5pm ET; Clay Macfarlane sent a [HOLD] Zoom invite on 8/11 for the ECX/BX Project Leroy Upsize Sync. Wednesday is 8/12/26, slot still to be confirmed. Blackstone has put an unusually wide team on it — capital markets plus the BXCI ECX deal team (Macfarlane, Santiago, Nowack, Patel, Mandana, Martin, Bianco, Elaprolu, Lerman, Blinov), which is a useful read on how seriously they are treating the upsize. Leroy Austin & Finland materials circulated internally 8/10. `lastContact` stays 1/20/26 — the call has not happened yet.
+
+**Morgan Stanley — yesterday's LTA sign-off partly walked back.** Three threads moved:
+
+1. **The LTA report is NOT with the rating agencies.** Laura told Maya on 8/10 that ECX "noticed there are some inconsistencies in the report that may need updating" and would revert. This supersedes the open item logged in v65, where MS was waiting only on ECX's go-ahead.
+2. **Equity commitment letter.** Maya asked for the latest draft to send to the agencies. Davis Polk (John Runne) confirmed they "began drafting but stopped when we paused" and will share a draft shortly; Laura committed to getting it to MS by COB.
+3. **Covenant grid and model.** Laura asked Akilesh for a grid refreshed for financings since 6/16; Akilesh confirmed the only new transaction is the **Galaxy financing, leased to CoreWeave**, which bears on comparability. Laura also asked MS to confirm the model reflects readiness at **RFS + 90 days** (no LDs) — still open.
+
+`lastContact` stays 7/28/26.
+
+**Goldman Sachs — broad team engaged, and a practical file-transfer problem.** Aditya circulated materials to a wide GS group on 8/10 (including their leveraged finance / AI team); Nivedh Iyer confirmed they would review and revert. The lease draft never landed — too large for GS's mail filters — so GS raised an internal unblock request and offered to stand up a data room instead. Expect large documents to go via a GS-hosted room, not email. New GS names captured: Nivedh Iyer, Varun Rastogi, Bradley Mhangami, Miriam Wheeler, Jonathan Tan, Lilly Costello, Jisoo Kim.
+
+**RBC — meeting slots on the table.** Laura offered three Herndon slots on 8/10: 14 September 12:00pm ET, 15 September 3–5pm, 18 September 3–5pm. Nanda Kamat: "Let us circle internally and revert." Card note and `nextSteps` updated; `lastContact` still unset (no call yet).
+
+**Ashville 2 — the financing-options call ran today, not 8/13.** A&O reissued the invite as "UPDATED TIME" and the call moved forward to 8/11. Davis Polk (David Penna) circulated a one-pager the night before comparing key elements of the common financing options in the market. Participants widened: A&O added Jeffrey Pellegrino and Gordon Mak, EQT added Kerstin Fuerntrath, Davis Polk on for Penna, Garcia Laposse and Runne. Phase 2 structure still open.
+
+**Structural fix — "LC Facilities" and the new LC Syndication tab were the same workstream, unlinked.** The sweep surfaced a "Project Liverpool — Syndicated Facility QA Log" forward, and Liverpool turns out to be the codename on the existing **LC Facilities** project — the same $2.5bn facility the v68 tab was built from. The two are now reconciled:
+
+- The project's outreach list was rebuilt from the v8.06 syndication tracker: 3 JLAs, 14 further active names with their ticket sizes, probabilities, fronting posture and coverage bank, 3 accordion candidates and 7 declines. It previously showed only 3 leads and 6 declines from the 8/4 bank matrix, and was missing every active participant plus the 8/6 declines (Bank of America, NAB, TD Bank).
+- The description now carries the headline economics and points at the LC Syndication tab; the teaser metrics were refreshed from "$100-500m / various relationship banks / April 2026" to the actual $2,500m facility, $900m approved, 0.46x weighted subscription and the CLA / JLA commitment dates.
+- The LC Syndication tab header now shows the Project Liverpool codename and cross-references the project.
+
+**Bug fixed in the Ask tab — a real routing defect, caught by this data.** Asking "Blackstone" returned the *closed project* "Project Leroy (Blackstone)" instead of the Blackstone lender card: project aliases were derived from parentheticals, so a project named after a lender swallowed that lender's name, and the router resolved projects before lenders. Project alias generation now discards any alias that is just a lender's name. "Blackstone" resolves to the card; "Project Leroy (Blackstone)" still resolves to the project. Regression-tested across 11 routing cases, all passing.
+
+**Excluded from the sweep:** the ECX Bond offering-memorandum drafting thread, bond acreage / ground-lease and EHS wording, A&O resolutions, Ashville 1 Davis Polk diligence (operating income / non-GAAP), Turntown's Ashville OH report V7 edits, Google valuation inputs, construction and PM status reports, the Q2 CFO deck and a talent-acquisition all-hands — workstream traffic, not bank conversations.
+
+**Flagged:** **Project Enigma** and **Project Faraday** appear in EQT's covenant question but exist nowhere in the tracker — most likely other EQT portfolio financings rather than ECX deals, so no cards were created. **Project Canyon** (Copia Bridge) still has an executed commitment letter and a first Credit Agreement draft with no project card. Barclays, NordLB and Wells Fargo still have no lender cards, and the dead `AIAssistant` component is still in the file.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright run green — zero console/page errors, zero external requests, 56 lenders / 24 active / 18 closed, note count up from 96 to 101, LC tab totals still tying to the source ($2,250m / $1,632.5m / $1,800m), and 11 of 11 Ask routing cases passing. Archived to `tracker/versions/ECX_Tracker_v69.html`.
