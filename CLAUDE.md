@@ -56,6 +56,15 @@ This is deliberately finer-grained than `group`, which is the broad heading task
 (Diligence, Structuring, Post-closing). A title reading "DD questions" under a "Diligence" header
 is right, not redundant.
 
+**The convention holds for tasks typed into the page too.** The quick-add box does not store what
+you type — `toConvention()` in the viewer infers the workstream from a lexicon, reduces the
+sentence to an imperative, and assigns the matching group, showing the result in the live preview
+before you commit. "waiting on MS to follow up on the Ashville 1 financial model…" becomes
+**Model — chase MS** under Ashville 1, with the sentence as typed kept in `notes`. Typing
+`Teaser: send the trimmed version to GS` skips the inference and is taken verbatim. When adding a
+new workstream label to the dataset, add it to that lexicon too, and put specific labels above
+generic ones — a bare `diligence` must not outrank `punch list diligence`.
+
 ## Summaries are written, not clipped
 
 Every task carries a `summary` — an authored one-liner under ~55 characters saying what the item

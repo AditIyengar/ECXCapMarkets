@@ -1226,7 +1226,8 @@ window.TASKFLOW_DATA = {
     h += '<button class="btn btn-teal btn-sm" id="qaAdd"' + (hasText ? "" : " disabled") + '>Add</button>';
     h += "</div>";
     if (hasText) {
-      h += '<div class="qaprev"><span class="qatitle">' + esc(p.title) + "</span>";
+      var shaped = toConvention(p.title, p.projectId || defaultProject(), "");
+      h += '<div class="qaprev">' + titleHTML(shaped.title);
       h += '<span class="chip" style="background:' + projById(p.projectId || defaultProject()).color + '22;color:' +
            projById(p.projectId || defaultProject()).color + '">' +
            esc(projById(p.projectId || defaultProject()).name) + (p.projectId ? "" : " (default)") + "</span>";
@@ -1247,15 +1248,19 @@ window.TASKFLOW_DATA = {
   function commitQuickAdd() {
     var p = parseQuick(S.qa);
     if (!p.title) return;
+    var pid = p.projectId || defaultProject();
+    var c = toConvention(p.title, pid, "");
     L.custom.push({
       id: "u-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      projectId: p.projectId || defaultProject(),
-      title: p.title,
+      projectId: pid,
+      title: c.title,
+      summary: c.summary,
+      group: c.group,
       due: p.due,
       priority: p.priority,
       assignee: p.assignee,
       status: "To Do",
-      notes: "",
+      notes: c.notes,
       source: "added here " + todayISO()
     });
     save();
@@ -1282,6 +1287,136 @@ window.TASKFLOW_DATA = {
       return '<div class="grp"><span>' + esc(g) + "</span><i></i></div>" +
              '<div class="rows">' + buckets[g].map(rowHTML).join("") + "</div>";
     }).join("");
+  }
+
+
+  /* ---------------- convention normaliser -------------------------------
+   * Every task, however it is added, must read "<workstream> — <action>"
+   * with a summary and a group. Typed input rarely arrives that way, so it
+   * is reshaped here rather than landing raw in an "Other" bucket.
+   * -------------------------------------------------------------------- */
+  var WORKSTREAMS = [
+    // Specific labels first — a generic "diligence" must not win over
+    // "punch list diligence", and "lease" must not win over "ground lease".
+    { label: "LTA report",       group: "Diligence",        re: /\bLTA\b/i },
+    { label: "DD responses",     group: "Diligence",        re: /\b(dd|diligence)\s+responses?\b/i },
+    { label: "DD questions",     group: "Diligence",        re: /\b(dd|diligence)\s+(questions?|requests?)\b/i },
+    { label: "KYC & VDR",        group: "Diligence",        re: /\bkyc\b|\bvdr\b/i },
+    { label: "Appraisal",        group: "Diligence",        re: /\bappraisals?\b/i },
+    { label: "Resolutions",      group: "Diligence",        re: /\bresolutions?\b|\bconsents?\b/i },
+    { label: "Punch list",       group: "Post-closing",     re: /\bpunch lists?\b/i },
+    { label: "Reliance letters", group: "Post-closing",     re: /\breliance letters?\b/i },
+    { label: "Amort & sizing",   group: "Model & analysis", re: /\bamorti[sz]\w*\b|\bsizing\b|\bsculpt\w*\b/i },
+    { label: "Comps",            group: "Model & analysis", re: /\bcomps?\b/i },
+    { label: "Board slides",     group: "Lender materials", re: /\bboard (slides?|deck|presentation)\b/i },
+    { label: "Term sheet",       group: "Lender materials", re: /\bterm sheets?\b/i },
+    { label: "Teaser",           group: "Lender materials", re: /\bteasers?\b/i },
+    { label: "Rating agency",    group: "OM & launch",      re: /\brating agenc(?:y|ies)\b/i },
+    { label: "OM",               group: "OM & launch",      re: /\bOM\b|\boffering memorandum\b/ },
+    { label: "Launch",           group: "OM & launch",      re: /\blaunch(?:es|ing)?\b/i },
+    { label: "Ground lease",     group: "Lease & power",    re: /\bground leases?\b/i },
+    { label: "Power contracts",  group: "Lease & power",    re: /\bppa\b|\bpower (?:contracts?|agreements?)\b/i },
+    { label: "Credit agreement", group: "Documentation",    re: /\bcredit agreements?\b/i },
+    { label: "Structure chart",  group: "Structuring",      re: /\bstructure charts?\b/i },
+    { label: "Insurance",        group: "Scheduling & admin", re: /\binsurance\b/i },
+    { label: "Lease",            group: "Lease & power",    re: /\bleases?\b/i },
+    { label: "Model",            group: "Model & analysis", re: /\bmodels?\b/i },
+    // Generic catch-alls last
+    { label: "Diligence",        group: "Diligence",        re: /\bdiligence\b|\bdd\b/i },
+    { label: "Lender email",     group: "Lender materials", re: /\bemails?\b|\boutreach\b/i }
+  ];
+
+  var FILLER = [
+    /^(please|kindly|can you|remember to|make sure to|need to|i need to|we need to|to)\s+/i,
+    /^(follow up on|follow-up on|check on|look at|look into|circle back on)\s+/i,
+    /^(the|a|an)\s+/i
+  ];
+
+  function inferWorkstream(text) {
+    for (var i = 0; i < WORKSTREAMS.length; i++) {
+      if (WORKSTREAMS[i].re.test(text)) return WORKSTREAMS[i];
+    }
+    return null;
+  }
+
+  // Reduce a sentence to an imperative fragment: drop the trailing clauses,
+  // the filler openings, and anything already said by the workstream label.
+  function punchyAction(raw, ws, projName) {
+    var t = " " + String(raw).trim().replace(/\s+/g, " ") + " ";
+
+    // "waiting on MS to …" is a chase, and says who
+    var chase = t.match(/\bwaiting (?:on|for)\s+([A-Z][\w&.\-]*(?:\s+[A-Z][\w&.\-]*)?)/);
+    if (chase) return "chase " + chase[1].trim();
+
+    t = t.replace(/\s[-–—]\s.*$/, " ");                    // drop after a dash aside
+    t = t.replace(/\s(and then|and we|, then|;).*$/i, " "); // drop trailing clause
+    t = t.trim();
+    if (projName) t = t.replace(new RegExp("\\b" + projName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "ig"), "").trim();
+    if (ws) t = t.replace(new RegExp("(?:\\bthe\\s+)?(?:" + ws.re.source + ")", ws.re.flags), "").trim();
+    t = t.replace(/\s+/g, " ").replace(/^[\s,;:.-]+|[\s,;:.-]+$/g, "");
+    FILLER.forEach(function () {
+      FILLER.forEach(function (f) { t = t.replace(f, ""); });
+    });
+    t = t.replace(/\b(later|asap|today|sometime)\s*$/i, "").trim();
+    // removing the project name or the workstream can strand a preposition
+    t = t.replace(/^(?:for|to|on|with|of|in|at|from|the|a|an)\s+/i, "");
+    t = t.replace(/\s+(?:for|to|on|with|of|in|at|from|and|the|a|an)$/i, "");
+    t = t.replace(/\s{2,}/g, " ").trim();
+    if (!t) return ws ? "action it" : "follow up";
+    if (t.length > 40) t = t.slice(0, 39).replace(/[\s,;:—-]+$/, "") + "…";
+    return t.charAt(0).toLowerCase() + t.slice(1);
+  }
+
+  // Shape any task into the house convention. Returns the fields to store.
+  function toConvention(rawTitle, projectId, existingNotes) {
+    var raw = String(rawTitle || "").trim();
+    var projName = projectId ? projById(projectId).name : "";
+
+    // Already conventional, or explicitly typed "Workstream: action"
+    var explicit = raw.match(/^([A-Za-z][\w&.\s]{1,24}?)\s*(?:—|–|:)\s*(.+)$/);
+    if (explicit) {
+      var lbl = explicit[1].trim(), act = explicit[2].trim();
+      var known = inferWorkstream(lbl);
+      return {
+        title: lbl + " — " + act,
+        group: known ? known.group : "Other",
+        summary: "",
+        notes: existingNotes || ""
+      };
+    }
+
+    var ws = inferWorkstream(raw);
+    var action = punchyAction(raw, ws, projName);
+    var label = ws ? ws.label : "Ad hoc";
+    var title = label + " — " + action;
+    // Nothing is lost: the sentence as typed becomes the note, and the part
+    // the title could not carry becomes the summary.
+    var leftover = raw.replace(/\s+/g, " ").trim();
+    var summary = leftover.length > title.length + 4 ? brief(leftover, 52) : "";
+    return {
+      title: title,
+      group: ws ? ws.group : "Other",
+      summary: summary,
+      notes: existingNotes || (leftover.length > title.length + 4 ? leftover : "")
+    };
+  }
+
+  // Tasks added before the convention existed (or by an older build) get
+  // reshaped once, in place, so the board has no odd rows out.
+  function migrateCustom() {
+    var changed = false;
+    L.custom = (L.custom || []).map(function (t) {
+      if (t.title && t.title.indexOf(" — ") !== -1 && t.group) return t;
+      var c = toConvention(t.title, t.projectId, t.notes);
+      changed = true;
+      return Object.assign({}, t, {
+        title: c.title,
+        group: t.group || c.group,
+        summary: t.summary || c.summary,
+        notes: t.notes || c.notes
+      });
+    });
+    if (changed) save();
   }
 
   function projChip(id, name, color, n) {
@@ -1594,15 +1729,19 @@ window.TASKFLOW_DATA = {
     el.querySelector("#m-save").addEventListener("click", function () {
       var title = el.querySelector("#m-title").value.trim();
       if (!title) return;
+      var mpid = el.querySelector("#m-proj").value;
+      var mc = toConvention(title, mpid, el.querySelector("#m-notes").value.trim());
       L.custom.push({
         id: "u-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-        projectId: el.querySelector("#m-proj").value,
-        title: title,
+        projectId: mpid,
+        title: mc.title,
+        summary: mc.summary,
+        group: mc.group,
         due: el.querySelector("#m-due").value || "",
         priority: el.querySelector("#m-pri").value,
         assignee: el.querySelector("#m-who").value.trim() || "Me",
         status: "To Do",
-        notes: el.querySelector("#m-notes").value.trim(),
+        notes: mc.notes,
         source: m.source || "added here"
       });
       save();
@@ -1731,6 +1870,7 @@ window.TASKFLOW_DATA = {
     if (th) document.documentElement.setAttribute("data-theme", th);
   } catch (e) {}
 
+  migrateCustom();
   render();
 })();
 </script>
