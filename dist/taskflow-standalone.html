@@ -511,6 +511,14 @@ window.TASKFLOW_DATA = {
     { id: "t-ash22", projectId: "proj-ashville", title: "Update the MOR financing board slides", summary: "Rithika needs it by 8/11 for the CFO update", group: "Reporting", due: "2026-08-11", priority: "high", assignee: "Me", status: "To Do",
       notes: "Rithika bumped this 8/10 — she needs an updated 'Board Presentation - Financing Update August 2026.pptx' ready by 8/11. Q2 CFO Update is 5:30 AM MT on 8/11.", source: "email 8/10 — MOR Financing Board Slides August 2026 Update" },
 
+    // ---- Ashville 2 ----
+    { id: "t-ash2-1", projectId: "proj-ashville2", title: "Re-cut the Ashville 2 amortisation profile and debt sizing", summary: "Sculpted amort, bullet after 5\u20137; sizing follows", group: "Lease terms", due: "", priority: "high", assignee: "Me", status: "To Do",
+      notes: "Agreed lease change: the amortisation profile goes sculpted with a bullet after 5 to 7 years, and the debt sizes differently off that profile. Held as one exercise rather than two tasks \u2014 the sizing falls out of the amortisation shape, so splitting them would mean re-running the same model twice. Feeds the anchor conversation, where Apterra has indicated a $500m+ ticket.", source: "call notes 2026-08-11 \u2014 Ashville 2 lease changes" },
+    { id: "t-ash2-2", projectId: "proj-ashville2", title: "Tighten assignment provisions and change of control in the lease", summary: "HY ignores these; asset-level lenders will not", group: "Lease terms", due: "", priority: "medium", assignee: "Me", status: "To Do",
+      notes: "Both are transfer and control provisions that high-yield investors typically do not fuss over but asset-level lenders do \u2014 which is exactly what an unwrapped Ashville 2 deal is. Kept as one review: same lease sections, same lender concern, and they will be negotiated together. CoC read as change of control.", source: "call notes 2026-08-11 \u2014 Ashville 2 lease changes" },
+    { id: "t-ash2-3", projectId: "proj-ashville2", title: "Davis Polk to circle with the leasing team on the changes", summary: "Waiting on DP before anything gets redrafted", group: "Lease terms", due: "", priority: "medium", assignee: "Davis Polk", status: "To Do",
+      notes: "Davis Polk will take the agreed lease changes to the leasing team. Nothing to do until they revert, but it gates the redraft \u2014 worth a nudge if it is quiet by the end of the week. 'DP' read as Davis Polk, who are already ECX counsel across the Ashville lease and OM threads.", source: "call notes 2026-08-11 \u2014 Ashville 2 lease changes" },
+
     // ---- Scioto ----
     { id: "t-sci1", projectId: "proj-scioto", title: "Prep for the Scioto financing options call", summary: "Thu 12:00 MT confirmed; two stale holds remain", group: "Financing options", due: "2026-08-13", priority: "medium", assignee: "Me", status: "To Do",
       notes: "CONFIRMED 8/11: A&O reissued the invite as 'UPDATED TIME' for Thu 8/13 at 12:00 PM MT (2:00 PM ET). Dorina is now writing from an AllenOvery.com address and Johan has added Kerstin Fuerntrath from EQT. The 8/11 and 8/12 Scioto holds still on your calendar were never withdrawn \u2014 ignore both.", source: "email 8/11 \u2014 UPDATED TIME Project Scioto preliminary call" },
@@ -720,7 +728,7 @@ window.TASKFLOW_DATA = {
     {
       projectId: "proj-ashville2",
       codename: "Ashville 2 — Ashville Energy Center Phase 2 (\"Unwrapped\")",
-      stage: "Anchor investor sounding",
+      stage: "Lease re-cut for asset level",
       stageKind: "market",
       size: "$500m+ anchor ticket",
       sizeNote: "Apterra indicated a minimum $500m anchor ticket with upside — that is a ticket, not the deal size. Total size not captured.",
@@ -736,8 +744,9 @@ window.TASKFLOW_DATA = {
         { name: "EQT", role: "Sponsor (Johan Hylander)" }
       ],
       notes: [
+        "Lease being re-cut for an asset-level deal (8/11): amortisation goes sculpted with a bullet after 5 to 7 years, debt sizes differently off that profile, and the assignment and change-of-control provisions need tightening — high-yield investors do not push on those, asset-level lenders do. Davis Polk is taking the changes to the leasing team.",
         "Apterra flagged mild pricing concern against another deal in the mid-500s.",
-        "Technical walkthrough of the Energy Center held 7/20 with Apterra's Chief Risk Officer — power load swing solution (UIG microgrid control scheme) and plot plan."
+        "Technical walkthrough of the Energy Center held 7/20 with Apterra's Chief Risk Officer — power load swing solution (UIG microgrid control scheme) and plot plan.",
       ],
       sources: [
         "Barclays call notes 2026-07-23 (Ashville 2 unwrapped)",
