@@ -91,6 +91,24 @@ turns on ("Waiting on Laura's review before it can go out"), not the first words
 short. The full text lives in `notes` and only appears on hover. The viewer falls back to
 mechanical truncation when `summary` is missing and it reads badly, so do not rely on it.
 
+## Local state is fragile — treat an export as the source of truth
+
+Completions, added tasks, deletions and merges live in the viewer's `localStorage`, not in
+`data/taskflow.js`. That is fine on a stable origin (GitHub Pages) and **not** fine in a published
+artifact iframe, which can hand out fresh storage on each deploy — so a republish silently discards
+the user's ticks. The page now probes storage on load, warns in red when writes do not stick, shows
+a running count of local changes, and offers **Copy for safekeeping** / **Restore local changes**.
+
+When the user reports losing completions, ask them to hit *Copy for safekeeping* and paste the
+blob. Fold it into the dataset permanently:
+
+- a completed task becomes a `taskUpdates` entry with `status: "Done"` (bump `updateBatch`)
+- a task they added becomes a real dataset task, keeping its `u-…` id so their tick stays attached
+- an addendum becomes part of the target task's `notes`
+
+That is the only way a completion becomes durable. Never tell the user their ticks are safe when
+they are only in a published artifact.
+
 ## Never invent a figure
 
 Deal sizes, pricing and dates are quoted from this page into real conversations. If a source does
