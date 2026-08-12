@@ -72,7 +72,8 @@ Paste this into a Claude Code session on this repo (or let the scheduled Routine
 >    it can go out"), not the opening words of the note clipped short — the
 >    viewer falls back to mechanical truncation only when `summary` is missing,
 >    and it reads badly. `group` is the workstream heading within the project;
->    reuse the names already in use rather than inventing near-duplicates. Update `notes`/`due` where the mail
+>    one of the SIX allowed sections — LTA report, Diligence requests, Appraisal, Lease, Permits,
+>    Bank Outreach — for any task on a deal project. Never invent a seventh and never use "Other". Update `notes`/`due` where the mail
 >    moved something. Add tasks for genuinely new commitments found in mail, with a `source`
 >    naming the message. Do not silently delete backlog items; if something looks done, add it to
 >    `taskUpdates` with `status: "Done"` and bump `updateBatch`.

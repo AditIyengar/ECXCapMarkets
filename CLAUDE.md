@@ -33,6 +33,25 @@ separate: different artefacts, not different halves of the same one.
 
 When it is genuinely ambiguous, merge and note the doubt rather than leaving two rows.
 
+**The board merges as you type, too.** On commit, the quick-add box looks for an open task on the
+same project with the same workstream label. If it finds one it appends an addendum to that task
+rather than creating a row — the preview says `MERGES INTO <task>` before you press Enter, and the
+row then shows a `+n merged` chip. Addenda take the earlier due date and the higher priority, and
+live in `localStorage` alongside your other edits, so a data refresh preserves them.
+
+## Six sections, and only six
+
+Every deal project is sectioned by exactly these, in this order:
+
+```
+LTA report · Diligence requests · Appraisal · Lease · Permits · Bank Outreach
+```
+
+`group` must be one of those six for any task on a deal project — no new section names, no
+`Other`. The non-deal projects (AI Projects, Stabilization, Internal) carry a single group each so
+no headers render for them. The lexicon in `toConvention()` maps every workstream label onto one
+of the six, so a typed task cannot invent a seventh.
+
 ## Titles carry the workstream
 
 Every task title is `<workstream> — <punchy action>`, and the viewer renders the workstream in

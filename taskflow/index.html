@@ -162,6 +162,8 @@
     margin-top: 9px; padding: 8px 0 0 29px; border-top: 1px dashed var(--line);
   }
   .qatitle { font-size: 13px; font-weight: 500; }
+  .qamerge { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--cool-fg); }
+  .qadone { font-size: 11.5px; color: var(--ok-fg); margin-top: 7px; padding-left: 29px; font-weight: 600; }
   .btn:disabled { opacity: .4; cursor: not-allowed; }
   .btn:disabled:hover { transform: none; }
 
@@ -380,7 +382,7 @@
   /* ---------------- local state (overlay on top of the dataset) ------------ */
   var L = load();
   function load() {
-    var base = { statuses: {}, deleted: [], custom: [], updateBatch: 0 };
+    var base = { statuses: {}, deleted: [], custom: [], addenda: {}, updateBatch: 0 };
     try {
       var raw = localStorage.getItem(STORE_KEY);
       if (raw) {
@@ -388,6 +390,7 @@
         base.statuses = s.statuses || {};
         base.deleted = s.deleted || [];
         base.custom = s.custom || [];
+        base.addenda = s.addenda || {};
         base.updateBatch = s.updateBatch || 0;
       }
     } catch (e) { /* first run */ }
@@ -447,22 +450,36 @@
     D.tasks.forEach(function (t) {
       if (L.deleted.indexOf(t.id) !== -1) return;
       var st = L.statuses[t.id];
-      out.push(Object.assign({}, t, {
+      out.push(applyAddenda(Object.assign({}, t, {
         status: st ? st.status : t.status,
         completedAt: st ? st.completedAt : null
-      }));
+      })));
     });
     L.custom.forEach(function (t) {
       if (L.deleted.indexOf(t.id) !== -1) return;
       var st = L.statuses[t.id];
-      out.push(Object.assign({}, t, {
+      out.push(applyAddenda(Object.assign({}, t, {
         status: st ? st.status : t.status,
         completedAt: st ? st.completedAt : null,
         custom: true
-      }));
+      })));
     });
     return out;
   }
+  // Typed input matching an existing workstream is folded into that task as
+  // an addendum rather than becoming a near-duplicate row.
+  function applyAddenda(t) {
+    var add = L.addenda && L.addenda[t.id];
+    if (!add || !add.length) return t;
+    var notes = t.notes || "", due = t.due, pri = t.priority;
+    add.forEach(function (a) {
+      notes += (notes ? " \u00b7 " : "") + "Added " + a.at + ": " + a.text;
+      if (a.due && (!due || a.due < due)) due = a.due;
+      if (a.priority === "high") pri = "high";
+    });
+    return Object.assign({}, t, { notes: notes, due: due, priority: pri, mergedCount: add.length });
+  }
+
   function isOpen(t) { return t.status !== "Done"; }
   function isOverdue(t) { return isOpen(t) && t.due && t.due < todayISO(); }
 
@@ -584,6 +601,7 @@
     qa: "",
     showDone: false,
     openProj: {},
+    qaMsg: "",
     month: (function () { var t = parseISO(todayISO()); return civil(t.getUTCFullYear(), t.getUTCMonth(), 1); })(),
     selDay: null,
     modal: null
@@ -717,8 +735,12 @@
     h += '<button class="btn btn-teal btn-sm" id="qaAdd"' + (hasText ? "" : " disabled") + '>Add</button>';
     h += "</div>";
     if (hasText) {
-      var shaped = toConvention(p.title, p.projectId || defaultProject(), "");
-      h += '<div class="qaprev">' + titleHTML(shaped.title);
+      var pid0 = p.projectId || defaultProject();
+      var shaped = toConvention(p.title, pid0, "");
+      var mt = findMergeTarget(pid0, shaped.title);
+      h += '<div class="qaprev">' + (mt
+        ? '<span class="qamerge">merges into</span> ' + titleHTML(mt.title)
+        : titleHTML(shaped.title));
       h += '<span class="chip" style="background:' + projById(p.projectId || defaultProject()).color + '22;color:' +
            projById(p.projectId || defaultProject()).color + '">' +
            esc(projById(p.projectId || defaultProject()).name) + (p.projectId ? "" : " (default)") + "</span>";
@@ -728,6 +750,7 @@
       if (p.assignee !== "Me") h += '<span class="chip" style="background:var(--cool-bg);color:var(--cool-fg)">' + esc(p.assignee) + "</span>";
       h += "</div>";
     } else {
+      if (S.qaMsg) h += '<div class="qadone">\u2713 ' + esc(S.qaMsg) + "</div>";
       h += '<div class="qahint"><b>@name</b> owner · <b>#project</b> · <b>!</b> high · <b>~</b> low · ' +
            'dates: <b>today</b>, <b>tomorrow</b>, <b>fri</b>, <b>next tue</b>, <b>in 3 days</b>, <b>eow</b>, <b>8/14</b>, <b>aug 14</b></div>';
     }
@@ -741,19 +764,34 @@
     if (!p.title) return;
     var pid = p.projectId || defaultProject();
     var c = toConvention(p.title, pid, "");
-    L.custom.push({
-      id: "u-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      projectId: pid,
-      title: c.title,
-      summary: c.summary,
-      group: c.group,
-      due: p.due,
-      priority: p.priority,
-      assignee: p.assignee,
-      status: "To Do",
-      notes: c.notes,
-      source: "added here " + todayISO()
-    });
+
+    var target = findMergeTarget(pid, c.title);
+    if (target) {
+      var action = c.title.slice(c.title.indexOf(" \u2014 ") + 3);
+      if (!L.addenda[target.id]) L.addenda[target.id] = [];
+      L.addenda[target.id].push({
+        text: action + (c.notes ? " (" + c.notes + ")" : ""),
+        due: p.due || "",
+        priority: p.priority,
+        at: todayISO()
+      });
+      S.qaMsg = "Merged into " + target.title;
+    } else {
+      L.custom.push({
+        id: "u-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        projectId: pid,
+        title: c.title,
+        summary: c.summary,
+        group: c.group,
+        due: p.due,
+        priority: p.priority,
+        assignee: p.assignee,
+        status: "To Do",
+        notes: c.notes,
+        source: "added here " + todayISO()
+      });
+      S.qaMsg = "";
+    }
     save();
     S.qa = "";
     render();
@@ -761,25 +799,32 @@
     if (el) el.focus();
   }
 
-  // Group headers only earn their space on a busy project — below these
+
+  // Section headers only earn their space on a busy project — below these
   // thresholds a single flat list reads better than a header per item.
   function groupedRowsHTML(rows) {
     var order = [], buckets = {};
     rows.forEach(function (t) {
-      var g = t.group || "Other";
+      var g = t.group || "Diligence requests";
       if (!buckets[g]) { buckets[g] = []; order.push(g); }
       buckets[g].push(t);
     });
     if (rows.length < 4 || order.length < 2) {
       return '<div class="rows">' + rows.map(rowHTML).join("") + "</div>";
     }
-    order.sort(function (a, b) { return buckets[b].length - buckets[a].length; });
+    // Fixed section order, so a project always reads the same way.
+    var SECTIONS = ["LTA report", "Diligence requests", "Appraisal", "Lease", "Permits", "Bank Outreach"];
+    order.sort(function (a, b) {
+      var ia = SECTIONS.indexOf(a), ib = SECTIONS.indexOf(b);
+      if (ia === -1) ia = 99;
+      if (ib === -1) ib = 99;
+      return ia !== ib ? ia - ib : buckets[b].length - buckets[a].length;
+    });
     return order.map(function (g) {
       return '<div class="grp"><span>' + esc(g) + "</span><i></i></div>" +
              '<div class="rows">' + buckets[g].map(rowHTML).join("") + "</div>";
     }).join("");
   }
-
 
   /* ---------------- convention normaliser -------------------------------
    * Every task, however it is added, must read "<workstream> — <action>"
@@ -795,30 +840,32 @@
     { label: "KYC & VDR",        group: "Diligence",        re: /\bkyc\b|\bvdr\b/i },
     { label: "Appraisal",        group: "Diligence",        re: /\bappraisals?\b/i },
     { label: "Resolutions",      group: "Diligence",        re: /\bresolutions?\b|\bconsents?\b/i },
-    { label: "Punch list",       group: "Post-closing",     re: /\bpunch lists?\b/i },
-    { label: "Reliance letters", group: "Post-closing",     re: /\breliance letters?\b/i },
-    { label: "Amort & sizing",   group: "Model & analysis", re: /\bamorti[sz]\w*\b|\bsizing\b|\bsculpt\w*\b/i },
-    { label: "Comps",            group: "Model & analysis", re: /\bcomps?\b/i },
-    { label: "Board slides",     group: "Lender materials", re: /\bboard (slides?|deck|presentation)\b/i },
-    { label: "Term sheet",       group: "Lender materials", re: /\bterm sheets?\b/i },
-    { label: "Teaser",           group: "Lender materials", re: /\bteasers?\b/i },
-    { label: "Rating agency",    group: "OM & launch",      re: /\brating agenc(?:y|ies)\b/i },
-    { label: "OM",               group: "OM & launch",      re: /\bOM\b|\boffering memorandum\b/ },
-    { label: "Launch",           group: "OM & launch",      re: /\blaunch(?:es|ing)?\b/i },
-    { label: "Ground lease",     group: "Lease & power",    re: /\bground leases?\b/i },
-    { label: "Power contracts",  group: "Lease & power",    re: /\bppa\b|\bpower (?:contracts?|agreements?)\b/i },
-    { label: "Credit agreement", group: "Documentation",    re: /\bcredit agreements?\b/i },
-    { label: "Structure chart",  group: "Structuring",      re: /\bstructure charts?\b/i },
-    { label: "Insurance",        group: "Scheduling & admin", re: /\binsurance\b/i },
-    { label: "Lease",            group: "Lease & power",    re: /\bleases?\b/i },
-    { label: "Model",            group: "Model & analysis", re: /\bmodels?\b/i },
+    { label: "Permits",          group: "Permits",            re: /\bpermits?\b|\bzoning\b|\bfloodplain\b|\bwastewater\b|\bgrading\b|\bPUCT\b/i },
+    { label: "Appraisal",        group: "Appraisal",          re: /\bvaluations?\b/i },
+    { label: "Punch list",       group: "Appraisal",          re: /\bpunch lists?\b/i },
+    { label: "Reliance letters", group: "Diligence requests", re: /\breliance letters?\b/i },
+    { label: "Amort & sizing",   group: "Bank Outreach",      re: /\bamorti[sz]\w*\b|\bsizing\b|\bsculpt\w*\b/i },
+    { label: "Comps",            group: "Bank Outreach",      re: /\bcomps?\b/i },
+    { label: "Board slides",     group: "Bank Outreach",      re: /\bboard (slides?|deck|presentation)\b/i },
+    { label: "Term sheet",       group: "Bank Outreach",      re: /\bterm sheets?\b/i },
+    { label: "Teaser",           group: "Bank Outreach",      re: /\bteasers?\b/i },
+    { label: "Rating agency",    group: "Bank Outreach",      re: /\brating agenc(?:y|ies)\b/i },
+    { label: "OM",               group: "Bank Outreach",      re: /\bOM\b|\boffering memorandum\b/ },
+    { label: "Launch",           group: "Bank Outreach",      re: /\blaunch(?:es|ing)?\b/i },
+    { label: "Ground lease",     group: "Lease",              re: /\bground leases?\b/i },
+    { label: "Power contracts",  group: "Lease",              re: /\bppa\b|\bpower (?:contracts?|agreements?)\b/i },
+    { label: "Credit agreement", group: "Bank Outreach",      re: /\bcredit agreements?\b/i },
+    { label: "Structure chart",  group: "Diligence requests", re: /\bstructure charts?\b/i },
+    { label: "Insurance",        group: "Diligence requests", re: /\binsurance\b/i },
+    { label: "Lease",            group: "Lease",              re: /\bleases?\b/i },
+    { label: "Model",            group: "Bank Outreach",      re: /\bmodels?\b/i },
     // Generic catch-alls last
     { label: "Diligence",        group: "Diligence",        re: /\bdiligence\b|\bdd\b/i },
-    { label: "Lender email",     group: "Lender materials", re: /\bemails?\b|\boutreach\b/i }
+    { label: "Lender email",     group: "Bank Outreach",      re: /\bemails?\b|\boutreach\b/i }
   ];
 
   var FILLER = [
-    /^(please|kindly|can you|remember to|make sure to|need to|i need to|we need to|to)\s+/i,
+    /^(please|kindly|can you|remember to|make sure to|need to|needs to|i need to|we need to|need|want|to)\s+/i,
     /^(follow up on|follow-up on|check on|look at|look into|circle back on)\s+/i,
     /^(the|a|an)\s+/i
   ];
@@ -870,7 +917,7 @@
       var known = inferWorkstream(lbl);
       return {
         title: lbl + " — " + act,
-        group: known ? known.group : "Other",
+        group: known ? known.group : "Diligence requests",
         summary: "",
         notes: existingNotes || ""
       };
@@ -886,7 +933,7 @@
     var summary = leftover.length > title.length + 4 ? brief(leftover, 52) : "";
     return {
       title: title,
-      group: ws ? ws.group : "Other",
+      group: ws ? ws.group : "Diligence requests",
       summary: summary,
       notes: existingNotes || (leftover.length > title.length + 4 ? leftover : "")
     };
@@ -894,6 +941,21 @@
 
   // Tasks added before the convention existed (or by an older build) get
   // reshaped once, in place, so the board has no odd rows out.
+  function workstreamOf(title) {
+    var i = String(title).indexOf(" \u2014 ");
+    return i < 0 ? "" : title.slice(0, i).toLowerCase();
+  }
+  function findMergeTarget(projectId, title) {
+    var ws = workstreamOf(title);
+    if (!ws) return null;
+    var hits = allTasks().filter(function (t) {
+      return t.projectId === projectId && isOpen(t) && workstreamOf(t.title) === ws;
+    });
+    if (!hits.length) return null;
+    hits.sort(function (a, b) { return (a.due || "9999").localeCompare(b.due || "9999"); });
+    return hits[0];
+  }
+
   function migrateCustom() {
     var changed = false;
     L.custom = (L.custom || []).map(function (t) {
@@ -941,6 +1003,7 @@
       h += '<span class="chip" style="' + st + '">' + lbl + "</span> ";
     }
     if (!d0 && t.priority === "high") h += '<span class="chip" style="background:var(--danger-bg);color:var(--danger-fg)">High</span> ';
+    if (!d0 && t.mergedCount) h += '<span class="chip" style="background:var(--cool-bg);color:var(--cool-fg)">+' + t.mergedCount + " merged</span> ";
     if (!d0 && t.assignee && t.assignee !== "Me") h += '<span class="chip" style="background:var(--cool-bg);color:var(--cool-fg)">' + esc(t.assignee) + "</span> ";
     // `summary` is an authored one-liner; brief() is only the fallback for a
     // task that has not been given one yet.
@@ -1292,7 +1355,7 @@
   document.addEventListener("input", function (ev) {
     // Repaint only the quick-add card so the caret and focus survive each keystroke.
     if (ev.target.id === "qa") {
-      S.qa = ev.target.value;
+      S.qa = ev.target.value; S.qaMsg = "";
       var caret = ev.target.selectionStart;
       var card = document.querySelector(".quickadd");
       if (card) {
