@@ -317,3 +317,17 @@ Released **8/17/26, 11:45 AM ET**. Targeted sweep for bank meetings and call not
 **Flagged:** **Copia** appears in SCB's pipeline rundown, which confirms Copia/Canyon is a live project — still no project card, and still no size or lender identity to build one from. **Project Enigma** and **Project Faraday** remain unexplained. Six names on active project outreach lists still lack cards: NordLB, NBC, ABN AMRO, LBBW, NAB, UniCredit (plus NIBC on Herring and Nordea on Vendace). The dead `AIAssistant` component is still in the file.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright run green — zero console/page errors, zero external requests, **59 lender cards** (was 56), 24 active projects, 14 market entries, **116 notes** (was 101), LC tab totals still tying to the source file, and 7 of 7 Ask routing cases passing including the three new cards. Archived to `tracker/versions/ECX_Tracker_v70.html`.
+
+---
+
+## v71 Changelog (8/17/26) — JPM receipt correction
+
+Released **8/17/26, 12:05 PM ET**. Correction from Aditya, no sweep. Title unchanged.
+
+**JP Morgan did receive the Project Guadalupe package.** v70 flagged the 8/14 send as unconfirmed because Laura had hit delivery problems ("just noticed my email didn't send — having some issues sending to JPM"). Aditya confirmed the package landed and that **Scott Wilcoxen said JPM will come back** with their views. The caveat is removed from both the JP Morgan card note and the Project Austin outreach entry, replaced with confirmed receipt and the pending response against the 8/20 deadline.
+
+**Scott Wilcoxen added as a named contact** — coverage for Guadalupe / AUS10, now the first entry in the JP Morgan `contactDetails` ahead of Jason on the equipment facility. Previously the card recorded him only as "Scott + team" inside a note. No email or phone on file yet.
+
+`lastContact` unchanged at 1/29/26 — the package and Wilcoxen's reply are email traffic, not a call.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright confirms the stamp, the corrected note and outreach text, Wilcoxen as the lead JPM contact, that the old "worth confirming receipt" caveat is gone from the data entirely, and 59 lenders / 24 projects / 116 notes unchanged — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v71.html`.
