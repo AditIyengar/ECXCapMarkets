@@ -362,3 +362,30 @@ The LC columns already present in both tabs were left exactly as they are, since
 **Bug caught by the smoke test and fixed before release:** the new panels referenced `h` (the `React.createElement` alias), which is scoped per tab function rather than global. Both panels threw `ReferenceError: h is not defined` on render and blanked the app. Each panel now declares its own alias. Worth remembering for future panels.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright clicked through **all 10 tabs** with every one rendering (zero console/page errors, zero external requests), both new panels verified present with their figures, and the fee and commitment totals confirmed still tying to the source workbooks. Archived to `tracker/versions/ECX_Tracker_v72.html`.
+
+---
+
+## v73 Changelog (8/17/26) — refresh-stamp time fix
+
+Released **8/17/26, 11:58 AM ET** — and this time the stamp was generated from the clock rather than typed.
+
+**The bug.** Aditya spotted that the header read "Last refreshed 8/17/26, 12:40 PM ET (v72)" while the actual time was 11:57 AM — the stamp was **43 minutes in the future**. Not a one-off: every recent release was stamped ahead of its real release time. Actual release times taken from the git commit timestamps:
+
+| version | stamped | actually released | error |
+|---|---|---|---|
+| v67 | 12:25 PM ET | 12:16 PM ET | +9 min |
+| v68 | 1:05 PM ET | 12:37 PM ET | +28 min |
+| v69 | 10:30 AM ET | 10:16 AM ET | +14 min |
+| v70 | 11:45 AM ET | 11:26 AM ET | +19 min |
+| v71 | 12:05 PM ET | 11:34 AM ET | +31 min |
+| v72 | 12:40 PM ET | 11:52 AM ET | +48 min |
+
+**Root cause.** The clock was read once early in a run, then a rounded-forward guess was typed into `LAST_REFRESH` at edit time instead of re-reading it. The bias always ran forward, and grew with the length of the run.
+
+**Why it mattered beyond cosmetics.** `LAST_REFRESH` is not decorative — `ASK_asOf()` parses it, and every staleness calculation keys off it: the "coldest lender relationships" ranking, the "N months ago" ages on last-contact answers, and the "due today" highlighting on the LC Syndication milestone chips. A stamp in the future silently biases all of them, and a refresh time that has not happened yet undermines trust in the whole page.
+
+**The fix, structural rather than a one-off correction.** The stamp is now produced by the release script from `TZ=America/New_York date` and substituted in programmatically, so it can only ever reflect a real observed clock reading. Publishing lands a minute or two after the stamp is written, which means the stamp now sits very slightly in the **past** — the correct direction for a "last refreshed" label. Verified in the smoke test, which parses the rendered header, compares it against the shell clock, and fails if the delta is positive.
+
+**Not rewritten:** the stamps inside `tracker/versions/ECX_Tracker_v67.html` through `v72.html`. Those are snapshots of what actually shipped, and editing them would falsify the archive. The table above is the correction of record; the git commit timestamps are authoritative for when each version really went out.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright confirms the rendered header matches `LAST_REFRESH`, the stamp is **1 minute behind** the real clock rather than ahead, `ASK_asOf()` still resolves to 8/17/26 and the staleness math continues to work — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v73.html`.
