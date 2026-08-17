@@ -331,3 +331,34 @@ Released **8/17/26, 12:05 PM ET**. Correction from Aditya, no sweep. Title uncha
 `lastContact` unchanged at 1/29/26 — the package and Wilcoxen's reply are email traffic, not a call.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright confirms the stamp, the corrected note and outreach text, Wilcoxen as the lead JPM contact, that the old "worth confirming receipt" caveat is gone from the data entirely, and 59 lenders / 24 projects / 116 notes unchanged — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v71.html`.
+
+---
+
+## v72 Changelog (8/17/26) — source-file cross-check + LC items on the Fees and Commitments tabs
+
+Released **8/17/26, 12:40 PM ET**. Aditya supplied the two source workbooks for verification. Title unchanged.
+
+### Cross-check result: both files tie out, zero mismatches
+
+**Lender fees — `Lender_Fees_Summary_7.21.26_VF.xlsx`.** Compared cell by cell: **57 bank rows on both sides**, 14 deal columns for 2025 and 8 for 2026 in **identical order**, and **zero value mismatches** across every cell. Totals tie to the file's "By Deal & Year Total" row: 2025 $103,576,093.83, 2026 $155,924,007.40, combined $259,500,101.23. Bank-name aliases all resolved (OCBC ↔ Oversea-Chinese Banking Corporation Limited, Credit Agricole CIB ↔ Crédit Agricole Corporate and Investment Bank, PKO ↔ Powszechna Kasa Oszczednosci, ANZ ↔ Australia and New Zealand Banking Group, and the two separate Principal Insurance Company rows for Shiner I and II).
+
+**Lender commitments — `EdgeConneX_Commitments_Q2.2026_VF.xlsx`.** **22 facility columns in identical order**, **123 bank rows on both sides**, **zero value mismatches**. Grand total $24,793,471,107 in the file versus $24,793,471,113 in the tracker — a **$6 difference**, purely from the tracker storing whole dollars. Every bank in the file is represented and no tracker row is absent from the file.
+
+**Two provenance findings, both now recorded in the UI:**
+
+1. **The commitments citation was pointing at a superseded filename.** The tracker cited `EdgeConneX Commitments (07.17.2026).xlsx`; the current file is `EdgeConneX_Commitments_Q2.2026_VF.xlsx`. The data is equivalent, so this is the same dataset under the Q2 name — `asOf 6/30/2026` is consistent. Source updated, with a note that it supersedes the earlier filename.
+2. **The Q2 workbook has no Backleverage column.** The Blackstone −$600m / Morgan Stanley +$600m backleverage badges therefore cannot be verified against this file — they carry over from the prior version. Disclosed in the commitments footer rather than left implicit. Note this does not affect any total: both banks' gross commitments match the file exactly (Blackstone $1.75bn across Leroy and Walleye), and the badges were already excluded from headline totals.
+
+Both tab footers now carry a dated verification line stating what was checked and what was found.
+
+### LC items added to both tabs
+
+**Commitments tab — "LC Syndication pipeline" panel.** All 17 active Project Liverpool names with participation, probability, probability-weighted amount, fronting and timing, sorted by weighted amount, with a totals row ($2,250m participation, $1,632.5m weighted, $1,800m fronting). Each row also shows that bank's **booked LC's commitment from the commitments workbook** alongside its syndication ticket, so the incremental ask is visible next to existing exposure. The panel sits **outside** the main table and is labelled as not part of the committed book, so nothing in it can move a total that ties to the source file's Grand Total row.
+
+**Fees tab — "LC facility fees booked to date" panel.** Rolls up the six LC columns already in the table (SMBC LC Facilities, BBVA / SMBC / SCB / NTX LC Facility, and Rabo LC upfront in 2026) which are easy to miss spread across two year blocks. Same figures, same source, nothing added: **SMBC $250,000** and **Cooperatieve Rabobank U.A. $300,000**, total **$550,000**. The panel states plainly that the $2.5bn syndicated facility has **no fees booked yet** — CLA commitments were due 10 Aug and JLA 17 Aug 2026 — and points at the LC Syndication tab for its economics.
+
+The LC columns already present in both tabs were left exactly as they are, since they tie to the source files.
+
+**Bug caught by the smoke test and fixed before release:** the new panels referenced `h` (the `React.createElement` alias), which is scoped per tab function rather than global. Both panels threw `ReferenceError: h is not defined` on render and blanked the app. Each panel now declares its own alias. Worth remembering for future panels.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright clicked through **all 10 tabs** with every one rendering (zero console/page errors, zero external requests), both new panels verified present with their figures, and the fee and commitment totals confirmed still tying to the source workbooks. Archived to `tracker/versions/ECX_Tracker_v72.html`.
