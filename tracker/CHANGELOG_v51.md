@@ -271,3 +271,49 @@ Released **8/11/26, 10:30 AM ET**. Sweep window: mailbox-wide since the v67 data
 **Flagged:** **Project Enigma** and **Project Faraday** appear in EQT's covenant question but exist nowhere in the tracker — most likely other EQT portfolio financings rather than ECX deals, so no cards were created. **Project Canyon** (Copia Bridge) still has an executed commitment letter and a first Credit Agreement draft with no project card. Barclays, NordLB and Wells Fargo still have no lender cards, and the dead `AIAssistant` component is still in the file.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright run green — zero console/page errors, zero external requests, 56 lenders / 24 active / 18 closed, note count up from 96 to 101, LC tab totals still tying to the source ($2,250m / $1,632.5m / $1,800m), and 11 of 11 Ask routing cases passing. Archived to `tracker/versions/ECX_Tracker_v69.html`.
+
+---
+
+## v70 Changelog (8/17/26) — call-notes sweep
+
+Released **8/17/26, 11:45 AM ET**. Targeted sweep for bank meetings and call notes rather than a date-window pass: free-text searches across the mailbox plus the "Bank Meetings" folder read unfiltered. This closed a six-day gap (8/12–8/17) that included five substantive call notes. Title unchanged.
+
+**⚑ Project Guadalupe is the external codename for the AUS10 raise.** Laura pitched it to Citi and JPM as "a 672MW IT project with an IG hyperscaler in Austin, TX with a combined behind-the-meter solution (together with a local partner) and outlook to grid connection" — with the **AUS10 financial model** attached, which is what ties the two together. Recorded as the codename on the existing Project Austin card rather than as a new project, matching the Ashville→Scioto and LC→Liverpool pattern. **Flagged, not silently reconciled:** the 672MW single-IG-hyperscaler framing does not match the card's 650MW committed + 350MW reserved multi-customer view. Someone should confirm which is current.
+
+**AUS10 / Guadalupe lender feedback — six calls, folded onto each card and synthesised on the project.** The consensus: banks want a **dual structure**, an HY or IG bond alongside PF, either from the start or as a bridge into it, with DC and EC financed together and a HoldCo/OpCo combination open if priced right.
+
+- **ING** — a DDTL is the best solution: dual track, bond for near-term buildings, DDTL for later-funding buildings to avoid carry. Has not done a BTM deal yet.
+- **Mizuho** — 6–8 lender club, 18 months + 6-month extension, 144A or USPP takeout; likely too large for USPP given project-on-project and construction risk, so building-by-building takeout with a condo structure is possible. Institutional tranches fit. Prefers a two-tiered CLA.
+- **RBC** and **BNP** — bond structures live, both still working internally.
+- **Santander** — bank facility alongside an IG or HY bond, PF-focused, joint approach. Asked for their read on the QTS/MSFT precedent.
+- **Barclays** — Laura's read: "nothing in particular, very similar to other calls."
+
+`lastContact` and `lastFundraisingCall` moved to 8/14/26 for all six (the calls ran in the week of 8/10–8/14; the consolidated summary is dated 8/17).
+
+**Deutsche Bank — 8/14 call, the most substantive of the sweep.** Five DB people across coverage, private credit infra, balance-sheet lending, digital infra and capital markets. **⚑ Ashville unwrapped would price in the mid 5s**, supported by equity capital from the wrapped piece — the first hard bank pricing datapoint on that trade. No market standard for credit enhancements; a credit wrap is best; Broadcom is very clean and DB can work with less clean. Non-IG tenants need lookthrough to the end tenant, with the preferred construct an MOU whereby CoreWeave drops the contract into an IG-rated SPV. DB has done more CoreWeave deals than any bank. APAC: Chinese hyperscalers ~25bps over US, free transferability rights won't work, leverage 8.5–9.5x vs 10–10.5x in the US, and **DB expects multiple project bonds in the next six months, at least one Malaysia and one Thailand**. Very active in bridge capital, HoldCo capital and APAC. Joe proposed DB for the 10yr Alibaba deal and the India discussions. `lastContact` → 8/14/26.
+
+**Standard Chartered — 8/13 lunch with Sri (now global head of digital infra) and Chloe.** Very bullish, willing to step into more exotic structures. **⚑ Liverpool: SCB is looking to come in for $200m**, can do more fronting and more again if allowed to backleverage with other banks, with voting rights staying with them — the v8.06 syndication tracker still shows SCB at 15% with no ticket, so this supersedes it. Also: eager on India given the ECX and Adani relationships; excited by Walleye-style BTM combinations; and actively exploring lending beyond regular hyperscalers with CEO-level support — Anthropic (needs financials, also working their RCF), OpenAI (bullish via SoftBank), Mistral (sovereign play), Chinese hyperscalers. SCB to revert on Liverpool backleverage/voting and on backleverage capability for **Ashville II**. Laura wants SCB in a lead role on Guadalupe, Walleye II, Tarpon II or the Ashville bond. `lastContact` → 8/13/26.
+
+**Blackstone — the Leroy upsize call happened on 8/12.** Laura, straight afterwards: "Thank you for the call earlier today", with a draft report sent that still needs updating. Intercompany balances for the Leroy entities followed on 8/14 as part of the upsizing and reshuffle. `lastContact` → 8/12/26, the first documented Leroy conversation since January.
+
+**Three new lender cards — all three built from documented calls, closing flagged gaps.**
+
+- **Bank of America** (new) — declined the LC facility, and the reasoning is now captured: no LC facility experience, less favourable capital treatment for US banks, unclear where it sits in the capital structure or how it leads to take-outs, and ECX interest coverage insufficient on their measure. Laura: "BOA really can't do anything — only devco." **⚑ She raised an open strategic question: should another bank become ECX's key cash-management provider, one that treats it as a genuine cross-sell?**
+- **Barclays** (new) — AUS10 feedback, plus the $200m LC facility line and the Ashville 1 Tier II invite. No named contacts on file yet.
+- **Wells Fargo** (new) — **⚑ the clearest approvals bottleneck in the group.** Still struggling with approvals on AUS10; a meeting is to be set with WF's risk team and Joe Harar to build internal support. Also struggling with internal capital allocation on the $100m LC facility line.
+
+**Also captured:** Citi invited into Guadalupe 8/13 (Benjamin Mortimer, Raimund Riedl) with **views and appetite requested by Thursday 8/20**; JPM invited 8/14, with a delivery problem worth confirming ("just noticed my email didn't send — having some issues sending to JPM"); GS model exchange 8/13 with RAP and model to follow and a call early the following week; and a Morgan Stanley meeting planned for Monday 8/17.
+
+**Project Austin outreach rebuilt** to 24 banks with each bank's actual feedback position, including three additions (Citi, Nomura, SCB) and the flag that **CIBC, NordLB, Truist, Rabobank and SCB never received the presentation** — LG proposes not to send, while still rating them CLA candidates.
+
+**Corrections to earlier entries.** The Ashville 2 financing-options call ran on **8/13**, not 8/11 as v69 recorded — A&O reissued the invite and Dorina Yessios followed up the same afternoon with "thank you for your time today". Fixed.
+
+**LC Syndication tab — a "developments since this snapshot" panel.** The v8.06 table is left exactly as transcribed; the SCB $200m target and the Bank of America decline reasoning are surfaced in a separate panel above the lockstep check, along with a note that the CLA (10 Aug) and JLA (17 Aug) commitment dates are now at or past due.
+
+**New market-intelligence entry (8/17)** consolidating the structural feedback, market conditions (spreads wider; three months of increasing dual-tracking; **BTM premium compressed as a concern, with comfort now hinging on lease protections for power delay**; heavy Meta paper; deal size the recurring constraint), the precedents in play (Nexus as Mizuho's and RBC's anchor comp, Walleye on risk allocation, QTS/MSFT for public issuance without lease disclosure, plus the Equinix secured bond case study circulated 8/17), DB's pricing and credit views, the APAC read and SCB's customer appetite.
+
+**Excluded:** the ECX Bond offering-memorandum drafting and KPMG diligence scheduling, bond acreage and ground-lease work, EHS wording, A&O resolutions, the EQT equity commitment letter drafting thread, Ashville EC updates, Turntown report edits, Google valuation inputs, construction and PM reports, and the Q2 CFO deck — workstream traffic, not bank conversations.
+
+**Flagged:** **Copia** appears in SCB's pipeline rundown, which confirms Copia/Canyon is a live project — still no project card, and still no size or lender identity to build one from. **Project Enigma** and **Project Faraday** remain unexplained. Six names on active project outreach lists still lack cards: NordLB, NBC, ABN AMRO, LBBW, NAB, UniCredit (plus NIBC on Herring and Nordea on Vendace). The dead `AIAssistant` component is still in the file.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright run green — zero console/page errors, zero external requests, **59 lender cards** (was 56), 24 active projects, 14 market entries, **116 notes** (was 101), LC tab totals still tying to the source file, and 7 of 7 Ask routing cases passing including the three new cards. Archived to `tracker/versions/ECX_Tracker_v70.html`.
