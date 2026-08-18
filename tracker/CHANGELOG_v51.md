@@ -495,3 +495,27 @@ v70 flagged the mismatch rather than picking a side, which meant the description
 **Untouched:** the 350MW and 1,000MW figures that belong to other things — Hyderabad (MSFT, ~350MW) on the ACX card and the NScale 500–1,000MW line in the neocloud comparables. Also unchanged: $6.4bn DC finance size, $3.18bn EC finance size, the tenant list, and the 25-bank outreach list.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright confirms the card resolves as Project Guadalupe with `DC Capacity = 672MW IT`, the description headline reading 672MW IT with no stray 650 read, 4 rendered occurrences of 672MW on the expanded card and the single remaining rendered 1,000MW being the labelled history sentence, 25 banks still on the outreach list, and the stamp level with the real clock — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v76.html`.
+
+---
+
+## v77 Changelog (8/18/26) — 650 references removed entirely
+
+Released **8/18/26, 12:07 PM ET**. Per Aditya, following v76: remove the 650 references entirely.
+
+v76 kept three labelled-as-superseded mentions of the old capacity read on the reasoning that a silently swapped headline number is hard to audit. Aditya's call is the other way: the old figure is simply wrong and does not belong in the tracker. All three are gone.
+
+| where | v76 | v77 |
+|---|---|---|
+| card description | "⚡ CAPACITY RESOLVED 8/18/26: … previously carried a second read of 650MW committed + 350MW reserved = 1,000MW total site, inherited from the March 2026 pipeline file …" | removed |
+| `BUDGET_PIPELINE` row 12 status | "672MW IT (was recorded as 650MW committed + 350MW reserved until 8/18/26)." | "672MW IT." |
+| `PipelineNotesTab` Austin Campus point | "672MW IT — the figure of record from 8/18/26 (earlier note here read 650MW approved by Microsoft + 350MW reservation = 1,000MW)." | "672MW IT." |
+
+A fourth line went with them: with the retired read deleted, the sentence "Capacity is 672MW IT throughout — the figure every lender has been shown since the 8/13/26 distribution" was left restating what the headline and the lender pitch quote already said twice, so it was cut too. The description now states 672MW IT once in the headline and once inside the verbatim pitch line, and nothing else.
+
+**Verification was widened rather than eyeballed.** The smoke test now walks every string and number in the whole data layer — `PROJECTS`, `LENDERS`, `CLOSED_PROJECTS`, `BOND_MARKET_NOTES`, `LC_SYND`, `LENDER_COMMITS`, `LENDER_FEES`, `CAPTABLE_ACTUALS`, `LC_SURETY_DATA` — to depth 6, flagging any `650MW`, any bare numeric `650`, any "350MW reserved" and any "1,000MW total". Result: **zero hits**. On the rendered page with the card expanded, `650` appears zero times and `1,000MW` zero times, while `672MW` appears twice.
+
+**Still untouched, because they are different records:** Hyderabad (MSFT, ~350MW) on the ACX Marvel III / Atlas card, and the NScale "500–1,000MW leased/built" line in the neocloud comparables. Neither has anything to do with Guadalupe capacity.
+
+**The audit trail moved rather than vanished.** What the card used to say is recorded in this changelog and in `tracker/versions/ECX_Tracker_v70.html` through `v76.html`, which are untouched snapshots. The live tracker now carries one capacity figure and no history of the other.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright confirms `DC Capacity = 672MW IT`, a clean description headline, zero 650-shaped values anywhere in the data layer, zero rendered `650` or `1,000MW`, 25 banks still on the outreach list, and the stamp 1 minute behind the real clock — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v77.html`.
