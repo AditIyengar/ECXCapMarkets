@@ -389,3 +389,51 @@ Released **8/17/26, 11:58 AM ET** — and this time the stamp was generated from
 **Not rewritten:** the stamps inside `tracker/versions/ECX_Tracker_v67.html` through `v72.html`. Those are snapshots of what actually shipped, and editing them would falsify the archive. The table above is the correction of record; the git commit timestamps are authoritative for when each version really went out.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright confirms the rendered header matches `LAST_REFRESH`, the stamp is **1 minute behind** the real clock rather than ahead, `ASK_asOf()` still resolves to 8/17/26 and the staleness math continues to work — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v73.html`.
+
+---
+
+## v74 Changelog (8/18/26) — 8/18 Outlook sweep: FAB card, Ashville 2 private-credit call, Guadalupe two days from the deadline
+
+Released **8/18/26, 11:46 AM ET** — stamp generated from `TZ=America/New_York date` per the v73 fix; the smoke test confirms it sits 1 minute behind the real clock.
+
+### New lender card — FAB (First Abu Dhabi Bank), lender #60
+
+The first full introductory call ran **18 Aug 2026** with **Sherzad Desai (Head of TMT), Kershel Pietersz (Head of Telecom) and Hicham (Trade Finance)**; the NDA was fully executed 17 Aug, so information sharing can now start. Card created with `status: dialogue`, `lastContact: 8/18/26` (a documented call, per the convention) and three notes covering the 8/18 call, the 8/17 "Heads up to non-CLAs" thread and Chris Wenger's 8/13–14 relationship read.
+
+What the call produced:
+
+- **Capital**: initial pool of **USD 750m available for ECX**, ACX bookable separately. OpCo tickets USD 50–200m in APAC, **up to USD 750m–1bn in the US**; Europe TBC. FAB can also provide back leverage.
+- **LC facility**: FAB recently completed a **$2bn guarantee facility for another DC platform** and wants in on Liverpool for **both financial and performance LCs**. Hicham leads. Eelco Holst: "we should push them for a high Liverpool ticket."
+- **Counterparty appetite**: big appetite for IG+ US tenants; comfortable with **Alibaba, Tencent, ByteDance**; limited appetite for Oracle but limits available; no neocloud mandate yet, though **exploring a relationship with Anthropic** ("trying to get comfortable… but have not done anything yet").
+- **Pipeline**: FAB itself selected **Salar, the AUS10 series and Liverpool** for invitation. Laura Godschalx directed FAB be treated like Barclays on information flow — project update in ~2–3 weeks — and added to the list asked to share financials. Eelco's open question, recorded as such: whether and how to give FAB a look at Ashville 2.
+
+FAB added to the outreach lists for **Project Austin (AUS10 / Guadalupe)**, **Project Salar — Norway & Finland** and **LC Facilities (Liverpool)**, and to **Ashville 2** as an explicit open question rather than an invitee. Ask-tab alias added so "FAB" and "First Abu Dhabi Bank" both resolve to the card.
+
+### Project Scioto — Ashville 2: private credit vs syndicated, the counsel view
+
+Folded in the **A&O Shearman and Davis Polk call summary** (notes by Rithika Nistala, circulated 8/17):
+
+- **A&O Shearman** (Dorina Yessios, Jeff Pellegrino, Gordon Mak, Peter Tolson) — private credit gives more leverage and delayed-draw flexibility than a syndicated TLB but tighter covenants and stricter call premiums (1–2 years). Comps: Arc Data Centers / Carlyle (GS-led), Doral Renewables, Evocation / Crestline. PC lenders are restricting liability-management transactions and some now require ratings. ⚑ **Austin's BTM tolling arrangement flagged as a potential complication.**
+- **Davis Polk** (David Penna, Costanza Garcia Laposse, John Runne) — run **1–2 HY quotes as a pricing benchmark**. Large PC lenders run these out of their RE groups, so docs look like traditional RE financing early and loosen post-close. Asset-plus-HoldCo has precedent (Switch, Rowan, Databank, Edged); standalone-asset HoldCo does not. Counsel ranking recorded verbatim — great: Milbank, Kirkland, Blackstone; good: Simpson, Paul Weiss; Blue Owl in the middle; not great: Cahill. Upfront rent can fund equity if the tenant signs early (up to $500m seen). ⚑ **No Google backstop means no step-in rights** — DP will review change-of-control / ROFO and lease language pre-execution at no cost. Total debt quantum ~$3.5bn.
+
+Also captured: Laura circulated the proposed investor list to Johan Hylander (EQT) on 8/18 suggesting **Ares and Oaktree** be added, and SCB was added to the outreach list for the backleverage offer already described in the card text.
+
+### Project Austin / Guadalupe — two days before the 8/20 appetite deadline
+
+- **Citi** is engaging hardest of any invitee: Ben Mortimer confirmed receipt 8/18 and asked for a same-day window; the call landed in the afternoon and Citi put **thirteen** people on the invite. `lastContact` → 8/18/26.
+- **BNP** returned a **formal written Q&A** on 8/17 after the 8/14 call — lease structure and tenant rating, early-termination fee schedule, risk allocation versus Walleye, what the ECX energy-centre guarantee covers, the customer buyout right, gas-lateral completion risk, the age of the Hull Street GE 7FA turbines, the Texas governor decision, whether the air permit comes before closing, why BCEI rather than ECX owns the EC, why Phase 2 costs more per MW, no cross-collateralisation between EC and DC, Hull Street outside the EC perimeter, and whether bond structures would be considered at closing.
+- **Natixis** asked for lease and tolling detail for structuring (Pim Rothweiler), then Bobby Luo's four structuring questions on pass-through mechanics, the intercompany power contract, the FCSA counterparties and Hull Street's post-operational role. ⚑ **Amaury Chastan is out on mandatory block leave until 31 August** — James Kaiser is backup.
+- **MUFG** cancelled the 8/18 DCM market-update call; substance moves to **Thursday 2pm**.
+- **Wells Fargo's** 180-day cure question answered: per lease, i.e. per building, no cross-defaults — RFS with temporary power cancels out only the affected building.
+- **Project milestone**: the **AUS11 / AUS12 generation permit was issued and approved 8/18**. Austin campus Phase 1 ESA and geotech reliance letters being collected for DD.
+
+### Bond & Market Intelligence — two new entries (14 → 16)
+
+- **8/18/26 — open energy-centre permits are now a market focus.** Davis Polk relayed that Cahill has told them **Morgan Stanley is fielding investor questions on the EC permit process**, because outstanding open permits have drawn heavy market focus on recent transactions. Cahill wants to walk the process; D&W runs point, so Chris and team may join. Flagged as an underwriter-side diligence and disclosure item rather than a project problem — and it lands the same week the AUS11/12 permit was approved, which helps that conversation.
+- **8/17/26 — non-CLA outreach list for Austin.** Laura's call list (Bank of China $400m, KDB $250m, ICBC large tickets, Bank of Baroda $200m and a potential Liverpool back-leverage role for SCB, plus UOB, Clifford, Shinhan, Huntington, NordLB, KfW, LBBW, Lloyds, Scotia, Principal, PGIM, NAB Institutional, Apollo, Blackstone), Sander's APAC additions (DBS at $100m+ on Metropolis/Atlas, Sinopac, UOB, Woori, Clifford, FAB — and the OCBC question), and Marjolein's European read (NatWest keen on a larger Walleye ticket, Intesa capacity-constrained on DC, Sabadell max $75m, NAB not comfortable with energy centres on ESG grounds, ANZ unclear in the US, offer to test Nordea and SEB). ⚑ Sixteen of these names still have no lender card.
+
+### Not done, deliberately
+
+Pure workstream document traffic was left out per the standing convention: the Leroy Exhibit A upsize drafts, the K&S IC-loan punchlist, the Bastrop FCSA redline, the AdaniConneX JVA guarantee release, the Hithium MSA / AUS11-12 purchase orders and the Ashville 1 NOI-margin definition thread. Counsel and advisory firms (A&O Shearman, Davis Polk, King & Spalding, Cahill) still get no lender cards — their input lives in the project descriptions and market feed.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright confirms 60 lender cards, 24 active projects, 18 closed, 16 market notes, FAB present with 3 notes on all four project lists, the rendered header matching `LAST_REFRESH` and sitting **1 minute behind** the real clock, and 12/12 Ask-tab routing cases resolving correctly (including "Guadalupe" and "Liverpool" as codenames, and "Project Leroy (Blackstone)" still landing on the closed deal rather than the Blackstone card) — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v74.html`.
