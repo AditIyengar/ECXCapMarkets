@@ -465,3 +465,33 @@ The tracker had been running a split identity — the card was titled "Project A
 **Deliberately not renamed:** anything where "Austin" means the place or the asset rather than this financing — `Google JV — Austin / Atlanta` (a separate card), "Austin Campus (McNair/Herndon)" in the Leroy borrowing-base description, "BCEI owns Austin energy center", the AUS10 / AUS11 / AUS12 building references, and the Austin campus DD and permitting threads. Renaming those would have made the tracker wrong in the other direction.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright confirms exactly **1 card named Project Guadalupe and 0 named Project Austin**, all 24 lender cross-links pointing at the new name, 25 banks on the outreach list, every one of the 10 tabs rendering, 12/12 Ask routing cases correct, and the stamp 3 minutes behind the real clock — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v75.html`.
+
+---
+
+## v76 Changelog (8/18/26) — Project Guadalupe capacity is 672MW everywhere
+
+Released **8/18/26, 12:03 PM ET**. Per Aditya: 672 everywhere. The reconciliation flag raised in v70 is now closed.
+
+The card had been carrying two incompatible capacity reads at once:
+
+- **672MW IT** — the figure in every piece of outbound material since the 8/13/26 distribution, and the one quoted verbatim in the Goldman Sachs, JP Morgan and Morgan Stanley notes ("a 672MW IT project with an IG hyperscaler in Austin, TX…"), plus the 6-lease structure note ("672MW total, one entity, one power contract").
+- **650MW committed + 350MW reserved = 1,000MW total site** — inherited from the March 2026 pipeline file and the EQT debt overview, and never updated.
+
+v70 flagged the mismatch rather than picking a side, which meant the description contradicted itself and the teaser panel showed a number no lender had seen. 672MW IT is now the figure of record in all six places that carried a capacity number:
+
+| where | before | after |
+|---|---|---|
+| card description headline | `650MW committed + 350MW reserved = 1,000MW` | **`672MW IT`** |
+| teaser `DC Capacity` metric | `650MW committed + 350MW reserved = 1,000MW total site` | **`672MW IT`** |
+| reconciliation paragraph | "worth reconciling" | ⚡ CAPACITY RESOLVED 8/18/26, with the retired read recorded |
+| `BUDGET_PIPELINE` row 12 `mw` | `650.0` | `672.0` |
+| `BUDGET_PIPELINE` row 12 status | `650MW committed + 350MW reserved` | `672MW IT (was recorded as … until 8/18/26)` |
+| `PipelineNotesTab` Austin Campus point | `650MW approved by Microsoft + 350MW reservation` | `672MW IT — the figure of record from 8/18/26 (earlier note read …)` |
+
+**The old read is retired, not erased.** Three mentions of 650MW survive, all of them explicitly labelled as superseded history — one in the resolution paragraph, two inline in the pipeline blocks. A tracker that silently swaps a headline number leaves anyone who saw the old one with no way to tell whether it changed or they misread it, so each site says what it used to say and when it changed.
+
+**Two of the six sites live on unreachable tabs.** `BUDGET_PIPELINE` (inside `FinancingPipelineTab`) and the Austin Campus points (inside `PipelineNotesTab`) are only rendered when `activeTab` is `pipeline` or `pipeline_notes`, and neither key appears in `TABS` — so nothing in the UI can reach them today. They were updated anyway: they are data, and leaving a stale 650 behind a disabled tab is exactly how a wrong number comes back when someone re-enables it.
+
+**Untouched:** the 350MW and 1,000MW figures that belong to other things — Hyderabad (MSFT, ~350MW) on the ACX card and the NScale 500–1,000MW line in the neocloud comparables. Also unchanged: $6.4bn DC finance size, $3.18bn EC finance size, the tenant list, and the 25-bank outreach list.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright confirms the card resolves as Project Guadalupe with `DC Capacity = 672MW IT`, the description headline reading 672MW IT with no stray 650 read, 4 rendered occurrences of 672MW on the expanded card and the single remaining rendered 1,000MW being the labelled history sentence, 25 banks still on the outreach list, and the stamp level with the real clock — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v76.html`.
