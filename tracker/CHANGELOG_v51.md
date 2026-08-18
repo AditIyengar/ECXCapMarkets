@@ -437,3 +437,31 @@ Also captured: Laura circulated the proposed investor list to Johan Hylander (EQ
 Pure workstream document traffic was left out per the standing convention: the Leroy Exhibit A upsize drafts, the K&S IC-loan punchlist, the Bastrop FCSA redline, the AdaniConneX JVA guarantee release, the Hithium MSA / AUS11-12 purchase orders and the Ashville 1 NOI-margin definition thread. Counsel and advisory firms (A&O Shearman, Davis Polk, King & Spalding, Cahill) still get no lender cards — their input lives in the project descriptions and market feed.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright confirms 60 lender cards, 24 active projects, 18 closed, 16 market notes, FAB present with 3 notes on all four project lists, the rendered header matching `LAST_REFRESH` and sitting **1 minute behind** the real clock, and 12/12 Ask-tab routing cases resolving correctly (including "Guadalupe" and "Liverpool" as codenames, and "Project Leroy (Blackstone)" still landing on the closed deal rather than the Blackstone card) — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v74.html`.
+
+---
+
+## v75 Changelog (8/18/26) — Project Austin renamed to Project Guadalupe across the board
+
+Released **8/18/26, 11:55 AM ET**. Per Aditya: the card carries the name lenders actually see.
+
+The tracker had been running a split identity — the card was titled "Project Austin" while every piece of outbound material, every bank thread and every lender note called the same financing **Project Guadalupe**. That split is now closed. Sixteen `Project Austin` references were repointed, plus two Austin-named project keys that had drifted:
+
+| where | before | after |
+|---|---|---|
+| `PROJECTS` card title | `Project Austin` | **`Project Guadalupe`** |
+| lender-card `projects` keys | `"Project Austin"` × 5 | `"Project Guadalupe"` |
+| OHA card | `"Project Austin (GPU/HY)"` | `"Project Guadalupe (GPU/HY)"` |
+| SMBC card | `"Austin PF"` | `"Project Guadalupe"` (old label noted inline) |
+| `BUDGET_PIPELINE` row 12 | `property: "Project Austin"` | `property: "Project Guadalupe"` |
+| `ASK_CODE_MAP` | `aus10 / aus 10 / austin campus` → Project Austin | all → **Project Guadalupe** |
+| lender note prose | "the AUS10 (Project Austin) outreach list" × 3 | "the AUS10 (Project Guadalupe) outreach list" |
+| Leroy II card | "standalone $6.4bn Project Austin campus PF" | "…Project Guadalupe campus PF (separate card, formerly titled Project Austin)" |
+| `ASK_EXAMPLES` | "Which banks are on Project Austin?" | "Which banks are on Project Guadalupe?" |
+
+**Ask tab widened rather than narrowed.** Renaming a card normally breaks every query that used the old name, so `ASK_CODE_MAP` gained `guadalupe`, `austin`, `project austin`, `aus10 series`, `aus 10 series` and `austin 10 series` alongside the existing `aus10`, `aus 10` and `austin campus`. All eight spellings now land on the same card — verified: `Project Guadalupe`, `Guadalupe`, `Project Austin`, `Austin`, `AUS10` and `austin campus` all resolve to "Project Guadalupe — 25 banks on the outreach list", and "who is leading Guadalupe" returns Goldman Sachs. Before this change, bare "Guadalupe" and "Liverpool" fell through to keyword search and landed on a lender note rather than the project.
+
+**The codename banner was inverted, not deleted.** The description previously read "⚑ EXTERNAL CODENAME: PROJECT GUADALUPE". It now records the rename itself — that the card was titled Project Austin until 8/18/26, that AUS10 series / Austin Campus 10-series remains the internal shorthand, and that the Ask tab still answers to the old names. The 672MW single-IG-hyperscaler versus 650MW committed + 350MW reserved multi-customer discrepancy flagged in v70 is untouched and still open.
+
+**Deliberately not renamed:** anything where "Austin" means the place or the asset rather than this financing — `Google JV — Austin / Atlanta` (a separate card), "Austin Campus (McNair/Herndon)" in the Leroy borrowing-base description, "BCEI owns Austin energy center", the AUS10 / AUS11 / AUS12 building references, and the Austin campus DD and permitting threads. Renaming those would have made the tracker wrong in the other direction.
+
+QC: all 5 script blocks pass `node --check`; offline Playwright confirms exactly **1 card named Project Guadalupe and 0 named Project Austin**, all 24 lender cross-links pointing at the new name, 25 banks on the outreach list, every one of the 10 tabs rendering, 12/12 Ask routing cases correct, and the stamp 3 minutes behind the real clock — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v75.html`.
