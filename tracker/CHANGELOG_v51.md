@@ -519,3 +519,48 @@ A fourth line went with them: with the retired read deleted, the sentence "Capac
 **The audit trail moved rather than vanished.** What the card used to say is recorded in this changelog and in `tracker/versions/ECX_Tracker_v70.html` through `v76.html`, which are untouched snapshots. The live tracker now carries one capacity figure and no history of the other.
 
 QC: all 5 script blocks pass `node --check`; offline Playwright confirms `DC Capacity = 672MW IT`, a clean description headline, zero 650-shaped values anywhere in the data layer, zero rendered `650` or `1,000MW`, 25 banks still on the outreach list, and the stamp 1 minute behind the real clock — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v77.html`.
+
+---
+
+## v78 Changelog (8/20/26) — Chris Wenger's Q2 commitments file becomes the source of truth; two banks un-double-counted
+
+Released **8/20/26, 2:59 PM ET**. Aditya: MUFG's Walleye looks outdated, same for NTX and Vendace looks off, Chris's Q2 lender commitment file should be gospel, and don't double count banks by keeping both the full name and the acronym.
+
+All three were right, and the first two turned out to be symptoms of a systemic problem.
+
+### The tracker was carrying two parallel commitment datasets
+
+`LENDER_COMMITS` (the Lender Commitments tab) had already been reconciled to `EdgeConneX_Commitments_Q2.2026_VF.xlsx` in v72 and still ties to it exactly — 123 rows × 22 facilities, zero mismatches, grand total $24,793.5m. But every lender card also carried a hand-maintained `existingFacilities` block, and **only 4 of the 31 comparable cards agreed with the file.** That second dataset is not cosmetic: it drives the "🏦 Existing · N" badge, the `commit` and facility counts in `LENDER_STATS`, and the per-bank breakdown under every facility on the Global Cap Table.
+
+**The Walleye error Aditya spotted, traced.** MUFG and Natixis both claimed **$614.8m** on Walleye. That figure is real, but it is *SocGen's* commitment at the 4/9/26 close — 20% of the $3,074.2m facility, still recorded verbatim in SocGen's own card text — and it had been copied onto other cards as though each bank held it. Post-syndication, SocGen, Natixis, MUFG and SMBC each hold exactly $111,842,213.73. Restating MUFG and Natixis removes **$1,006m of phantom Walleye commitment** from the tracker.
+
+**The Vendace error, traced.** Natixis's card claimed **Vendace $378.4m**. Natixis has no Vendace commitment at all — Vendace is SocGen ($428.7m, Left Lead Arranger and Admin Agent), CACIB ($114.3m) and Goldman Sachs ($305.4m), which sum to the facility's $857.4m. What the card was *missing* was Natixis's **Beluga at $369.8m** — close enough to $378.4m that it reads as one number filed against the wrong facility. Natixis's LC Facility was also understated at $163m against $300m, which is the figure that matches its role as a Liverpool JLA and fronting bank.
+
+### The fix: cards are now generated from the file
+
+Rather than patch the two cards Aditya named, all **37 cards with a row in Chris's file were regenerated from it**, so the cards and the Commitments tab cannot drift apart again. Eight cards gained a facilities block they never had (Apollo, Apterra, Bank of America, Barclays, ICBC, RBC, TD Securities, Wells Fargo) and ING Bank went from 3 facilities to 12. Card-side role and colour text was preserved but stripped of stale figures — SocGen still reads "Admin Agent + Co-Left Lead Arranger + JBR, SOFR+250bps, 4+1yr", just against $111.8m rather than $614.8m.
+
+Facility labels deliberately kept the cards' existing vocabulary (Vendace, Wahoo, Metropolis Bridge, LC Facility) rather than switching to the file's column names, because the Global Cap Table resolves facilities through `CAPTABLE_ACTUALS.alias` and renaming them would have silently broken that join. Amounts avoid thousands separators for the same class of reason: `parseAmt()` and `LENDER_STATS` both match `/\$\s*([0-9]+(?:\.[0-9]+)?)\s*(bn|b|m)\b/`, which a comma breaks silently — the pre-existing "$2,500m" on the Ares card had been parsing as **zero** in the cap table. Ares now reads $1275.9m and counts.
+
+Two cards have no row in the file and were flagged rather than deleted: **HSBC** (Shiner $50m, Tarpon $75m — carried from earlier records, unconfirmed) and **Kutxabank** (Beluga $23m / €20m via the SocGen sell-down, which post-dates the file).
+
+### Two banks were being counted twice
+
+The source file records two institutions under both an acronym and a full name, with **disjoint** facilities — the signature of a labelling inconsistency rather than two booking entities:
+
+| merged into | absorbs | facilities brought in |
+|---|---|---|
+| **NatWest** (Beluga $125.7m) | "National Westminster Bank" | Walleye $85m |
+| **CACIB** (Beluga $308.7m, Tarpon $58.5m, Tarpon EBL $13.8m) | "Credit Agricole" | Vendace $114.3m, Wahoo $104.2m |
+
+Row count goes 123 → 121 and the **Grand Total is unchanged at $24,793.5m** — the money was always right, the bank count was not. Each merged row now carries an `alias` field, rendered as a `+ National Westminster Bank` / `+ Credit Agricole` badge next to the bank name with the explanation on hover, so the merge is visible rather than buried. A normalised-name sweep across all 121 rows found no other collisions.
+
+I checked the near-misses and left them alone: CoBank vs National Cooperative Bank, Apollo Capital Management vs Apterra Infrastructure Capital, and "BNP Paribas AM" (the asset-management arm, with no separate BNP Paribas row) are all genuinely distinct.
+
+### Global Cap Table now says what it actually covers
+
+Fixing the cards fixed the cap table's per-bank attribution, but it also exposed a claim worth stating plainly: the bank breakdown covers only the institutions that *have* a lender card. A live-computed banner now says so — **41 cards, $17.71bn of the $24.79bn book, about 71%** — names what the rest is (ABS noteholders, insurers, sovereign funds, regional banks with no card yet), and points to the Lender Commitments tab for the complete book. The headline Total Commitments figure is unaffected; it ties to the June 2026 Debt Overview, not to the cards.
+
+The Commitments tab footer previously read "Bank names exactly as in the source", which is no longer true, and now records the two merges and the fact that cards are generated from the same file.
+
+QC: all 5 script blocks pass `node --check`; a new verifier walks all 60 cards against the file through the bank- and facility-alias maps and reports **zero mismatches**; `LENDER_COMMITS` is 121 rows summing to $24,793.5m against the file's $24,793.5m; no row duplicates a merged alias and no normalised-name collisions remain; offline Playwright renders all 10 tabs, both merge badges and the coverage banner, with zero console/page errors and zero external requests. Archived to `tracker/versions/ECX_Tracker_v78.html`.
