@@ -4400,6 +4400,9 @@ var BOND_MARKET_NOTES = [{
 })();
 // Updated on every refresh/sync (incl. the weekday-evening automated Outlook sweep) — shown in the header.
 var LAST_REFRESH = "8/20/26, 2:59 PM ET (v78)";
+// Outlook coverage cut-off: the last day whose call notes and bank emails have been folded in.
+// Set at release together with LAST_REFRESH; both are read by the header and by ASK_asOf().
+var SWEEP_THROUGH = "8/18/26";
 var REGIONS = ["All Regions", "US", "Europe", "APAC", "Global"];
 var PROJECT_TYPES = ["All Types", "Project Finance", "HoldCo", "Equipment", "ABS", "LC", "Bond", "Other"];
 var LENDER_TYPES = ["All Types", "Bank", "Credit Fund", "Counsel"];
@@ -11448,7 +11451,7 @@ function GuideTab() {
   var thStyle = { padding: "9px 12px", textAlign: "left", fontSize: 10.5, fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em", background: "#F8FAFC", whiteSpace: "nowrap" };
   var tdStyle = { padding: "10px 12px", fontSize: 12.5, color: "#374151", lineHeight: 1.6, verticalAlign: "top", borderBottom: "1px solid #F1F5F9" };
   var SOURCES = [
-    { data: "Bank conversations, call notes & last-contact dates (Active Lenders)", src: "\u201CCall Notes: [Bank]\u201D and \u201CMeeting notes\u201D emails sent to the DCM distribution list (dcm@edgeconnex.com), the Outlook \u201CBank Meetings\u201D folder, project call-note documents on SharePoint, and confirmed bank meetings on team calendars.", loc: "Outlook \u203A mailbox + Bank Meetings folder \u00B7 SharePoint \u203A Corporate Finance_Team \u203A [Project] \u203A 03. Due Diligence \u203A 05. Call Notes", own: "Whoever held the call writes it up and sends it to DCM. Swept automatically every weekday evening (ET) \u2014 see the Last refreshed stamp in the header." },
+    { data: "Bank conversations, call notes & last-contact dates (Active Lenders)", src: "\u201CCall Notes: [Bank]\u201D and \u201CMeeting notes\u201D emails sent to the DCM distribution list (dcm@edgeconnex.com), the Outlook \u201CBank Meetings\u201D folder, project call-note documents on SharePoint, and confirmed bank meetings on team calendars.", loc: "Outlook \u203A mailbox + Bank Meetings folder \u00B7 SharePoint \u203A Corporate Finance_Team \u203A [Project] \u203A 03. Due Diligence \u203A 05. Call Notes", own: "Whoever held the call writes it up and sends it to DCM. Swept from Outlook on request \u2014 ask Claude to refresh the tracker \u2014 and the header shows both the refresh stamp and the last day of call notes folded in." },
     { data: "Commitments by bank (Lender Commitments tab + existing facilities on lender cards)", src: "EdgeConneX Commitments workbook \u2014 currently EdgeConneX Commitments (07.17.2026).xlsx, Overview tab: 123 institutions \u00D7 22 facilities in USD at the file\u2019s EUR/USD rate. Mirrored cell-for-cell; totals are computed and tie to the file\u2019s own Grand Total row to the dollar.", loc: "SharePoint \u203A 12. Portfolio Management - Loans Outstanding \u203A 04. Debt Overviews \u203A 02. Portfolio Commitments", own: "Chris Wenger \u2014 refreshed with each new commitments file. Ask Claude to refresh the tab when one lands." },
     { data: "Fees paid by bank (Lender Fees tab)", src: "Lender Fees Summary workbook \u2014 currently Lender Fees Summary_7.21.26_VF.xlsx (Fee Overview tab). Mirrored cell-for-cell: null = not in the deal, $0 = in the deal with no fee.", loc: "SharePoint \u203A 12. Portfolio Management \u203A 04. Debt Overviews \u203A 09. Lender Fees \u203A Sent to EQT", own: "Chris Wenger \u2014 monthly. Ask Claude to refresh the tab when a new file lands." },
     { data: "Debt stack, pricing, maturities & hedges (Global Cap Table)", src: "June 2026 Debt Overview.xlsx \u2014 Notes Payable Overview sheet ONLY (21 facilities, $22.06bn commitments as of 6/30/26, EUR at 1.14315), plus the Hedging Summary sheet in the same workbook for the swap fixed rates and cap strikes behind the \u201CRate \u2014 Paying\u201D column.", loc: "SharePoint \u203A 12. Portfolio Management \u203A 04. Debt Overviews \u203A 08. EQT \u203A 7.16.26 ECX Debt Slide", own: "Chris Wenger \u2014 monthly. Each refresh must tie total commitments to the confirmed figure (incl. King and the $50m RCF, which the file\u2019s own total row misses)." },
@@ -11462,7 +11465,7 @@ function GuideTab() {
       hd("\uD83D\uDCD6 What this tracker is"),
       p("The single place for EdgeConneX Corporate Finance\u2019s bank relationships and the debt fundraising programme: who we have spoken to and when, what was discussed and shared, who is committed to what, who has been approached (and who declined) on every live deal, what we pay each institution in fees, and the full $22bn debt stack."),
       p("It is one permanent page \u2014 \u201CECX Fundraising Tracker \u2014 Master\u201D \u2014 at one link that never changes. The name and URL stay fixed for every release; version numbers appear only in the \u201CLast refreshed\u201D stamp in the header, and each release is archived as a dated copy in the team repo. Nothing here is live-connected to a database: every number traces back to a source file in the table below, and the data changes only when a sync runs."),
-      p("\uD83D\uDD04 The header stamp tells you how current it is. Call notes are swept from Outlook automatically every weekday evening (ET); everything else refreshes when its source file lands and someone asks Claude for it.")),
+      p("\uD83D\uDD04 The header carries two dates: when the tracker was last refreshed (stamped from the clock at release, never typed) and the last day of Outlook call notes folded in. Nothing runs on a schedule \u2014 every refresh is on request, and everything else refreshes when its source file lands and someone asks Claude for it.")),
     h("div", { style: card },
       hd("\uD83D\uDDC2 Where every number comes from"),
       h("div", { style: { overflow: "auto" } }, h("table", { style: { width: "100%", borderCollapse: "collapse" } },
@@ -11481,7 +11484,7 @@ function GuideTab() {
       h("div", { style: { marginTop: 10, fontSize: 11, color: "#9CA3AF", lineHeight: 1.6 } }, "All SharePoint paths sit under Corporate Finance_Team (Eelco Holst\u2019s site), which syncs to your machine via OneDrive.")),
     h("div", { style: card },
       hd("\uD83D\uDD04 How the tracker gets updated"),
-      p(h("b", null, "Automatically, every weekday evening (ET). "), "A scheduled routine sweeps the mailbox and the Bank Meetings folder for new call and meeting notes, folds them into the right lender cards, republishes this page, and moves the header stamp forward. You are only pinged when something material was synced."),
+      p(h("b", null, "Only on request \u2014 nothing runs on a schedule. "), "When someone asks Claude to refresh, it sweeps the mailbox and the Bank Meetings folder for call and meeting notes since the last sweep, folds them into the right lender and project cards, runs the quality checks, republishes this page and moves both header dates forward: the refresh stamp (taken from the clock at release) and the last day of call notes folded in. If the header date looks old, the tracker is old \u2014 ask for a refresh."),
       p(h("b", null, "As things happen \u2014 the Inputs & Review tab. "), "Drop a note, link the lender it concerns, approve it, and it appears on that lender\u2019s card in your browser immediately. Send the sync digest to Claude periodically to make it permanent for the whole team."),
       p(h("b", null, "On request \u2014 just ask Claude. "), "In plain language: \u201Csync the latest call notes\u201D, \u201Crefresh the Lender Fees tab from Chris\u2019s latest file\u201D, \u201Cupdate the cap table from the July Debt Overview\u201D, \u201Cadd a card for [bank]\u201D. Claude reads the source files, updates the data, runs the quality checks and republishes to this same link."),
       p(h("b", null, "Versions. "), "The page name never changes. Each release bumps the version inside the header stamp, is archived as a copy in the team repo (tracker/versions/), and stays reachable through the page\u2019s own version history \u2014 so rollback is always possible without ever circulating a differently-named file.")),
@@ -13968,7 +13971,7 @@ function App() {
       marginTop: 5,
       fontWeight: 600
     }
-  }, "🔄 Last refreshed " + LAST_REFRESH + " \xB7 auto-sweeps Outlook call notes weekday evenings (ET)")), /*#__PURE__*/React.createElement("div", {
+  }, "🔄 Last refreshed " + LAST_REFRESH + " \xB7 Outlook call notes folded in through " + SWEEP_THROUGH + " \xB7 refreshed on request; the stamp is taken from the clock at release")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 20,
