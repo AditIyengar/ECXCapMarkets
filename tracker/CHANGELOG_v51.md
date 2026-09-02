@@ -564,3 +564,29 @@ Fixing the cards fixed the cap table's per-bank attribution, but it also exposed
 The Commitments tab footer previously read "Bank names exactly as in the source", which is no longer true, and now records the two merges and the fact that cards are generated from the same file.
 
 QC: all 5 script blocks pass `node --check`; a new verifier walks all 60 cards against the file through the bank- and facility-alias maps and reports **zero mismatches**; `LENDER_COMMITS` is 121 rows summing to $24,793.5m against the file's $24,793.5m; no row duplicates a merged alias and no normalised-name collisions remain; offline Playwright renders all 10 tabs, both merge badges and the coverage banner, with zero console/page errors and zero external requests. Archived to `tracker/versions/ECX_Tracker_v78.html`.
+
+---
+
+## v79 Changelog (9/2/26) — the tracker stops being a wall of text
+
+Released **9/2/26** (stamp from the clock at release). Aditya, looking at the live page: "Its a bit dense now. We can have more pop out windows but keep the table structures" — and, of the Project Guadalupe card, "This block of text is horrible." Both fair. This release is the layout change; the 8/18 → 9/2 Outlook sweep and the QA fan-out on this redesign are still running and land as v80.
+
+### What you see now
+
+**Cards are summaries; the record lives in a pop-out.** Clicking a lender or project card no longer expands it in place and shoves the grid apart. It opens a centred pop-out (a portaled `Modal`: Esc, ✕ or a click on the backdrop closes it; the page behind stops scrolling; the section tabs stay pinned while you scroll the body). Lender pop-outs keep the five sections — Call Notes, Projects, Existing Facilities, Rejected Projects, Contact Details. Project pop-outs carry the full overview, workstreams, bank outreach and lender notes. Any name marked ↗ inside a pop-out jumps straight to that lender's or project's pop-out on the right tab; the `ecx-close-modals` event guarantees two dialogs are never open at once, and `openLender` / `openProject` state in `App` means the Ask tab's links and cross-card links open the target directly instead of scrolling to it.
+
+**Cards themselves got short.** Lender cards: badges, name, summary clamped to two lines, at most four project pills with a "+N more" tail (the remainder on hover), and the stat tiles — which now wrap under the name on narrow cards instead of clipping. Project cards: the description clamps to three lines with an "Open ↗" hint; the expected-close and size tiles are grouped and wrap. Grids are three-up at 1440px and cards stretch to row height, so rows are tidy. On the lenders tab the tallest card went from the full expanded height (several screens for Natixis) to **273px**.
+
+**Long text became structured text.** The Guadalupe description is 6,800 characters and Ashville 2's is 4,000 — they were rendered as one paragraph. A new `RichText` renderer splits a description into blocks: a block opening with a date ("8/18/26 — …") becomes a dated update with the date as a badge; a block whose first line is a capitalised heading ("LENDER FEEDBACK SYNTHESIS (six calls…):", "A&O SHEARMAN (…) — …") becomes a section title with the parenthetical as its subtitle; "- " lines become bullets. One data fix went with it: the 8/18 Guadalupe update had been glued onto the last synthesis bullet in v74 without a blank line and now stands as its own dated block. Notes longer than 900 characters start folded behind "Read more" everywhere.
+
+**Tables were left as tables**, as asked: Lender Fees, Lender Commitments, LC Syndication and Global Cap Table are unchanged apart from the shared header.
+
+### The header now tells the truth about dates
+
+The header claimed the tracker "auto-sweeps Outlook call notes weekday evenings (ET)", and the Guide repeated it three times. Nothing runs on a schedule — every refresh is on request — so that is gone. In its place the header shows two dates: **Last refreshed** (the build time, stamped from the clock at release since v73) and **Outlook call notes folded in through 〈date〉** — a new `SWEEP_THROUGH` field, so a reader can see how current the *content* is, not just the page. It reads **8/18/26** in this release because that is the last sweep folded in; v80 moves it to 9/2/26. The release smoke test fails if the sweep-through date is missing, later than the stamp, or if any "automatic" wording reappears.
+
+### Under the hood, for whoever touches this next
+
+`Modal` renders through `ReactDOM.createPortal` to `document.body`. The first cut rendered it inside the card, and the card's `:hover { transform }` made the fixed-position panel jump on every mouse move until Playwright reported the close button "not stable" — an ancestor transform turns `position: fixed` into `position: absolute`. Portal plus no ancestor transforms is the rule. `LenderCard` and `ProjectCard` take `forceOpen` / `onClosed`; `App` clears its `openLender` / `openProject` on close so the same card can be reopened from another link.
+
+QC: all 5 script blocks pass `node --check`; the release smoke run confirms stamp ≤ clock and equal to the rendered header, `SWEEP_THROUGH` rendered and ≤ stamp, no cadence claim, 60 lenders / 24 projects / 18 closed / 16 market notes / 125 lender notes / 121 commitment rows, all 10 tabs rendering, the Natixis pop-out opening and deep-linking to Project Guadalupe as a single dialog, Escape restoring scroll, 7/7 Ask routes, the cap-table banner and the two merge badges — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v79.html`. A six-lens QA fan-out (density, pop-out interaction, regression, content parity, narrow viewports, code review) is still running against this build; anything it confirms is fixed in v80.
