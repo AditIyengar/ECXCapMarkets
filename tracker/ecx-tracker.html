@@ -141,6 +141,14 @@
     ::-webkit-scrollbar-track { background: #F1F5F9; }
     ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
     select, input, button { font-family: inherit; }
+    .ecx-modal-backdrop { animation: ecxFade 0.16s ease-out; }
+    .ecx-modal-panel { animation: ecxRise 0.18s ease-out; }
+    @keyframes ecxFade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes ecxRise { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: none; } }
+    .ecx-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ecx-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .ecx-card { transition: box-shadow 0.15s; }
+    .ecx-card:hover { box-shadow: 0 6px 22px rgba(15, 23, 42, 0.09); }
   </style>
 </style>
 <script>/**
@@ -4507,9 +4515,61 @@ function StatusBadge(_ref4) {
     }
   }, isLimited ? "⚠ Capacity Limited" : "✓ Active");
 }
+
+// ── Shared pop-out: one Modal for every detail view (lenders, projects, notes) ──
+// Keeps the cards short: the summary stays on the page, the long material opens
+// on top of it. Escape, the ✕ and a click on the backdrop all close it; the
+// global "ecx-close-modals" event closes every open one at once so deep links
+// from one pop-out to another never stack.
+function Modal(props) {
+  var onClose = props.onClose;
+  React.useEffect(function () {
+    var onKey = function (e) { if (e.key === "Escape") onClose(); };
+    var onAll = function () { onClose(); };
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("ecx-close-modals", onAll);
+    var prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return function () {
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("ecx-close-modals", onAll);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+  var width = props.width || 980;
+  return ReactDOM.createPortal(/*#__PURE__*/React.createElement("div", {
+    className: "ecx-modal-backdrop",
+    onMouseDown: function (e) { if (e.target === e.currentTarget) onClose(); },
+    style: { position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.55)", backdropFilter: "blur(2px)", zIndex: 1000, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ecx-modal-panel",
+    role: "dialog", "aria-modal": "true",
+    style: { background: "#fff", borderRadius: 16, width: "100%", maxWidth: width, maxHeight: "calc(100vh - 80px)", display: "flex", flexDirection: "column", boxShadow: "0 24px 64px rgba(15, 23, 42, 0.35)", overflow: "hidden" }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", alignItems: "flex-start", gap: 14, padding: "18px 24px 14px", borderBottom: "1px solid #E5E7EB", background: "linear-gradient(180deg, #F8FAFC 0%, #fff 100%)" }
+  }, props.icon ? /*#__PURE__*/React.createElement("div", { style: { flexShrink: 0, marginTop: 2 } }, props.icon) : null,
+    /*#__PURE__*/React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+      props.kicker ? /*#__PURE__*/React.createElement("div", { style: { fontSize: 10.5, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#64748B", marginBottom: 3 } }, props.kicker) : null,
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 20, fontWeight: 700, color: "#0F172A", fontFamily: "'Libre Baskerville', Georgia, serif", lineHeight: 1.25 } }, props.title),
+      props.subtitle ? /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748B", marginTop: 4, lineHeight: 1.5 } }, props.subtitle) : null),
+    /*#__PURE__*/React.createElement("button", {
+      onClick: onClose, "aria-label": "Close", title: "Close (Esc)",
+      style: { flexShrink: 0, width: 34, height: 34, borderRadius: 10, border: "1px solid #E2E8F0", background: "#fff", color: "#475569", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", lineHeight: 1 }
+    }, "✕")),
+  /*#__PURE__*/React.createElement("div", { className: "ecx-modal-body", style: { overflowY: "auto", padding: "6px 0 18px" } }, props.children))), document.body);
+}
+// Small "Open" affordance used on card headers instead of the old ▲/▼ chevron.
+function OpenHint(props) {
+  return /*#__PURE__*/React.createElement("span", {
+    style: { fontSize: 11.5, fontWeight: 700, color: "#1D4ED8", background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 8, padding: "4px 9px", whiteSpace: "nowrap", flexShrink: 0 }
+  }, props.label || "Open ↗");
+}
 function NoteCard(_ref5) {
   var note = _ref5.note,
     compact = _ref5.compact;
+  var _nc = _useState(false), ncOpen = _nc[0], setNcOpen = _nc[1];
+  var ncText = String(note.content || "");
+  var ncLong = ncText.length > 900;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#F9FAFB",
@@ -4581,7 +4641,10 @@ function NoteCard(_ref5) {
       lineHeight: 1.75,
       whiteSpace: "pre-wrap"
     }
-  }, formatNote(note.content)));
+  }, formatNote(ncLong && !ncOpen ? ncText.slice(0, 900).replace(/\s+\S*$/, "") + " \u2026" : ncText)), ncLong ? /*#__PURE__*/React.createElement("button", {
+    onClick: function (e) { e.stopPropagation(); setNcOpen(!ncOpen); },
+    style: { marginTop: 8, background: "none", border: "none", color: "#1D4ED8", fontWeight: 700, fontSize: 11.5, cursor: "pointer", padding: 0, fontFamily: "inherit" }
+  }, ncOpen ? "Show less \u25B4" : "Read more \u25BE") : null);
 }
 // ── Bank logos: favicon by domain, with monogram fallback if missing/offline ──
 var BANK_ICONS = {
@@ -4664,12 +4727,16 @@ function LenderCard(_ref6) {
   var name = _ref6.name,
     info = _ref6.info,
     projectsData = _ref6.projectsData,
-    onSelectProject = _ref6.onSelectProject;
+    onSelectProject = _ref6.onSelectProject,
+    forceOpen = _ref6.forceOpen,
+    onClosed = _ref6.onClosed;
   var lstats = LENDER_STATS(info);
   var _useState2 = _useState(false),
     _useState3 = _slicedToArray(_useState2, 2),
     expanded = _useState3[0],
     setExpanded = _useState3[1];
+  React.useEffect(function () { if (forceOpen) setExpanded(true); }, [forceOpen]);
+  var closeCard = function () { setExpanded(false); if (onClosed) onClosed(); };
   var _useState4 = _useState("notes"),
     _useState5 = _slicedToArray(_useState4, 2),
     activeSection = _useState5[0],
@@ -4679,17 +4746,16 @@ function LenderCard(_ref6) {
   var efCount = Object.keys(info.existingFacilities || {}).length;
   var relBadge = info.type === "Counsel" ? { bg: "#F3F4F6", bd: "#D1D5DB", fg: "#6B7280", label: "\u2696\uFE0F Counsel" } : efCount > 0 ? { bg: "#DBEAFE", bd: "#93C5FD", fg: "#1E40AF", label: "\uD83C\uDFE6 Existing Lender \u00B7 " + efCount + (efCount === 1 ? " facility" : " facilities") } : { bg: "#D1FAE5", bd: "#6EE7B7", fg: "#065F46", label: "\u2728 New Lender" };
   return /*#__PURE__*/React.createElement("div", {
+    className: "ecx-card",
     style: {
       background: info.type === "Counsel" ? "#F3F4F6" : "#fff",
       border: info.type === "Counsel" ? "1px solid #D1D5DB" : "1px solid #E5E7EB",
       borderRadius: "12px",
-      overflow: "hidden",
-      transition: "box-shadow 0.2s",
-      boxShadow: expanded ? "0 4px 20px rgba(0,0,0,0.08)" : "none"
+      overflow: "hidden"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "16px 20px",
+      padding: "14px 16px",
       cursor: "pointer"
     },
     onClick: function onClick() {
@@ -4700,14 +4766,16 @@ function LenderCard(_ref6) {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "flex-start",
-      gap: 12
+      gap: 12,
+      flexWrap: "wrap"
     }
   }, /*#__PURE__*/React.createElement(BankLogo, {
     name: name,
     size: 36
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      flex: 1
+      flex: "1 1 220px",
+      minWidth: 0
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -4747,6 +4815,7 @@ function LenderCard(_ref6) {
       fontFamily: "'Libre Baskerville', Georgia, serif"
     }
   }, name), info.summary && /*#__PURE__*/React.createElement("div", {
+    className: "ecx-clamp-2",
     style: {
       fontSize: 12,
       color: "#6B7280",
@@ -4760,7 +4829,7 @@ function LenderCard(_ref6) {
       flexWrap: "wrap",
       marginTop: 8
     }
-  }, Object.keys(info.projects).map(function (projName) {
+  }, Object.keys(info.projects).slice(0, 4).map(function (projName) {
     var proj = projectsData.find(function (p) {
       return p.name === projName;
     });
@@ -4773,9 +4842,9 @@ function LenderCard(_ref6) {
         onSelectProject(projName);
       },
       style: {
-        fontSize: 11,
+        fontSize: 10.5,
         fontWeight: 600,
-        padding: "3px 9px",
+        padding: "2px 8px",
         borderRadius: 20,
         background: isClosed ? "#F3F4F6" : "#EFF6FF",
         color: isClosed ? "#9CA3AF" : "#1D4ED8",
@@ -4788,11 +4857,13 @@ function LenderCard(_ref6) {
       },
       title: info.projects[projName]
     }, proj ? "".concat(proj.region === "US" ? "🇺🇸" : proj.region === "Europe" ? "🇪🇺" : proj.region === "APAC" ? "🌏" : "🌐", " ") : "", projName);
-  }))), /*#__PURE__*/React.createElement("div", {
+  }), projectCount > 4 ? /*#__PURE__*/React.createElement("span", { style: { fontSize: 10.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "#F8FAFC", color: "#64748B", border: "1px solid #E2E8F0", whiteSpace: "nowrap" }, title: Object.keys(info.projects).slice(4).join(" \u00B7 ") }, "+" + (projectCount - 4) + " more") : null)), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       alignItems: "center",
-      gap: 8
+      gap: 8,
+      flexWrap: "wrap",
+      marginLeft: "auto"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -4843,21 +4914,23 @@ function LenderCard(_ref6) {
       color: "#9CA3AF",
       textTransform: "uppercase"
     }
-  }, "projects")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 18,
-      color: "#9CA3AF"
-    }
-  }, expanded ? "▲" : "▼")))), expanded && /*#__PURE__*/React.createElement("div", {
-    style: {
-      borderTop: "1px solid #F3F4F6"
-    }
+  }, "projects")), /*#__PURE__*/React.createElement(OpenHint, null)))), expanded && /*#__PURE__*/React.createElement(Modal, {
+    title: name,
+    kicker: (info.type || "Lender") + (info.status ? " \u00B7 " + (info.status === "capacity_limited" ? "capacity limited" : info.status) : ""),
+    subtitle: [info.lastContact && info.lastContact !== "-" ? "Last contact " + info.lastContact : null, lstats.facCount ? lstats.facCount + " existing " + (lstats.facCount === 1 ? "facility" : "facilities") : null, projectCount ? projectCount + " project" + (projectCount === 1 ? "" : "s") : null].filter(Boolean).join(" \u00B7 "),
+    icon: /*#__PURE__*/React.createElement(BankLogo, { name: name, size: 40 }),
+    onClose: closeCard,
+    width: 1040
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       borderBottom: "1px solid #F3F4F6",
       padding: "0 20px",
-      flexWrap: "wrap"
+      flexWrap: "wrap",
+      position: "sticky",
+      top: 0,
+      background: "#fff",
+      zIndex: 1
     }
   }, [["notes", "Call Notes (".concat(((_info$notes2 = info.notes) === null || _info$notes2 === void 0 ? void 0 : _info$notes2.length) || 0, ")")], ["projects", "Projects (".concat(projectCount, ")")], ["existingFacilities", "Existing Facilities"], ["rejectedProjects", "Rejected Projects"], ["contacts", "Contact Details"]].map(function (_ref7) {
     var _ref8 = _slicedToArray(_ref7, 2),
@@ -5180,11 +5253,15 @@ var OUTREACH_GROUPS = [
 function ProjectCard(_ref1) {
   var project = _ref1.project,
     lenderNotes = _ref1.lenderNotes,
-    onSelectLender = _ref1.onSelectLender;
+    onSelectLender = _ref1.onSelectLender,
+    forceOpen = _ref1.forceOpen,
+    onClosed = _ref1.onClosed;
   var _useState6 = _useState(false),
     _useState7 = _slicedToArray(_useState6, 2),
     expanded = _useState7[0],
     setExpanded = _useState7[1];
+  React.useEffect(function () { if (forceOpen) setExpanded(true); }, [forceOpen]);
+  var closeCard = function () { setExpanded(false); if (onClosed) onClosed(); };
   var _useState8 = _useState("lenders"),
     _useState9 = _slicedToArray(_useState8, 2),
     activeSection = _useState9[0],
@@ -5193,17 +5270,16 @@ function ProjectCard(_ref1) {
   var hasTeaser = !!project.teaserData;
   var sizeLabel = projectSizeLabel(project);
   return /*#__PURE__*/React.createElement("div", {
+    className: "ecx-card",
     style: {
       background: "#fff",
       border: "1px solid #E5E7EB",
       borderRadius: "12px",
-      overflow: "hidden",
-      transition: "box-shadow 0.2s",
-      boxShadow: expanded ? "0 4px 20px rgba(0,0,0,0.08)" : "none"
+      overflow: "hidden"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "16px 20px",
+      padding: "14px 16px",
       cursor: "pointer"
     },
     onClick: function onClick() {
@@ -5214,11 +5290,13 @@ function ProjectCard(_ref1) {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "flex-start",
-      gap: 12
+      gap: 12,
+      flexWrap: "wrap"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      flex: 1
+      flex: "1 1 220px",
+      minWidth: 0
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -5271,7 +5349,9 @@ function ProjectCard(_ref1) {
       color: "#111827",
       fontFamily: "'Libre Baskerville', Georgia, serif"
     }
-  }, project.name)), project.expectedClose && project.expectedClose !== "Paused" ? /*#__PURE__*/React.createElement("div", {
+  }, project.name)), /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginLeft: "auto" }
+  }, project.expectedClose && project.expectedClose !== "Paused" ? /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#065F46",
       color: "#fff",
@@ -5367,24 +5447,31 @@ function ProjectCard(_ref1) {
       lineHeight: 1.2,
       marginTop: 2
     }
-  }, "TBD")), /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: "#9CA3AF",
-      fontSize: 18,
-      flexShrink: 0
-    }
-  }, expanded ? "▲" : "▼")), project.description && /*#__PURE__*/React.createElement("p", {
+  }, "TBD")), /*#__PURE__*/React.createElement(OpenHint, null))), project.description && /*#__PURE__*/React.createElement("p", {
+    className: "ecx-clamp-3",
     style: {
       margin: "8px 0 0",
       fontSize: 12,
       color: "#6B7280",
       lineHeight: 1.6
     }
-  }, project.description)), expanded && project.workstreams && /*#__PURE__*/React.createElement("div", {
+  }, project.description)), expanded && /*#__PURE__*/React.createElement(Modal, {
+    title: project.name,
+    kicker: [REGION_TOKENS(project.region).join(" / "), project.type, project.owner ? "Owner " + project.owner : null].filter(Boolean).join(" \u00B7 "),
+    subtitle: [sizeLabel ? "Expected size " + sizeLabel : null, project.expectedClose ? "Expected close " + project.expectedClose : null, project.outreach ? project.outreach.length + " banks on the outreach list" : null, notesCount ? notesCount + " lender" + (notesCount === 1 ? "" : "s") + " with notes" : null].filter(Boolean).join(" \u00B7 "),
+    onClose: closeCard,
+    width: 1100
+  }, project.description ? /*#__PURE__*/React.createElement("div", {
+    style: { padding: "14px 24px 4px" }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: 11, fontWeight: 700, color: "#1E3A5F", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }
+  }, "Overview"), /*#__PURE__*/React.createElement("div", {
+    style: { fontSize: 12.5, color: "#374151", lineHeight: 1.75, whiteSpace: "pre-wrap" }
+  }, project.description)) : null, project.workstreams && /*#__PURE__*/React.createElement("div", {
     style: {
       borderTop: "1px solid #F3F4F6",
       background: "#FBFCFE",
-      padding: "14px 20px"
+      padding: "14px 24px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -5446,10 +5533,10 @@ function ProjectCard(_ref1) {
         marginTop: 4
       }
     }, ws.description));
-  })), expanded && project.outreach && /*#__PURE__*/React.createElement("div", {
+  })), project.outreach && /*#__PURE__*/React.createElement("div", {
     style: {
       borderTop: "1px solid #F3F4F6",
-      padding: "14px 20px"
+      padding: "14px 24px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -5507,7 +5594,7 @@ function ProjectCard(_ref1) {
         }
       }, o.status === "declined" ? "✕ " : "", o.bank, hasCard ? " ↗" : "");
     }));
-  })), expanded && notesCount > 0 && /*#__PURE__*/React.createElement("div", {
+  })), notesCount > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       borderTop: "1px solid #F3F4F6"
     }
@@ -5560,7 +5647,7 @@ function ProjectCard(_ref1) {
         whiteSpace: "pre-wrap"
       }
     }, formatNote(note)));
-  })))));
+  }))))));
 }
 
 // ── Lender Fees Data (Source: Lender Fees Summary_7.21.26_VF.xlsx — Chris Wenger, shared monthly to DCM) ──
@@ -11624,7 +11711,8 @@ function InputsTab(_p) {
         h("span", { style: { marginLeft: "auto", fontSize: 11, color: "#1D4ED8", fontWeight: 600 } }, introOpen ? "collapse ▲" : "expand ▼")),
       introOpen ? h("div", { style: { padding: "0 20px 16px", display: "flex", flexDirection: "column", gap: 8 } },
         introLine("What this is", "EdgeConneX Capital Markets' live tracker of every bank relationship and the debt fundraising program — one shared link, always the latest version. It is the team's single view of who we've talked to, who's committed to what, who's being courted for which deal, what we've paid, and the full debt stack."),
-        introLine("The tabs", "Active Lenders — every institution with full call history, commitments and pipeline involvement. Active Projects — live financings, largest first; grouped cards (Leroy, HoldCo, Salar) break out workstreams when expanded. Closed 2025 & 2026 — completed deals with lender-level terms and fees. Lender Fees — fees paid by bank (Chris Wenger's monthly file). Global Cap Table — the $22bn debt stack, tied to the monthly Debt Overview. 📖 Guide — the full manual with every source file, owner and refresh cadence."),
+        introLine("The tabs", "❓ Ask — plain-English questions answered from the tracker's own data. Active Lenders — every institution with full call history, commitments and pipeline involvement. Active Projects — live financings, largest first; grouped cards (Leroy, HoldCo, Salar) break out workstreams when opened. Closed 2025 & 2026 — completed deals with lender-level terms and fees. Lender Fees — fees paid by bank (Chris Wenger's file). Lender Commitments — the committed book, bank by facility, tied to Chris Wenger's quarterly commitments workbook. LC Syndication — the Project Liverpool syndication tracker. Global Cap Table — the debt stack, tied to the monthly Debt Overview. 📖 Guide — the full manual with every source file, owner and refresh cadence."),
+        introLine("Reading a card", "Lender and project cards are deliberately short: badges, the headline numbers and up to four project pills. Click anywhere on a card (or its Open ↗ hint) to open the full record in a pop-out — call notes, projects, existing facilities, rejections and contacts for a lender; overview, workstreams, bank outreach and lender notes for a project. Long notes start folded behind Read more. Inside a pop-out, any name marked ↗ jumps straight to that lender's or project's pop-out. Esc, ✕ or a click outside closes it. The fee, commitment, LC syndication and cap-table tabs keep their tables as tables."),
         introLine("This tab", "The team's capture inbox. 1. Add what just happened (a meeting, a rejection, an indication) — pick the date, link the lender(s), tick 'documented call' if it was a real meeting. 2. Approve it — it appears on those lender cards immediately in your browser. 3. Every so often, Copy sync digest and paste it into the Claude tracker chat — that bakes approved entries into the published version for the whole team and clears them from your queue automatically."),
         introLine("Backed by", "Call-notes emails to the DCM list + Outlook Bank Meetings, the CF Pipeline files and deal teasers, the EdgeConneX Commitments workbook, Chris Wenger's monthly Lender Fees Summary and Debt Overview — plus what the team drops in right here.")) : null),
     h("div", { style: { background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "20px 24px", marginBottom: 16 } },
@@ -13795,9 +13883,14 @@ function App() {
       sources: 39
     };
   }, []);
+  var _ol = _useState(null), openLender = _ol[0], setOpenLender = _ol[1];
+  var _op = _useState(null), openProject = _op[0], setOpenProject = _op[1];
   var handleSelectLender = function handleSelectLender(name) {
+    window.dispatchEvent(new Event("ecx-close-modals"));
     setHighlightLender(name);
     setActiveTab("lenders");
+    setOpenProject(null);
+    setOpenLender(name);
     setTimeout(function () {
       var el = document.getElementById("lender-".concat(name));
       if (el) el.scrollIntoView({
@@ -13807,8 +13900,11 @@ function App() {
     }, 100);
   };
   var handleSelectProject = function handleSelectProject(name) {
+    window.dispatchEvent(new Event("ecx-close-modals"));
     setHighlightProject(name);
     setActiveTab("projects");
+    setOpenLender(null);
+    setOpenProject(name);
     setTimeout(function () {
       var el = document.getElementById("project-".concat(name));
       if (el) el.scrollIntoView({
@@ -13855,7 +13951,7 @@ function App() {
   }, "EdgeConneX Capital Markets"), /*#__PURE__*/React.createElement("h1", {
     style: {
       margin: 0,
-      fontSize: 26,
+      fontSize: 23,
       fontWeight: 700,
       fontFamily: "'Libre Baskerville', Georgia, serif"
     }
@@ -13905,7 +14001,7 @@ function App() {
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 26,
+        fontSize: 22,
         fontWeight: 800,
         color: s.warning ? "#FCD34D" : s.green ? "#6EE7B7" : "#fff",
         lineHeight: 1
@@ -14069,9 +14165,8 @@ function App() {
   }) : /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
-      gridTemplateColumns: "repeat(2, 1fr)",
-      gap: 16,
-      alignItems: "start"
+      gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+      gap: 16
     }
   }, filteredLenders.map(function (_ref31) {
     var _ref32 = _slicedToArray(_ref31, 2),
@@ -14096,7 +14191,9 @@ function App() {
       name: name,
       info: info,
       projectsData: PROJECTS,
-      onSelectProject: handleSelectProject
+      onSelectProject: handleSelectProject,
+      forceOpen: openLender === name,
+      onClosed: function () { if (openLender === name) setOpenLender(null); }
     })));
   }))), activeTab === "projects" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -14107,7 +14204,7 @@ function App() {
   }, "Showing ", filteredProjects.length, " of ", PROJECTS.length, " projects \u00B7 sorted by expected financing size (largest first; unsized last) \u00B7 expected close per Corporate Finance Pipeline_NEW.xlsx (Funding Date column, read 8/4/26)"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(440px, 1fr))",
+      gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
       gap: 16
     }
   }, filteredProjects.map(function (project) {
@@ -14120,7 +14217,9 @@ function App() {
     }, /*#__PURE__*/React.createElement(ProjectCard, {
       project: project,
       lenderNotes: projectLenderMap[project.name] || {},
-      onSelectLender: handleSelectLender
+      onSelectLender: handleSelectLender,
+      forceOpen: openProject === project.name,
+      onClosed: function () { if (openProject === project.name) setOpenProject(null); }
     }));
   }))), activeTab === "closed" && /*#__PURE__*/React.createElement(ClosedProjectsTab, {
     projects: CLOSED_PROJECTS
