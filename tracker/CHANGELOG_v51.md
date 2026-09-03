@@ -658,3 +658,33 @@ Left alone from the low list, deliberately: "+N more" occasionally orphaning on 
 ### Release
 
 Stamp `9/3/26, 1:02 AM ET (v80)` taken from the clock at release; folded-in date 9/2/26. QC: all 5 script blocks pass `node --check`; the release smoke run confirms stamp ≤ clock and equal to the rendered header, `SWEEP_THROUGH` rendered and ≤ stamp, no cadence claim, 65 lenders / 24 projects / 18 closed / 65 market notes / 195 lender notes / 121 commitment rows, all 10 tabs rendering with content, the Natixis pop-out and the Guadalupe deep link opening, seven Ask queries routing, zero console errors and zero external requests. Archived as `tracker/versions/ECX_Tracker_v80.html`.
+
+
+## v81 Changelog (9/3/26) — same-day refresh: Wells Fargo's 8/31 call, the Ashville 1 launch plan, and the indicative-terms replies
+
+### What changed for the reader
+
+A same-day sweep of Outlook from the v80 cut-off (9/2, 6:20 PM ET) to noon 9/3. Laura's 9/2 forward "Can you include in bank tracker?" (the Principal / Anders Amundson thread) was checked against the Principal card created in v80: the card already carries the whole thread — PPIF Amsterdam 16 Sept at 12:30 CET, Principal's DevCo-facility interest, Marjolein's "good to keep in mind" — so nothing was missing. The folded-in date moves to 9/3/26.
+
+- **Wells Fargo** gets its first documented conversation: Joe Harar and Laura spoke with WF's Natalie and Dave on 8/31 (set up by Rena Romanini). WF says it can be constructive on the devco upsize; Laura asked 9/2 whether Guadalupe could be an earlier opportunity. `lastContact` set to 8/31/26 (it had never been set); the Guadalupe outreach row carries the new colour.
+- **Ashville 1** has a launch plan. With agency feedback expected mid-week of 9/7, Morgan Stanley recommends recording the investor presentation on 10 or 11 Sept and three days of 45-minute virtual pre-marketing calls the week of 14 Sept. Agencies "really engaged", BB category, the model is the gating item at all three; MS sent the 1.10x model with the DSRA upsized to $200MM for the new interest rate (1.15x upside flagged, Google had not opined in time); S&P asked for BCEI cash flows that do not exist; all Fitch / T&T answers went back 9/2 evening; DON/POM near final. The card also carries the BCEI PUE-table clarification and the ~$10/kW IT per month variable O&M pass-through.
+- **Guadalupe indicative-terms replies.** ING will review and revert and asked for a syndication-strategy call (3:30 PM ET 9/3, scheduled, no readout yet so no `lastContact` move). BNP confirmed and asked whether the $9.0–9.5bn covers all LC needs: it covers the DC + EC term loan only, LCs of ~$250–300m are sized separately. Nomura will revert by 9/9. Huntington acknowledged the NDA. Goldman Sachs returned the model with stub-period interest and capex fixes, the RAS scenario deck and a PF-tab version with agency presentation assumptions; W9 sent for agency KYC.
+- **LC Facilities**: the Kinder Morgan Firm Transportation amendment and Interconnect Agreement for the Bastrop low-pressure station were fully executed 9/1; the upgraded LC is due within 30 days and is already in the LC tracker.
+- **Milan / Beluga** context from the 3Q BoD financing update on the Spigola card: Bertonico at 40% LTC stepping to 85% on the finalized LTA report (assume October); Opera and Fizzonasco in Beluga at 40%; TLV31 has a 5 MW Microsoft RFP with construction expected from 1 October.
+
+### By the numbers
+
+| | v80 | v81 |
+|---|---|---|
+| lender notes | 195 | 202 (Wells Fargo, Morgan Stanley, ING, BNP, Goldman Sachs, Nomura, Huntington) |
+| next-steps rewritten | — | 6 (Wells Fargo, Morgan Stanley, ING, BNP, Goldman Sachs, Nomura) |
+| Guadalupe outreach rows updated | — | 4 (Wells Fargo, ING, BNP, Nomura) |
+| project description updates | — | 4 (Ashville 1, Guadalupe, LC Facilities, Spigola) |
+| `lastContact` moves | — | Wells Fargo → 8/31/26 only; ING's 9/3 call is scheduled, not held |
+| folded-in through | 9/2/26 | 9/3/26 |
+
+Skipped on purpose: the Monument Advocacy / EDF presentation (government affairs), Laura's quote request to the LTA advisors, appraiser and LTA document traffic (one-line mentions on the project cards only), calendar accept/decline replies, and the "Fw: Catch Up?" forward itself (already on the Principal card).
+
+### Release
+
+Stamp `9/3/26, 12:18 PM ET (v81)` taken from the clock at release. QC: all 5 script blocks pass `node --check`; the release smoke run confirms stamp = rendered header and ≤ clock, `SWEEP_THROUGH` 9/3/26 rendered, no cadence claim, 65 lenders / 24 projects / 18 closed / 65 market notes / 202 lender notes / 121 commitment rows, all 10 tabs rendering, the Natixis pop-out and the Guadalupe deep link opening, seven Ask queries routing, zero console errors and zero external requests; the accessibility script passes (equal-height cards, keyboard-open dialog, focus trap, Escape restores focus, 820px no overflow). Archived as `tracker/versions/ECX_Tracker_v81.html`.
