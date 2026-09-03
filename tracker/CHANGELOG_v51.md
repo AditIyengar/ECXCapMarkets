@@ -590,3 +590,71 @@ The header claimed the tracker "auto-sweeps Outlook call notes weekday evenings 
 `Modal` renders through `ReactDOM.createPortal` to `document.body`. The first cut rendered it inside the card, and the card's `:hover { transform }` made the fixed-position panel jump on every mouse move until Playwright reported the close button "not stable" — an ancestor transform turns `position: fixed` into `position: absolute`. Portal plus no ancestor transforms is the rule. `LenderCard` and `ProjectCard` take `forceOpen` / `onClosed`; `App` clears its `openLender` / `openProject` on close so the same card can be reopened from another link.
 
 QC: all 5 script blocks pass `node --check`; the release smoke run confirms stamp ≤ clock and equal to the rendered header, `SWEEP_THROUGH` rendered and ≤ stamp, no cadence claim, 60 lenders / 24 projects / 18 closed / 16 market notes / 125 lender notes / 121 commitment rows, all 10 tabs rendering, the Natixis pop-out opening and deep-linking to Project Guadalupe as a single dialog, Escape restoring scroll, 7/7 Ask routes, the cap-table banner and the two merge badges — zero console/page errors, zero external requests. Archived to `tracker/versions/ECX_Tracker_v79.html`. A six-lens QA fan-out (density, pop-out interaction, regression, content parity, narrow viewports, code review) is still running against this build; anything it confirms is fixed in v80.
+
+
+## v80 Changelog (9/3/26) — the 8/18→9/2 Outlook sweep lands, and the redesign hardens
+
+### What changed for the reader
+
+The tracker now carries every call note, RFP response, rating-agency readout and relationship touchpoint that moved through Aditya's Outlook between 8/18 and 9/2 (the header's "Outlook call notes folded in through" date moves from 8/18/26 to 9/2/26). Headline picture:
+
+- **Project Guadalupe** dominated the window. 13 of the 19 invited banks returned RFP responses (TD, ING, Mizuho and Nomura on 8/20; Barclays and Santander 8/21; BNP 8/22; SMBC, MUFG and BBVA 8/24; JP Morgan 8/26; SocGen's 28-page Structuring Considerations deck only on 9/2). BMO declined an underwrite on 8/25, CACIB is gated by September limit increases and Natixis is overdue. ECX picked a single $9.0–9.5bn senior secured delayed-draw construction loan (S+250, 85% LTC / 65% LTV, 1.10x DC / 1.30x EC DSCR, 4+1) and sent the Summary of Indicative Terms to 14 banks on 9/1–9/2 with underwriting appetite due COB 9/9. Goldman Sachs runs the rating-agency / HY 144A track (RA model 8/24, RAP drafts 8/26 and 9/1, update call 8/31, RAP review 9/1, agency fees and engagement-letter KYC 9/1–9/2). Outreach table: 22 of 28 banks now at "proposal", BMO at "declined", the two new relationship banks (Huntington, PNC) at "dialogue".
+- **Project Scioto — Ashville 1.** Morgan Stanley ran the Moody's (8/24), Fitch and S&P (8/25) update meetings on the $3.9bn bond; T&T diligence calls followed; the DSCR debate settled on a 1.10x model with a $200MM DSRA sent to the agencies on 9/2 (1.15x upside flagged); MS agreed to drop the RAC on an EC sale; soft agency read is BB-category with feedback due mid-week of 9/7 for a launch right after Labor Day. BCEI's warning that Phase 3&4 RFS may fall outside the Anthropic longstop (only 2 of 8 LM6000s secured) is on the card.
+- **Project Scioto — Ashville 2** opened to private credit via EQT: Ares (SOFR+500+, 1.3x DSCR, 80–85% LTC), KKR and Sixth Street were sounded on 8/28 (notes 8/31), none with true ANT experience and all needing financial statements; Oaktree is re-engaging (9/1).
+- **Project Leroy II.** Blackstone's Austin addition is keyed to Newmark's full development appraisal due Tue 9/8 with closing immediately after (8/28 call); the Bx DD list was answered 8/24–8/27; the NOB is held at the $809.7m LTC cap pending valuation; CA commercial open points went to the 9/2 call.
+- **Relationship touchpoints.** MUFG meeting 8/20 (equipment/engine facility, tenant limits); SCB APAC catch-up 9/2 ($1bn sweet spot for the Alibaba/Tencent Johor financing at 250–260bps); NatWest NY meeting week of 19 Oct; CIBC meeting to be set for 9/16–17; TD chasing on its unsolicited ATL11 take-out views; MDBRS reaffirmed the ECX ABS at BBB/Stable. The 3Q BoD financing schedule and PCX PMO status feed the Leroy, Salar, Vaasa, Spigola, Herring, Johor, Mirai, New Albany North, Tarpon III and PCX cards.
+
+### By the numbers
+
+| | v79 | v80 |
+|---|---|---|
+| lender cards | 60 | 65 (+Huntington, PNC, Principal, KKR, Sixth Street) |
+| lender notes | 125 | 195 (+70, including the Citi and RBC gap fill) |
+| lender next-steps rewritten | — | 27 |
+| outreach rows updated | — | 29 across all projects (23 on Guadalupe, incl. Citi and RBC → proposal) |
+| project description updates | — | 88 dated blocks across 18 project cards |
+| market notes | 16 | 65 (+46 from the plan, +3 from the Citi / RBC gap fill) |
+| `lastContact` bumps | — | Morgan Stanley 8/25, Blackstone 8/28, SMBC 8/20, Ares 8/28, SCB 9/2, Goldman Sachs 9/1, MUFG 8/21, NatWest 8/18 (only where a call or meeting is documented; written proposals do not bump) |
+
+### How the sweep ran
+
+Graph search over 4,300 messages under 11 angles (call notes, RFP, rating agency, each project name, each active bank) → 332 threads kept → 206 records extracted and independently verified against the source mail (2,596 facts) → eight-chunk synthesis grouped by primary bank → a senior-editor pass that produced the plan → a critic pass over the plan against the record index. The critic found two gaps (the Citi and RBC Guadalupe threads had never been extracted) and three minor contradictions (a JP Morgan `lastContact` bump with no documented call, removed; Scioto 2 dates written three ways, normalised; the KKR / Sixth Street calls dated by the 8/31 write-up rather than the 8/28 call, redated). The gap threads were re-run as their own shard and folded in before release.
+
+The container has four CPUs, so a workflow runs two agents at a time; the extraction was sharded across nine workflows (eighteen concurrent agents) with the scratchpad as the data bus. A container restart mid-sweep killed the first run and its resume could not cache-hit (the original arguments were lost), so 105 records were rebuilt from the journal and the remainder re-extracted.
+
+### Curation decisions worth knowing
+
+- 64 candidate market notes were cut to 46: dropped the calendar-invite-only items, notes that restated a lender note verbatim, and quoted pre-window history (Bastrop disposition colour from April, the OM covenant-grid thread from June).
+- 86 threads were skipped on purpose and are listed in the plan file: counsel-only calls (Milbank, K&S), invites without readouts, duplicate records of the same thread, league-table mentions inside a competitor's proposal, and document traffic.
+- Counsel, advisors, rating agencies, appraisers and sponsors still get no lender cards and no lender notes; their content lives on the project cards.
+- Amounts are written without thousands separators ("$1275.9m") because the cap-table parser reads a comma as a break.
+
+### The Citi and RBC gap fill
+
+The critic's two gaps were real: neither bank's 8/20 written response had been extracted. Both were re-run as their own shard (extract, then an independent verify against the mail) and applied before release. Citi recommends a DDTL up to $9.7bn (S+250–275) potentially with a HY 5NC2 at 8.5–9.0%, sees IG as unlikely (MG+e lease, SLA termination rights, high-BB expected) and would stagger any HY into two or three prints. RBC recommends a $5.0bn 4+1 bank loan (S+250) plus a $4.5bn 4(a)(2) private placement (T+200–275), believes one IG rating is achievable and sufficient, and offers up to 20% of the bank piece as joint underwriter seeking Lead Left ICLA. The two banks read the lease differently (Citi: MG+e with termination rights; RBC: NNN at $123/kW escalating 2%) — flagged on both cards and on the Guadalupe card as the point to settle before the agency strategy is fixed. Neither response bumps `lastContact` (written responses only; Citi stays at the 8/18 Q&A call, RBC at 8/14).
+
+### The QA fan-out on v79, and what it changed
+
+Six reviewers each drove the v79 page offline in Chromium through a different lens — visual density, pop-out interaction, whole-app regression, content parity against the data objects, narrow viewports (1100 and 820px) and a static review of the diff — and a skeptic re-reproduced every medium/high finding before it counted. **14 confirmed, 0 refuted, 21 low-severity notes.** All 14 and the cheap lows are in this release.
+
+| finding | fix |
+|---|---|
+| Cards in a row ended at three different heights; stat tiles and "Open ↗" floated at different y | `.ecx-card` fills its grid item (height 100%, flex column); lender tiles pin to the bottom edge via `align-content: space-between` |
+| Project tile row jumped 26px when badges wrapped and sat right-justified over a dead band | tiles are a full-width, left-aligned strip under the title |
+| A deep link to a lender or project hidden by the search / region / type / status filter dead-ended, then the pop-out opened by itself later | `handleSelectLender` / `Project` reset the filters and force Cards view so the target always mounts; the dialog opens in the same commit |
+| 46 lender→project pills pointed at closed deals or facilities with no project card and dead-ended | new `ECX_findProject` resolves exact → normalised → single substring → token subset ("Project Vendace (Sweden) Syndication" now reaches the Sweden card); pills with no target lose the ↗ and the click |
+| Cross-linking from one pop-out to another blinked (a frame with no dialog, then a re-fade) | cards initialise `expanded` from `forceOpen`; a 300ms `ecx-swapping` class suppresses the animation |
+| No focus management; Tab escaped to the page; no accessible name | Modal focuses its panel on open, traps Tab, restores focus on close, `aria-labelledby` an `h2` title |
+| Pop-outs were mouse-only | card headers are `role=button`, `tabIndex 0`, open on Enter/Space, with a `:focus-visible` ring |
+| Guide still described inline expansion | Active Lenders / Active Projects copy rewritten for the pop-out model |
+| Two-line summary clamp lost text that appeared nowhere else | full summary at the top of the lender pop-out, and as a hover title on the card |
+| 820px: tab strip pushed the page wider than the viewport | strip wraps; buttons are nowrap with tighter padding (still one row at 1440) |
+| Unexplained 2px green ring on 29 lender cards | legend chip beside "Showing 60 of 60 lenders"; `OCI` regex word-bounded |
+
+Lows fixed too: Modal reads `onClose` through a ref (stale closure); backdrop ignores mouse-down for 250ms after mount (double-click); backdrop `z-index 10000` clears the floating Save button; pill-row click opens the Projects section; section switches scroll the body to top; stable note keys; `RichText` keeps the word "Update" in dated headings; the Existing Facilities FX label reads the constant; Leroy II drops "Expand for each workstream"; Global Cap Table uses the full 1400px; and the LC & Surety closings table no longer shows a blank row — a pipeline record (Chicago / HRT, 38.5MW into Wahoo) had been pasted into that array; it now sits in the pipeline table as no 11a.
+
+Left alone from the low list, deliberately: "+N more" occasionally orphaning on a third line, the lender meta row wrapping inconsistently, 9px tile captions, and the underlying tab changing beneath a cross-linked dialog. Cosmetic; noted for later.
+
+### Release
+
+Stamp `9/3/26, 1:02 AM ET (v80)` taken from the clock at release; folded-in date 9/2/26. QC: all 5 script blocks pass `node --check`; the release smoke run confirms stamp ≤ clock and equal to the rendered header, `SWEEP_THROUGH` rendered and ≤ stamp, no cadence claim, 65 lenders / 24 projects / 18 closed / 65 market notes / 195 lender notes / 121 commitment rows, all 10 tabs rendering with content, the Natixis pop-out and the Guadalupe deep link opening, seven Ask queries routing, zero console errors and zero external requests. Archived as `tracker/versions/ECX_Tracker_v80.html`.
