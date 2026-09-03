@@ -147,7 +147,11 @@
     @keyframes ecxRise { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: none; } }
     .ecx-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .ecx-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    .ecx-card { transition: box-shadow 0.15s; }
+    .ecx-card { transition: box-shadow 0.15s; height: 100%; display: flex; flex-direction: column; }
+    .ecx-card-head { flex: 1 1 auto; display: flex; flex-direction: column; outline: none; }
+    .ecx-card-head:focus-visible { box-shadow: inset 0 0 0 2px #2563EB; border-radius: 12px; }
+    .ecx-lender-row { flex: 1 1 auto; align-content: space-between; }
+    .ecx-swapping .ecx-modal-backdrop, .ecx-swapping .ecx-modal-panel { animation: none !important; }
     .ecx-card:hover { box-shadow: 0 6px 22px rgba(15, 23, 42, 0.09); }
   </style>
 </style>
@@ -780,7 +784,7 @@ var PROJECTS = [{
     { bank: "Wells Fargo", status: "dialogue", note: "Still looking for $75m ticket (pipeline 8/4/26)" },
     { bank: "BMO", status: "dialogue", note: "Approached on the $1bn upsize (1/20/26 call)" }],
   expectedClose: "26Q2",
-  description: "Leroy (Blackstone) land bank & capex facility program — grouped card covering the three current workstreams: the ~$1bn facility upsize, the addition of the Austin Campus, and the addition of Norway. Expand for each workstream.",
+  description: "Leroy (Blackstone) land bank & capex facility program — grouped card covering the three current workstreams: the ~$1bn facility upsize, the addition of the Austin Campus, and the addition of Norway. The workstreams are broken out in this record.",
   region: "Global / NA",
   type: "Land Bank / Capex Facility",
   owner: "Laura Godschalx",
@@ -4476,9 +4480,9 @@ function RichText(props) {
   return /*#__PURE__*/React.createElement("div", { style: pStyle }, blocks.map(function (block, i) {
     var ls = block.split("\n");
     var first = ls[0].trim();
-    var dated = first.match(/^(\d{1,2}\/\d{1,2}\/\d{2,4})\s*(?:UPDATE)?\s*[—–-]+\s*(.*)$/i);
+    var dated = first.match(/^(\d{1,2}\/\d{1,2}\/\d{2,4})\s*(UPDATE)?\s*[—–-]+\s*(.*)$/i);
     if (dated) {
-      var title = dated[2].replace(/:$/, "").trim();
+      var title = (dated[2] ? "Update \u2014 " : "") + dated[3].replace(/:$/, "").trim();
       var body = title.length > 90 ? [title].concat(ls.slice(1)) : ls.slice(1);
       return /*#__PURE__*/React.createElement("div", { key: i, style: { display: "flex", gap: 12, margin: "12px 0 0", paddingTop: 12, borderTop: i ? "1px solid #F1F5F9" : "none" } },
         /*#__PURE__*/React.createElement("div", { style: { flexShrink: 0, fontSize: 11, fontWeight: 800, color: "#1D4ED8", background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 6, padding: "2px 7px", height: "fit-content", whiteSpace: "nowrap" } }, dated[1]),
@@ -4584,42 +4588,64 @@ function StatusBadge(_ref4) {
 // on top of it. Escape, the ✕ and a click on the backdrop all close it; the
 // global "ecx-close-modals" event closes every open one at once so deep links
 // from one pop-out to another never stack.
+var ECX_MODAL_SEQ = 0;
 function Modal(props) {
-  var onClose = props.onClose;
+  var onCloseRef = React.useRef(props.onClose); onCloseRef.current = props.onClose;
+  var panelRef = React.useRef(null);
+  var idRef = React.useRef(null); if (idRef.current === null) { ECX_MODAL_SEQ += 1; idRef.current = "ecx-modal-title-" + ECX_MODAL_SEQ; }
+  var mountedAt = React.useRef(0);
   React.useEffect(function () {
-    var onKey = function (e) { if (e.key === "Escape") onClose(); };
-    var onAll = function () { onClose(); };
+    mountedAt.current = Date.now();
+    var prevFocus = document.activeElement;
+    var tabbables = function () {
+      if (!panelRef.current) return [];
+      return Array.prototype.slice.call(panelRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+        .filter(function (el) { return !el.disabled && el.offsetParent !== null; });
+    };
+    var onKey = function (e) {
+      if (e.key === "Escape") { onCloseRef.current(); return; }
+      if (e.key === "Tab" && panelRef.current) {
+        var t = tabbables(); if (!t.length) { e.preventDefault(); panelRef.current.focus(); return; }
+        var first = t[0], last = t[t.length - 1], active = document.activeElement;
+        if (!panelRef.current.contains(active)) { e.preventDefault(); (e.shiftKey ? last : first).focus(); return; }
+        if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+      }
+    };
+    var onAll = function () { onCloseRef.current(); };
     document.addEventListener("keydown", onKey);
     window.addEventListener("ecx-close-modals", onAll);
     var prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    if (panelRef.current) panelRef.current.focus({ preventScroll: true });
     return function () {
       document.removeEventListener("keydown", onKey);
       window.removeEventListener("ecx-close-modals", onAll);
       document.body.style.overflow = prevOverflow;
+      if (prevFocus && document.contains(prevFocus) && typeof prevFocus.focus === "function") { try { prevFocus.focus({ preventScroll: true }); } catch (err) {} }
     };
   }, []);
   var width = props.width || 980;
   return ReactDOM.createPortal(/*#__PURE__*/React.createElement("div", {
     className: "ecx-modal-backdrop",
-    onMouseDown: function (e) { if (e.target === e.currentTarget) onClose(); },
-    style: { position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.55)", backdropFilter: "blur(2px)", zIndex: 1000, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }
+    onMouseDown: function (e) { if (e.target === e.currentTarget && Date.now() - mountedAt.current > 250) onCloseRef.current(); },
+    style: { position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.55)", backdropFilter: "blur(2px)", zIndex: 10000, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "40px 20px", overflowY: "auto" }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "ecx-modal-panel",
-    role: "dialog", "aria-modal": "true",
-    style: { background: "#fff", borderRadius: 16, width: "100%", maxWidth: width, maxHeight: "calc(100vh - 80px)", display: "flex", flexDirection: "column", boxShadow: "0 24px 64px rgba(15, 23, 42, 0.35)", overflow: "hidden" }
+    className: "ecx-modal-panel", ref: panelRef, tabIndex: -1,
+    role: "dialog", "aria-modal": "true", "aria-labelledby": idRef.current,
+    style: { background: "#fff", borderRadius: 16, width: "100%", maxWidth: width, maxHeight: "calc(100vh - 80px)", display: "flex", flexDirection: "column", boxShadow: "0 24px 64px rgba(15, 23, 42, 0.35)", overflow: "hidden", outline: "none" }
   }, /*#__PURE__*/React.createElement("div", {
     style: { display: "flex", alignItems: "flex-start", gap: 14, padding: "18px 24px 14px", borderBottom: "1px solid #E5E7EB", background: "linear-gradient(180deg, #F8FAFC 0%, #fff 100%)" }
   }, props.icon ? /*#__PURE__*/React.createElement("div", { style: { flexShrink: 0, marginTop: 2 } }, props.icon) : null,
     /*#__PURE__*/React.createElement("div", { style: { flex: 1, minWidth: 0 } },
       props.kicker ? /*#__PURE__*/React.createElement("div", { style: { fontSize: 10.5, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#64748B", marginBottom: 3 } }, props.kicker) : null,
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 20, fontWeight: 700, color: "#0F172A", fontFamily: "'Libre Baskerville', Georgia, serif", lineHeight: 1.25 } }, props.title),
+      /*#__PURE__*/React.createElement("h2", { id: idRef.current, style: { margin: 0, fontSize: 20, fontWeight: 700, color: "#0F172A", fontFamily: "'Libre Baskerville', Georgia, serif", lineHeight: 1.25 } }, props.title),
       props.subtitle ? /*#__PURE__*/React.createElement("div", { style: { fontSize: 12, color: "#64748B", marginTop: 4, lineHeight: 1.5 } }, props.subtitle) : null),
     /*#__PURE__*/React.createElement("button", {
-      onClick: onClose, "aria-label": "Close", title: "Close (Esc)",
+      onClick: function () { onCloseRef.current(); }, "aria-label": "Close", title: "Close (Esc)",
       style: { flexShrink: 0, width: 34, height: 34, borderRadius: 10, border: "1px solid #E2E8F0", background: "#fff", color: "#475569", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", lineHeight: 1 }
     }, "✕")),
-  /*#__PURE__*/React.createElement("div", { className: "ecx-modal-body", style: { overflowY: "auto", padding: "6px 0 18px" } }, props.children))), document.body);
+  /*#__PURE__*/React.createElement("div", { className: "ecx-modal-body", style: { overflowY: "auto", padding: "0 0 18px" } }, props.children))), document.body);
 }
 // Small "Open" affordance used on card headers instead of the old ▲/▼ chevron.
 function OpenHint(props) {
@@ -4794,12 +4820,13 @@ function LenderCard(_ref6) {
     forceOpen = _ref6.forceOpen,
     onClosed = _ref6.onClosed;
   var lstats = LENDER_STATS(info);
-  var _useState2 = _useState(false),
+  var _useState2 = _useState(!!forceOpen),
     _useState3 = _slicedToArray(_useState2, 2),
     expanded = _useState3[0],
     setExpanded = _useState3[1];
   React.useEffect(function () { if (forceOpen) setExpanded(true); }, [forceOpen]);
   var closeCard = function () { setExpanded(false); if (onClosed) onClosed(); };
+  var pickSection = function (k) { setActiveSection(k); var mb = document.querySelector(".ecx-modal-body"); if (mb) mb.scrollTop = 0; };
   var _useState4 = _useState("notes"),
     _useState5 = _slicedToArray(_useState4, 2),
     activeSection = _useState5[0],
@@ -4817,6 +4844,9 @@ function LenderCard(_ref6) {
       overflow: "hidden"
     }
   }, /*#__PURE__*/React.createElement("div", {
+    className: "ecx-card-head",
+    role: "button", tabIndex: 0, "aria-expanded": expanded, "aria-haspopup": "dialog",
+    onKeyDown: function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setExpanded(true); } },
     style: {
       padding: "14px 16px",
       cursor: "pointer"
@@ -4825,6 +4855,7 @@ function LenderCard(_ref6) {
       return setExpanded(!expanded);
     }
   }, /*#__PURE__*/React.createElement("div", {
+    className: "ecx-lender-row",
     style: {
       display: "flex",
       justifyContent: "space-between",
@@ -4879,6 +4910,7 @@ function LenderCard(_ref6) {
     }
   }, name), info.summary && /*#__PURE__*/React.createElement("div", {
     className: "ecx-clamp-2",
+    title: info.summary,
     style: {
       fontSize: 12,
       color: "#6B7280",
@@ -4886,6 +4918,8 @@ function LenderCard(_ref6) {
       lineHeight: 1.5
     }
   }, info.summary), projectCount > 0 && /*#__PURE__*/React.createElement("div", {
+    title: "Open the Projects section",
+    onClick: function (e) { e.stopPropagation(); setActiveSection("projects"); setExpanded(true); },
     style: {
       display: "flex",
       gap: 6,
@@ -4893,16 +4927,14 @@ function LenderCard(_ref6) {
       marginTop: 8
     }
   }, Object.keys(info.projects).slice(0, 4).map(function (projName) {
-    var proj = projectsData.find(function (p) {
-      return p.name === projName;
-    });
+    var proj = ECX_findProject(projectsData, projName);
     var isClosed = projName.toLowerCase().includes("closed") || (info.projects[projName] || "").toUpperCase().startsWith("CLOSED");
     var regionColor = proj ? getRegionColor(REGION_TOKENS(proj.region)[0]) : "#6B7280";
     return /*#__PURE__*/React.createElement("span", {
       key: projName,
       onClick: function onClick(e) {
         e.stopPropagation();
-        onSelectProject(projName);
+        if (proj) onSelectProject(proj.name);
       },
       style: {
         fontSize: 10.5,
@@ -4912,13 +4944,13 @@ function LenderCard(_ref6) {
         background: isClosed ? "#F3F4F6" : "#EFF6FF",
         color: isClosed ? "#9CA3AF" : "#1D4ED8",
         border: isClosed ? "1px solid #D1D5DB" : "1px solid ".concat(regionColor),
-        cursor: "pointer",
+        cursor: proj ? "pointer" : "default",
         whiteSpace: "nowrap",
         textDecoration: isClosed ? "line-through" : "none",
         opacity: isClosed ? 0.7 : 1,
         transition: "background 0.15s"
       },
-      title: info.projects[projName]
+      title: proj ? info.projects[projName] : (info.projects[projName] || "") + " \u2014 no active project card (closed deal or not tracked as a project)"
     }, proj ? "".concat(proj.region === "US" ? "🇺🇸" : proj.region === "Europe" ? "🇪🇺" : proj.region === "APAC" ? "🌏" : "🌐", " ") : "", projName);
   }), projectCount > 4 ? /*#__PURE__*/React.createElement("span", { style: { fontSize: 10.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "#F8FAFC", color: "#64748B", border: "1px solid #E2E8F0", whiteSpace: "nowrap" }, title: Object.keys(info.projects).slice(4).join(" \u00B7 ") }, "+" + (projectCount - 4) + " more") : null)), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -4984,7 +5016,9 @@ function LenderCard(_ref6) {
     icon: /*#__PURE__*/React.createElement(BankLogo, { name: name, size: 40 }),
     onClose: closeCard,
     width: 1040
-  }, /*#__PURE__*/React.createElement("div", {
+  }, info.summary ? /*#__PURE__*/React.createElement("div", {
+    style: { padding: "12px 24px 10px", fontSize: 12.5, color: "#475569", lineHeight: 1.65, borderBottom: "1px solid #F8FAFC" }
+  }, info.summary) : null, /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       borderBottom: "1px solid #F3F4F6",
@@ -5002,7 +5036,7 @@ function LenderCard(_ref6) {
     return /*#__PURE__*/React.createElement("button", {
       key: key,
       onClick: function onClick() {
-        return setActiveSection(key);
+        return pickSection(key);
       },
       style: {
         background: "none",
@@ -5022,7 +5056,7 @@ function LenderCard(_ref6) {
     }
   }, activeSection === "notes" && /*#__PURE__*/React.createElement("div", null, ((_info$notes3 = info.notes) === null || _info$notes3 === void 0 ? void 0 : _info$notes3.length) > 0 ? (info.notes || []).map(function (note, i) {
     return /*#__PURE__*/React.createElement(NoteCard, {
-      key: i,
+      key: (note.date || "") + "|" + String(note.source || "").slice(0, 40) + "|" + i,
       note: note
     });
   }) : /*#__PURE__*/React.createElement("div", {
@@ -5034,9 +5068,7 @@ function LenderCard(_ref6) {
     var _ref0 = _slicedToArray(_ref9, 2),
       projName = _ref0[0],
       note = _ref0[1];
-    var proj = projectsData.find(function (p) {
-      return p.name === projName;
-    });
+    var proj = ECX_findProject(projectsData, projName);
     return /*#__PURE__*/React.createElement("div", {
       key: projName,
       style: {
@@ -5067,13 +5099,12 @@ function LenderCard(_ref6) {
       style: {
         fontWeight: 700,
         fontSize: 13,
-        color: "#047857",
-        cursor: "pointer"
+        color: proj ? "#047857" : "#374151",
+        cursor: proj ? "pointer" : "default"
       },
-      onClick: function onClick() {
-        return onSelectProject(projName);
-      }
-    }, projName, " \u2197")), /*#__PURE__*/React.createElement("div", {
+      title: proj ? "Open " + proj.name : "No active project card \u2014 closed deal or not tracked as a project",
+      onClick: proj ? function onClick() { return onSelectProject(proj.name); } : undefined
+    }, projName, proj ? " \u2197" : "")), /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 12,
         color: "#374151",
@@ -5137,7 +5168,7 @@ function LenderCard(_ref6) {
       style: { fontSize: 13, fontWeight: 700, color: "#14532D", letterSpacing: "0.05em" }
     }, "TOTAL"), /*#__PURE__*/React.createElement("div", {
       style: { fontSize: 13, fontWeight: 700, color: "#14532D" }
-    }, fmt + "\u2002(@ EUR/USD 1.16513)"));
+    }, fmt + "\u2002(@ EUR/USD " + EUR_USD + ")"));
   }()) : /*#__PURE__*/React.createElement("div", {
     style: { fontSize: 13, color: "#6B7280", fontStyle: "italic" }
   }, "No existing facilities recorded.")),
@@ -5319,7 +5350,7 @@ function ProjectCard(_ref1) {
     onSelectLender = _ref1.onSelectLender,
     forceOpen = _ref1.forceOpen,
     onClosed = _ref1.onClosed;
-  var _useState6 = _useState(false),
+  var _useState6 = _useState(!!forceOpen),
     _useState7 = _slicedToArray(_useState6, 2),
     expanded = _useState7[0],
     setExpanded = _useState7[1];
@@ -5341,6 +5372,9 @@ function ProjectCard(_ref1) {
       overflow: "hidden"
     }
   }, /*#__PURE__*/React.createElement("div", {
+    className: "ecx-card-head",
+    role: "button", tabIndex: 0, "aria-expanded": expanded, "aria-haspopup": "dialog",
+    onKeyDown: function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setExpanded(true); } },
     style: {
       padding: "14px 16px",
       cursor: "pointer"
@@ -5413,7 +5447,7 @@ function ProjectCard(_ref1) {
       fontFamily: "'Libre Baskerville', Georgia, serif"
     }
   }, project.name)), /*#__PURE__*/React.createElement("div", {
-    style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginLeft: "auto" }
+    style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", flexBasis: "100%", marginTop: 4 }
   }, project.expectedClose && project.expectedClose !== "Paused" ? /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#065F46",
@@ -11393,7 +11427,7 @@ function GlobalCapTableTab() {
   var chip = function (b, j) {
     return h("span", { key: b.bank, style: { display: "inline-flex", alignItems: "center", gap: 5, background: j === 0 ? "#DBEAFE" : "#F8FAFC", border: "1px solid " + (j === 0 ? "#93C5FD" : "#E2E8F0"), borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600, color: "#1E3A5F", marginRight: 5, marginBottom: 4 } }, h(BankLogo, { name: b.bank, size: 14 }), b.bank + " " + fmtM(b.amt));
   };
-  return h("div", { style: { maxWidth: 1200, margin: "0 auto" } },
+  return h("div", { style: { maxWidth: 1400, margin: "0 auto" } },
     h("div", { style: { display: "flex", gap: 14, marginBottom: 12, flexWrap: "wrap" } },
       h("div", { style: cardStyle }, h("div", { style: labStyle }, "Total Commitments"), h("div", { style: { fontSize: 24, fontWeight: 800, color: "#1D4ED8", marginTop: 4 } }, fmtM(grandTotal)), h("div", { style: { fontSize: 10, color: "#065F46", fontWeight: 700, marginTop: 2 } }, "\u2713 ties to " + CAPTABLE_ACTUALS.asOf + " Debt Overview")),
       h("div", { style: cardStyle }, h("div", { style: labStyle }, "Drawn"), h("div", { style: { fontSize: 24, fontWeight: 800, color: "#065F46", marginTop: 4 } }, fmtM(grandDrawn))),
@@ -11549,8 +11583,8 @@ function GuideTab() {
     h("div", { style: card },
       hd("\uD83D\uDCA1 Reading each tab"),
       tab("Inputs & Review", "The team capture inbox and the landing tab. Compose (date \u00B7 initials \u00B7 linked lenders \u00B7 documented-call flag) \u2192 approve \u2192 applied live to the linked cards, with undo. Entries live in your browser until a sync bakes them in for everyone."),
-      tab("Active Lenders", "One card per institution, sorted by active pipeline exposure (largest first). Each card carries the relationship badge (\uD83C\uDFE6 Existing Lender with facility count vs \u2728 New Lender), two stat boxes \u2014 navy Active Pipeline (total size of the live deals they are on) and green Committed (their facility commitments) \u2014 the full conversation history with attendees and materials, and clickable project chips. Toggle Cards \u2194 Table top-right; in Table view a row expands to the same full card."),
-      tab("Active Projects", "The live pipeline, largest expected size first. Each card shows the navy Expected Size and green Expected Close boxes, region pills (a deal can carry more than one, e.g. Global + NA), and on expand: \u25A4 workstreams for grouped programmes (Leroy, HoldCo, Salar), the \uD83C\uDFE6 Bank Outreach panel \u2014 every bank approached, grouped Lead / Invited / Support / In dialogue / Proposal received / Declined (struck through in red), hover for detail, click to open the bank\u2019s card \u2014 and each lender\u2019s latest read on the deal."),
+      tab("Active Lenders", "One compact card per institution, sorted by active pipeline exposure (largest first): the relationship badge (\uD83C\uDFE6 Existing Lender with facility count vs \u2728 New Lender), two stat boxes \u2014 navy Active Pipeline (total size of the live deals they are on) and green Committed (their facility commitments) \u2014 and up to four project pills (+N more). Click the card or its Open \u2197 hint to open the full record in a pop-out: call notes with attendees and materials, projects, existing facilities, rejections and contacts; long notes start folded behind Read more. Pills marked \u2197 jump to that project\u2019s pop-out; pills without the arrow are closed deals or facilities with no project card. Toggle Cards \u2194 Table top-right."),
+      tab("Active Projects", "The live pipeline, largest expected size first. Each card shows region pills (a deal can carry more than one, e.g. Global + NA), the navy Expected Size and green Expected Close boxes and a three-line summary. Click the card or Open \u2197 for the pop-out: the full overview rendered as sections and dated updates, \u25A4 workstreams for grouped programmes (Leroy, HoldCo, Salar), the \uD83C\uDFE6 Bank Outreach panel \u2014 every bank approached, grouped Lead / Invited / Support / In dialogue / Proposal received / Declined (struck through in red), hover for detail, click \u2197 to open the bank\u2019s pop-out \u2014 and each lender\u2019s latest read on the deal."),
       tab("Closed 2025 & 2026", "Completed transactions by year with lender-by-lender commitments, draws, fees withheld, key terms and funds-flow summaries. Repeat facilities are grouped: the Wahoo DevCo RCF shows as one card that opens to all four closings."),
       tab("Lender Fees", "What we have paid each institution across 2025 and 2026, largest first; click a bank to expand its deal-by-deal breakdown, or switch to the by-deal matrix. \u201C\u2014\u201D means not in the deal; $0 means in the deal with no fee."),
       tab("Lender Commitments", "The mirror image: what each institution has committed, across all 22 facilities. Click a bank for its facility-by-facility breakdown, or switch to the full matrix with column totals. Badges flag backleverage where the source file records it."),
@@ -11591,6 +11625,23 @@ function persistInputEntries(list) {
 // re-applies on every open until the Claude sync bakes the entry into the published
 // version, at which point SYNCED_INPUT_IDS purges it from the local queue.
 var APPLIED_INPUT_IDS = {};
+function ECX_findProject(list, name) {
+  if (!list || !name) return null;
+  var exact = null;
+  for (var i = 0; i < list.length; i++) { if (list[i].name === name) return list[i]; }
+  var norm = function (x) { return String(x || "").toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9]/g, ""); };
+  var n = norm(name);
+  if (n.length < 5) return null;
+  for (var k = 0; k < list.length; k++) { if (norm(list[k].name) === n) return list[k]; }
+  var cands = list.filter(function (p) { var pn = norm(p.name); return pn.indexOf(n) >= 0 || n.indexOf(pn) >= 0; });
+  if (cands.length === 1) return cands[0];
+  // token fallback: every meaningful word of the key appears in exactly one project name
+  // ("Project Vendace (Sweden) Syndication" → "Project Vendace — Sweden Syndication")
+  var toks = String(name).toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter(function (w) { return w.length >= 3 && w !== "project" && w !== "the"; });
+  if (!toks.length) return null;
+  var hits = list.filter(function (p) { var pn = p.name.toLowerCase(); return toks.every(function (w) { return pn.indexOf(w) >= 0; }); });
+  return hits.length === 1 ? hits[0] : null;
+}
 function ECX_DATE_VAL(s) {
   var m = String(s || "").match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
   if (!m) return 0;
@@ -13944,10 +13995,21 @@ function App() {
       sources: 39
     };
   }, []);
+  var _lvs = _useState("cards"),
+    _lvs2 = _slicedToArray(_lvs, 2),
+    lenderView = _lvs2[0],
+    setLenderView = _lvs2[1];
   var _ol = _useState(null), openLender = _ol[0], setOpenLender = _ol[1];
   var _op = _useState(null), openProject = _op[0], setOpenProject = _op[1];
+  var beginSwap = function () {
+    document.body.classList.add("ecx-swapping");
+    setTimeout(function () { document.body.classList.remove("ecx-swapping"); }, 300);
+  };
   var handleSelectLender = function handleSelectLender(name) {
+    if (!LENDERS[name]) return;
+    beginSwap();
     window.dispatchEvent(new Event("ecx-close-modals"));
+    setSearchText(""); setFilterRegion("All Regions"); setFilterType("All Types"); setFilterStatus("All Status"); setLenderView("cards");
     setHighlightLender(name);
     setActiveTab("lenders");
     setOpenProject(null);
@@ -13960,8 +14022,13 @@ function App() {
       });
     }, 100);
   };
-  var handleSelectProject = function handleSelectProject(name) {
+  var handleSelectProject = function handleSelectProject(rawName) {
+    var target = ECX_findProject(PROJECTS, rawName);
+    if (!target) return;
+    var name = target.name;
+    beginSwap();
     window.dispatchEvent(new Event("ecx-close-modals"));
+    setSearchText(""); setFilterRegion("All Regions"); setFilterType("All Types");
     setHighlightProject(name);
     setActiveTab("projects");
     setOpenLender(null);
@@ -13974,10 +14041,6 @@ function App() {
       });
     }, 100);
   };
-  var _lvs = _useState("cards"),
-    _lvs2 = _slicedToArray(_lvs, 2),
-    lenderView = _lvs2[0],
-    setLenderView = _lvs2[1];
   var TABS = [["inputs", "\u270d\ufe0f Inputs & Review"], ["ask", "\u2753 Ask"], ["lenders", "Active Lenders (".concat(Object.keys(LENDERS).length, ")")],["projects", "Active Projects (".concat(PROJECTS.length, ")")], ["closed", "Closed 2025 & 2026 (".concat(CLOSED_PROJECTS.length, ")")], ["fees", "Lender Fees"], ["commits", "Lender Commitments"], ["lcsynd", "LC Syndication"], ["captable", "Global Cap Table"], ["guide", "\uD83D\uDCD6 Guide"]];
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -14079,7 +14142,8 @@ function App() {
   }))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
-      gap: 0
+      gap: 0,
+      flexWrap: "wrap"
     }
   }, TABS.map(function (_ref29) {
     var _ref30 = _slicedToArray(_ref29, 2),
@@ -14095,8 +14159,9 @@ function App() {
         color: activeTab === tab ? "#fff" : "#93C5FD",
         border: "none",
         borderBottom: activeTab === tab ? "2px solid #fff" : "2px solid transparent",
-        padding: "10px 18px",
+        padding: "9px 14px",
         fontSize: 13,
+        whiteSpace: "nowrap",
         fontWeight: activeTab === tab ? 700 : 500,
         cursor: "pointer",
         fontFamily: "inherit",
@@ -14211,7 +14276,10 @@ function App() {
       color: "#6B7280",
       marginBottom: 16
     }
-  }, "Showing ", filteredLenders.length, " of ", Object.keys(LENDERS).length, " lenders \u00B7 sorted by active pipeline exposure (largest first; ties by most recent conversation)"), /*#__PURE__*/React.createElement("div", {
+  }, "Showing ", filteredLenders.length, " of ", Object.keys(LENDERS).length, " lenders \u00B7 sorted by active pipeline exposure (largest first; ties by most recent conversation)", /*#__PURE__*/React.createElement("span", {
+    title: "Cards with a 2px green ring mention ByteDance or Oracle appetite in their notes",
+    style: { marginLeft: 12, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, color: "#166534", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 8, padding: "2px 8px", fontWeight: 600 }
+  }, /*#__PURE__*/React.createElement("span", { style: { width: 10, height: 10, borderRadius: 3, border: "2px solid #16A34A", display: "inline-block" } }), "green ring = ByteDance / Oracle appetite")), /*#__PURE__*/React.createElement("div", {
     style: { display: "flex", gap: 6, justifyContent: "flex-end", marginTop: -30, marginBottom: 14 }
   }, [["cards", "\u25A6 Cards"], ["table", "\u2630 Table"]].map(function (v) {
     return /*#__PURE__*/React.createElement("button", {
@@ -14235,7 +14303,7 @@ function App() {
       info = _ref32[1];
     var allText = JSON.stringify(info.notes || []) + (info.summary || "") + JSON.stringify(info.projects || {});
     var hasBD = /bytedance|ByteDance/i.test(allText);
-    var hasOracle = /oracle|OCI/i.test(allText);
+    var hasOracle = /oracle|\bOCI\b/i.test(allText);
     var highlight = hasBD || hasOracle;
     return /*#__PURE__*/React.createElement("div", {
       key: name,
@@ -14297,7 +14365,7 @@ function App() {
         info = _ref34[1];
       var allText = JSON.stringify(info.notes || []) + (info.summary || "") + JSON.stringify(info.projects || {});
       var hasBD = /bytedance|ByteDance/i.test(allText);
-      var hasOracle = /oracle|OCI/i.test(allText);
+      var hasOracle = /oracle|\bOCI\b/i.test(allText);
       return hasBD || hasOracle;
     });
     if (bdOracleLenders.length === 0) return null;
@@ -14343,7 +14411,7 @@ function App() {
         info = _ref36[1];
       var allText = JSON.stringify(info.notes || []) + (info.summary || "") + JSON.stringify(info.projects || {});
       var hasBD = /bytedance|ByteDance/i.test(allText);
-      var hasOracle = /oracle|OCI/i.test(allText);
+      var hasOracle = /oracle|\bOCI\b/i.test(allText);
       return /*#__PURE__*/React.createElement("div", {
         key: name,
         style: {
