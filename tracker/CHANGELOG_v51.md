@@ -711,11 +711,11 @@ Everything that reached Aditya's mailbox between the v81 cut-off (9/3, 12:10 PM 
 | | v81 | v82 |
 |---|---|---|
 | lender cards | 65 | 66 (+EIB) |
-| lender notes | 202 | 218 |
+| lender notes | 202 | 217 |
 | next-steps rewritten | — | 10 |
 | outreach rows updated | — | 6 (Wells Fargo → declined; SocGen, TD, ING, GS, KKR refreshed) |
 | project description updates | — | 16 dated blocks across Guadalupe, Ashville 1 and 2, Leroy II, Tarpon II, Tarpon III, PCX Global, New Albany North |
-| market notes | 65 | 5 |
+| market notes | 65 | 70 |
 | `lastContact` moves | — | TD Securities → 8/14/26 (Ed Kim's "Good catching up in Boulder", the first documented in-person conversation; exact day unstated); EIB 9/4/26 on the new card. No other card moved: every other bank contact in the window was email, a written proposal, or a call without a readout |
 | folded-in through | 9/3/26 | 9/8/26 |
 
