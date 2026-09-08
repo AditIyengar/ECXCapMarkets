@@ -753,3 +753,13 @@ Aditya's notes from the 9/8 2:00 PM ET ECX / FAB call replace the calendar place
 - **Where it lands.** LC Facilities (Liverpool) and Guadalupe cards carry dated blocks; FAB's outreach rows on LC Facilities, Guadalupe and Salar are refreshed and a new lead row is added on Marvel III / Atlas — ACX India, since FAB named India a priority market. Next steps rewritten: high Liverpool ticket via Hicham El Khaoudy, stay on the Guadalupe and Salar lists, sound FAB for ACX India, management meeting with Joe Harar, financials and the Ashville 2 question.
 
 Release: stamp `9/8/26, 3:00 PM ET (v84)` from the clock; `SWEEP_THROUGH` unchanged at 9/8/26; all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 24 projects, 10 tabs, pop-out opens, zero console errors, zero external requests). Archived as `tracker/versions/ECX_Tracker_v84.html`.
+
+
+## v85 Changelog (9/8/26) — Project Guadalupe expected size
+
+Per Aditya (9/8/26), Project Guadalupe's expected size is now **$8.5–9bn**, replacing the $6.4bn March-26 Excel/EQT estimate.
+
+- **Guadalupe card.** Description opens with the new expected size and notes the superseded $6.4bn figure; the "DC Finance Size" teaser metric becomes "Expected Finance Size — $8.5–9bn", so the Active Projects header now reads "Expected size $8.5–9bn" and lender exposure sorting uses the $9bn upper bound (the "EC Finance Size" $3.18bn row is unchanged).
+- **Cross-references.** Leroy's "Addition of Austin Campus" workstream now points to the "standalone $8.5–9bn Project Guadalupe campus PF"; the Guide's Budget Pipeline row keeps the Excel $6.4bn source figure and adds "expected size now $8.5–9bn (9/8/26)".
+
+Release: stamp `9/8/26, 3:19 PM ET (v85)` from the clock; `SWEEP_THROUGH` unchanged at 9/8/26; all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 24 projects, 10 tabs, pop-out opens, zero console errors, zero external requests). Archived as `tracker/versions/ECX_Tracker_v85.html`.
