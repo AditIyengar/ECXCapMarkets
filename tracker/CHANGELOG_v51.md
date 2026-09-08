@@ -742,3 +742,14 @@ Aditya's notes from the 9/8 10:30 AM ET meeting with Truist Securities at the He
 - **Action.** Aditya to send the Guadalupe overview portion only. Guadalupe outreach row for Truist refreshed (dialogue); next steps rewritten around the overview, the Andrew call, the exposure re-org and the ABS sounding.
 
 Release: stamp `9/8/26, 11:35 AM ET (v83)` from the clock; `SWEEP_THROUGH` unchanged at 9/8/26; all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 24 projects, 10 tabs, pop-out opens, zero console errors, zero external requests). Archived as `tracker/versions/ECX_Tracker_v83.html`.
+
+
+## v84 Changelog (9/8/26) — First Abu Dhabi Bank call readout
+
+Aditya's notes from the 9/8 2:00 PM ET ECX / FAB call replace the calendar placeholder on the FAB card; `lastContact` moves to 9/8/26.
+
+- **Exposure and appetite.** FAB has close to $1bn of ECX exposure across the US and other markets; $300–500m commitment appetite per transaction today, rising to $2–3bn for ECX over the next 2–3 years. Priority markets: India, the US and Europe. Looking to build the relationship.
+- **Product box.** Open to large LC or ICLA tickets, especially with performance guarantees; LC minimum $100–500m; RCF minimum $100–150m (can do $50m, but the bank does not shy away from big numbers).
+- **Where it lands.** LC Facilities (Liverpool) and Guadalupe cards carry dated blocks; FAB's outreach rows on LC Facilities, Guadalupe and Salar are refreshed and a new lead row is added on Marvel III / Atlas — ACX India, since FAB named India a priority market. Next steps rewritten: high Liverpool ticket via Hicham El Khaoudy, stay on the Guadalupe and Salar lists, sound FAB for ACX India, management meeting with Joe Harar, financials and the Ashville 2 question.
+
+Release: stamp `9/8/26, 3:00 PM ET (v84)` from the clock; `SWEEP_THROUGH` unchanged at 9/8/26; all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 24 projects, 10 tabs, pop-out opens, zero console errors, zero external requests). Archived as `tracker/versions/ECX_Tracker_v84.html`.
