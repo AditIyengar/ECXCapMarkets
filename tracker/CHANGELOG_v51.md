@@ -728,3 +728,17 @@ Attachments (SG / GS term-sheet PDFs, the GS RAP draft and board deck, TD's ATL1
 ### Release
 
 Stamp `9/8/26, 10:34 AM ET (v82)` taken from the clock at release. QC: all 5 script blocks pass `node --check`; the release smoke run confirms the stamp is rendered and not ahead of the clock, `SWEEP_THROUGH` 9/8/26 rendered, no cadence claim, 66 lenders / 24 projects / 18 closed, all 10 tabs rendering with content, a lender pop-out opens, zero console errors and zero external requests. Archived as `tracker/versions/ECX_Tracker_v82.html`.
+
+
+## v83 Changelog (9/8/26) — Truist in-person readout
+
+Aditya's notes from the 9/8 10:30 AM ET meeting with Truist Securities at the Herndon office (Mark Morrison and Shalaj Tater, both formerly RBC) replace the calendar placeholder on the Truist card. `lastContact` moves to 9/8/26 — the first documented conversation since 8/5.
+
+- **Capacity.** Truist has $9–10bn out to data centres and is "at a standstill for deploying more capital"; a new CEO started last week and is reorganising exposure figures, with the PF side hoping to lift hold limits internally.
+- **Positioning.** Six-plus months of dialogue; Truist wants an operating partner with ECX's reputation sitting with it ahead of a batch number.
+- **Credit box.** Pure IG so far ("if you pick 5 deals, there's still so much other direct IG paper in the market you would choose"), but no issue holding non-IG lease exposure inside a broader multi-asset transaction.
+- **Energy centers.** ECX is looking for buyers of the energy-center assets; Truist to set up a call with Andrew on its team on potential buyers, and a forward sale would be more attractive to them. Everything sits under one contract today. Recorded on the Truist card, the Guadalupe card and PCX Global.
+- **ABS.** Truist is a top 3–4 DC ABS bookrunner; the new-master-trust vs existing-colo-trust question is open.
+- **Action.** Aditya to send the Guadalupe overview portion only. Guadalupe outreach row for Truist refreshed (dialogue); next steps rewritten around the overview, the Andrew call, the exposure re-org and the ABS sounding.
+
+Release: stamp `9/8/26, 11:35 AM ET (v83)` from the clock; `SWEEP_THROUGH` unchanged at 9/8/26; all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 24 projects, 10 tabs, pop-out opens, zero console errors, zero external requests). Archived as `tracker/versions/ECX_Tracker_v83.html`.
