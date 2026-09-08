@@ -688,3 +688,43 @@ Skipped on purpose: the Monument Advocacy / EDF presentation (government affairs
 ### Release
 
 Stamp `9/3/26, 12:18 PM ET (v81)` taken from the clock at release. QC: all 5 script blocks pass `node --check`; the release smoke run confirms stamp = rendered header and ≤ clock, `SWEEP_THROUGH` 9/3/26 rendered, no cadence claim, 65 lenders / 24 projects / 18 closed / 65 market notes / 202 lender notes / 121 commitment rows, all 10 tabs rendering, the Natixis pop-out and the Guadalupe deep link opening, seven Ask queries routing, zero console errors and zero external requests; the accessibility script passes (equal-height cards, keyboard-open dialog, focus trap, Escape restores focus, 820px no overflow). Archived as `tracker/versions/ECX_Tracker_v81.html`.
+
+
+## v82 Changelog (9/8/26) — the full post-Labor-Day refresh: inbox, Bank Meetings folder and calendar, 9/3 noon → 9/8 10:30 AM ET
+
+### What changed for the reader
+
+Everything that reached Aditya's mailbox between the v81 cut-off (9/3, 12:10 PM ET) and 9/8 mid-morning was read: 211 messages across all folders (about 45 substantive threads once the automated SOF / xConnect / completion notices were set aside), the 51 items in the Bank Meetings folder were checked against the cards one by one, and the Outlook calendar for the week of 9/7 was used as evidence for calls that have no written readout yet. The folded-in date moves from 9/3/26 to 9/8/26.
+
+- **A new lender card: EIB.** Eelco Holst's 9/4 call note with Vincent Metzler (European Investment Bank, project financings east of the Rhine). EIB's risk appetite mirrors the commercial banks, it "can provide large tickets", has not yet financed a data centre (it is looking at multi-tenant and GPU situations), lends to Deutsche Glasfaser (so some sensitivity towards EQT) and will send an NDA; ECX to involve EIB once a bank structure has progressed. `lastContact` 9/4/26 (date of the note; the call date is not stated).
+- **Wells Fargo steps back from Guadalupe.** Rena Romanini (9/7): "given the 180 day termination right, that one will be hard for us." The Guadalupe outreach row moves to declined; WF stays interested in the devco upsize.
+- **Guadalupe indicative terms reach SocGen and Goldman.** Aditya sent SG the Summary of Indicative Terms on 9/8 (appetite due by the end of this week); Ricardo Alvarez confirmed receipt and wants to discuss — call Wed 9/9 3:30 PM ET with ten from SG, Laura asked for a pre-call. GS received the dual-track indicative term sheet 9/3 (feedback, especially on sizing, due 9/9), circulated the WIP rating-agency presentation (9/4) and a draft board deck for Eelco (9/8); agency engagement-letter KYC is nearly closed (entity ECX MCN Austin Property 5, LLC, signatory Joe Harar). TD asked for a rough estimate of the longer-term hold of each of the five banks able to underwrite 20% ahead of its internal Guadalupe discussion (9/8) and fixed the ATL11 take-out call for Thu 9/24 12:00 PM ET. ING's 9/3 3:30 PM ET syndication-strategy call is on the calendar (Herman accepted) with no readout on file. Barclays sent four research pieces after "the call earlier this week" — EDGEU traded EUR5m at +160bps on 8/27.
+- **Ashville 1 agency Q&A is effectively closed.** Three incremental rounds (Fitch 9/4, Moody's and S&P 9/4, more 9/5), the PML report 9/6, the LM6000 "9500 HHV" correction; Laura 9/8: "Based on this I don't believe anything else is outstanding", Hellman: "I believe that is everything outstanding. We will update the agencies." Pre-marketing: record the investor presentation 9/10–9/11, investor-call blocks held Thu 9/17 from 10 AM ET and Fri 9/18 (11–12, 1–3 PM ET), at least another 1.5 days to be secured. The model-schedule dispute with MS was resolved (MS had not changed the schedule; Laura retracted). Cahill's DoN comments mostly concern the disposition of the PowerCo; the OM tracker is down to clarifying questions. Counsel and engineer answers for the agencies (GT on lease pass-throughs and the CSA TPU trigger, DPW on SPE covenants, BCEI on 50,000 GPD water and a 1.33 day-1 PUE, Dickinson Wright on the air-permit disclosure and the writ of mandamus) and the Newmark appraisal revision (capex up to $2748.8m, risk/profit 15% to 20% questioned) are on the project card.
+- **KKR is waiting on ECX.** Marisa Parnes (9/8): NDA executed 8/31, "glad to begin reviewing materials whenever available" — the Ashville 2 package promised 8/28 has not gone out.
+- **Leroy II.** The EdgeConneX Senior Finance Co 2, LLC bank account is still not open (Vinesh Kalimuthu 9/4: BofA vs Citi decision pending, end-September target, DACA needed); Bx reliance-letter edits name BXCI ECX DEVCO LENDER 1/2/3 LLC, Mizuho Capital Markets LLC and BXC Armadillo Co-Investment Fund-D LP, with Alter Domus (US) LLC as administrative agent on the Terracon AUS10-series letter; Metcalfe Wolff confirmed as Blackstone's Texas local counsel.
+- **Guadalupe workstreams.** The 9/3 diligence kickoff set the shape: B&V and counsel engaged next week, DD report to banks end-September, lender Q&A in October, early-November close ("ambitious"); the 9/2 Austin coordination call has the Hull Street FCSA "down to the last key financial points", the TWDB brackish-water vote on 9/10 as a live risk, ~500,000 dth/day of gas lined up against ~950k at full load and the LCRA $8.7m LC/cash request. Kick-offs with A&O Shearman and Milbank are on the calendar for 9/8.
+- **Calendar evidence, no readouts yet:** Truist in person at Herndon 9/8 10:30 AM ET (Mark Morrison and three colleagues), ECX / FAB call 9/8 2:00 PM ET, Blackstone Leroy weekly 9/9 4:30 PM ET. Notes record the meetings as scheduled; `lastContact` moves only when a readout arrives.
+- **Market notes** from SMBC Nikko's weekly (DC ABS secondaries +115 to +237bps, September Fed odds), Barclays research (European DC ABS), B&V's BTM/AI precedents, the Texas ERCOT audit and the first combined energy-centre + data-centre agency process.
+
+### By the numbers
+
+| | v81 | v82 |
+|---|---|---|
+| lender cards | 65 | 66 (+EIB) |
+| lender notes | 202 | 218 |
+| next-steps rewritten | — | 10 |
+| outreach rows updated | — | 6 (Wells Fargo → declined; SocGen, TD, ING, GS, KKR refreshed) |
+| project description updates | — | 16 dated blocks across Guadalupe, Ashville 1 and 2, Leroy II, Tarpon II, Tarpon III, PCX Global, New Albany North |
+| market notes | 65 | 5 |
+| `lastContact` moves | — | TD Securities → 8/14/26 (Ed Kim's "Good catching up in Boulder", the first documented in-person conversation; exact day unstated); EIB 9/4/26 on the new card. No other card moved: every other bank contact in the window was email, a written proposal, or a call without a readout |
+| folded-in through | 9/3/26 | 9/8/26 |
+
+### How the sweep ran
+
+Container re-provisioned since v81, so the working tree came up on the default branch without the tracker: the branch was re-checked-out from origin (v81 intact) and the applier and release smoke test were rebuilt. Three subagents read the threads by workstream (Guadalupe and bank replies; Ashville 1; Leroy and project reports) with one Graph call at a time to stay under the rate limit; I wrote the Wells Fargo, KKR, TD and calendar fragments directly. Every fragment names its source message and quotes the speaker. Skipped on purpose: SOF / xConnect / completion notifications, the Monument Advocacy deck except its DOE EDF financing facts (on the PCX card), EY-Parthenon SOW traffic, the AUS02 and New Albany South PM reports (no cards for those sites), calendar accept / decline replies, and the fantasy-football draft.
+
+Attachments (SG / GS term-sheet PDFs, the GS RAP draft and board deck, TD's ATL11 deck, Barclays research, T&T and B&V proposals) were not opened — only email bodies were read; the notes say so where it matters.
+
+### Release
+
+Stamp `9/8/26, 10:34 AM ET (v82)` taken from the clock at release. QC: all 5 script blocks pass `node --check`; the release smoke run confirms the stamp is rendered and not ahead of the clock, `SWEEP_THROUGH` 9/8/26 rendered, no cadence claim, 66 lenders / 24 projects / 18 closed, all 10 tabs rendering with content, a lender pop-out opens, zero console errors and zero external requests. Archived as `tracker/versions/ECX_Tracker_v82.html`.
