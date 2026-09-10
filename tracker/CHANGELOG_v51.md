@@ -765,7 +765,7 @@ Per Aditya (9/8/26), Project Guadalupe's expected size is now **$8.5–9bn**, re
 Release: stamp `9/8/26, 3:19 PM ET (v85)` from the clock; `SWEEP_THROUGH` unchanged at 9/8/26; all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 24 projects, 10 tabs, pop-out opens, zero console errors, zero external requests). Archived as `tracker/versions/ECX_Tracker_v85.html`.
 
 
-## v86 Changelog (9/10/26) — Live team sync for the Inputs & Review tab
+## v86 Changelog (9/9/26) — Live team sync for the Inputs & Review tab
 
 The team's inputs are now shared live across everyone who opens the tracker inside claude.ai. The artifact declares the runtime `db` capability (its shared document store) with the rule "anyone who can open the page reads, only people shared with edit access write", pinned to runtime contract 0.2.44. Opened anywhere else (a downloaded copy) the tab behaves exactly as before: entries stay in that browser until a sync digest is sent.
 
