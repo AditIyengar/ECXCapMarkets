@@ -457,24 +457,37 @@ function(a,b,c){if(!Vd(b))throw Error(n(200));return Wd(null,a,b,!1,c)};Q.unmoun
 </script>
 <div id="root"><div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F1F5F9;color:#64748B;font-family:'DM Sans','Segoe UI',sans-serif;font-size:14px;">Loading ECX Fundraising Tracker…</div></div>
 <script>
-// Shared file-save helper. Uses the claude.ai artifact downloads capability when
-// present (window.claude.downloads — viewer confirms each save); otherwise falls
-// back to a plain anchor download (when the file is opened directly in a browser).
-window.ECX_SAVE_FILE = function (filename, data, mime) {
-  if (window.claude && window.claude.downloads && window.claude.downloads.save) {
-    window.claude.downloads.save({ filename: filename, data: data }).catch(function () {});
-    return;
-  }
+// Shared file-save helper. Inside the claude.ai viewer the downloads capability is reached through
+// claude.use("downloads") (the viewer confirms each save); it resolves after the first script run, so
+// saves wait for it. Anywhere else (the file opened directly in a browser) a plain anchor download is used.
+window.ECX_IN_VIEWER = !!(window.claude && typeof window.claude.use === "function");
+window.ECX_DOWNLOADS = null;
+window.ECX_DOWNLOADS_READY = (function () {
   try {
-    var blob = data instanceof Blob ? data : new Blob([data], { type: mime || "application/octet-stream" });
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 500);
-  } catch (e) { console.error("Save failed:", e); }
+    if (window.ECX_IN_VIEWER) {
+      return Promise.resolve(window.claude.use("downloads")).then(function (ns) { window.ECX_DOWNLOADS = ns || null; return window.ECX_DOWNLOADS; }, function () { return null; });
+    }
+    if (window.claude && window.claude.downloads && typeof window.claude.downloads.save === "function") window.ECX_DOWNLOADS = window.claude.downloads;
+  } catch (e) {}
+  return Promise.resolve(window.ECX_DOWNLOADS);
+})();
+window.ECX_SAVE_FILE = function (filename, data, mime) {
+  window.ECX_DOWNLOADS_READY.then(function (dl) {
+    if (dl && typeof dl.save === "function") {
+      dl.save({ filename: filename, data: data }).catch(function () {});
+      return;
+    }
+    try {
+      var blob = data instanceof Blob ? data : new Blob([data], { type: mime || "application/octet-stream" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 500);
+    } catch (e) { console.error("Save failed:", e); }
+  });
 };
 </script>
   <script>
@@ -12760,7 +12773,7 @@ function GuideTab() {
     { data: "Active projects: sizes, expected close dates & lead banks", src: "Corporate Finance Pipeline_NEW.xlsx \u2014 Pipeline (transactions) sheet. The navy Expected Size box and the largest-first ordering read the Finance Size figure; the green Expected Close box reads the Funding Date column.", loc: "SharePoint \u203A Corporate Finance_Team \u203A 03. Finance Process \u203A CF Pipeline (the canonical copy \u2014 older copies exist under M&A meeting-material folders)", own: "Deal owners (Laura Godschalx / Marjolein Heida / Sander Borgers) \u2014 updated around the weekly CF Pipeline meeting." },
     { data: "Bank Outreach per project \u2014 who we\u2019ve approached and who declined", src: "The same CF Pipeline workbook: lead/support lender columns, the Bank Matrix II sheet (including its explicit \u201Cdeclined\u201D cells) and the Ashville Wallet sheet for invite tiers \u2014 combined with decline reasons captured in call notes.", loc: "SharePoint \u203A 03. Finance Process \u203A CF Pipeline (Bank Matrix II / Ashville Wallet sheets)", own: "Corporate Finance team. Reflected onto each bank\u2019s own card automatically, so the two views always agree." },
     { data: "Closed deals (Closed 2025 & 2026 tab)", src: "Deal records at close \u2014 lender-by-lender commitments, draws, pricing, fee detail and funds-flow summaries; EUR deals converted at the rate noted on the tab.", loc: "Deal folders (funds-flow workbooks, Loan Overview.xlsx) + Lender Fees Summary", own: "Static once closed; new closings added on sync." },
-    { data: "Quick team updates (Inputs & Review tab)", src: "Typed straight into this tracker by anyone on the team \u2014 a rejection, a meeting that just happened, a new indication. Link the lender(s) it concerns when composing.", loc: "Approving an entry applies it to the linked lender cards immediately in your browser; it becomes permanent for everyone at the next Claude sync.", own: "Anyone. Approve \u2192 applied live \u2192 Copy sync digest \u2192 paste into the Claude tracker chat periodically." }
+    { data: "Quick team updates (Inputs & Review tab)", src: "Typed straight into this tracker by anyone on the team \u2014 a rejection, a meeting that just happened, a new indication. Link the lender(s) it concerns when composing.", loc: "Inside claude.ai the entries live in the tracker's shared store (live team sync): adding or approving one updates every open copy of the tracker at once, and approval applies it to the linked lender cards for everyone. Claude bakes approved entries into the next published version. Opened outside claude.ai, entries stay in that browser until a sync digest is sent.", own: "Anyone with edit access adds and approves; viewers see everything live. Claude reads the shared store at each refresh." }
   ];
   return h("div", { style: { maxWidth: 1050, margin: "0 auto" } },
     h("div", { style: card },
@@ -12787,12 +12800,12 @@ function GuideTab() {
     h("div", { style: card },
       hd("\uD83D\uDD04 How the tracker gets updated"),
       p(h("b", null, "Only on request \u2014 nothing runs on a schedule. "), "When someone asks Claude to refresh, it sweeps the mailbox and the Bank Meetings folder for call and meeting notes since the last sweep, folds them into the right lender and project cards, runs the quality checks, republishes this page and moves both header dates forward: the refresh stamp (taken from the clock at release) and the last day of call notes folded in. If the header date looks old, the tracker is old \u2014 ask for a refresh."),
-      p(h("b", null, "As things happen \u2014 the Inputs & Review tab. "), "Drop a note, link the lender it concerns, approve it, and it appears on that lender\u2019s card in your browser immediately. Send the sync digest to Claude periodically to make it permanent for the whole team."),
+      p(h("b", null, "As things happen \u2014 the Inputs & Review tab. "), "Drop a note, link the lender it concerns, approve it, and it appears on that lender\u2019s card immediately \u2014 for the whole team when the tracker runs inside claude.ai (live team sync), or in your browser when it runs elsewhere. Claude bakes approved entries into the next published version at each refresh."),
       p(h("b", null, "On request \u2014 just ask Claude. "), "In plain language: \u201Csync the latest call notes\u201D, \u201Crefresh the Lender Fees tab from Chris\u2019s latest file\u201D, \u201Cupdate the cap table from the July Debt Overview\u201D, \u201Cadd a card for [bank]\u201D. Claude reads the source files, updates the data, runs the quality checks and republishes to this same link."),
       p(h("b", null, "Versions. "), "The page name never changes. Each release bumps the version inside the header stamp, is archived as a copy in the team repo (tracker/versions/), and stays reachable through the page\u2019s own version history \u2014 so rollback is always possible without ever circulating a differently-named file.")),
     h("div", { style: card },
       hd("\uD83D\uDCA1 Reading each tab"),
-      tab("Inputs & Review", "The team capture inbox and the landing tab. Compose (date \u00B7 initials \u00B7 linked lenders \u00B7 documented-call flag) \u2192 approve \u2192 applied live to the linked cards, with undo. Entries live in your browser until a sync bakes them in for everyone."),
+      tab("Inputs & Review", "The team capture inbox and the landing tab. Compose (date \u00B7 initials \u00B7 linked lenders \u00B7 documented-call flag) \u2192 approve \u2192 applied live to the linked cards, with undo. Inside claude.ai the entries are shared live across the team (edit access to add and approve; view access sees everything); a copy opened elsewhere keeps them in that browser until a sync bakes them in."),
       tab("Active Lenders", "One compact card per institution, sorted by active pipeline exposure (largest first): the relationship badge (\uD83C\uDFE6 Existing Lender with facility count vs \u2728 New Lender), two stat boxes \u2014 navy Active Pipeline (total size of the live deals they are on) and green Committed (their facility commitments) \u2014 and up to four project pills (+N more). Click the card or its Open \u2197 hint to open the full record in a pop-out: call notes with attendees and materials, projects, existing facilities, rejections and contacts; long notes start folded behind Read more. Pills marked \u2197 jump to that project\u2019s pop-out; pills without the arrow are closed deals or facilities with no project card. Toggle Cards \u2194 Table top-right."),
       tab("Active Projects", "The live pipeline, largest expected size first. Each card shows region pills (a deal can carry more than one, e.g. Global + NA), the navy Expected Size and green Expected Close boxes and a three-line summary. Click the card or Open \u2197 for the pop-out: the full overview rendered as sections and dated updates, \u25A4 workstreams for grouped programmes (Leroy, HoldCo, Salar), the \uD83C\uDFE6 Bank Outreach panel \u2014 every bank approached, grouped Lead / Invited / Support / In dialogue / Proposal received / Declined (struck through in red), hover for detail, click \u2197 to open the bank\u2019s pop-out \u2014 and each lender\u2019s latest read on the deal."),
       tab("Closed 2025 & 2026", "Completed transactions by year with lender-by-lender commitments, draws, fees withheld, key terms and funds-flow summaries. Repeat facilities are grouped: the Wahoo DevCo RCF shows as one card that opens to all four closings."),
@@ -12805,36 +12818,95 @@ function GuideTab() {
       p(h("b", null, "Two commitment universes, on purpose. "), "The Global Cap Table shows the Notes Payable Overview universe only ($22.06bn, tied to the Debt Overview). Lender Commitments shows the commitments-file universe ($24.8bn), which also includes LC commitments, HoldCo investor commitments and ABS noteholders. Neither is wrong \u2014 quote the one that matches the question."),
       p(h("b", null, "Lender \u2194 project links are by exact name. "), "A bank appears on a project (and carries its pipeline exposure) when the names match exactly, so renaming a deal means renaming it on both sides. Bank Outreach entries are reflected onto lender cards automatically, so the project view and the card view cannot drift apart."),
       p(h("b", null, "Last Contact means a real conversation. "), "It moves only for a documented call or meeting; intel picked up second-hand is recorded as a note without moving the date."),
-      p(h("b", null, "Inputs are per-browser until synced. "), "This is a static page with no shared backend, so an approved entry is visible to you immediately but reaches teammates only once it is baked into the published version."),
+      p(h("b", null, "Inputs are shared live inside claude.ai. "), "The published tracker keeps its team inputs in a shared store, so an entry added or approved by anyone with edit access appears for every viewer straight away (the header pill reads Live team sync). Baking into the published version remains the permanent record. A copy opened outside claude.ai has no shared store: there, inputs stay per-browser until synced (the pill reads Saved on this device)."),
       p(h("b", null, "Everything is sourced. "), "If a figure looks wrong, the tab footnotes name the file, sheet, as-of date and FX rate behind it \u2014 start there, then ask Claude to resync from the corrected source.")));
 }
 
-// ── Team Inputs workflow (v52): Add + Approve on the single Inputs & Review tab → approval applies linked-lender updates live in that browser → Copy sync digest for Claude → synced ids baked below auto-clear on next version ──
-// On each sync, Claude appends the synced entry ids to SYNCED_INPUT_IDS. Any browser-stored entry with a matching id is purged on load.
+// ── Team Inputs workflow (v86): Add + Approve on the single Inputs & Review tab → approval applies linked-lender updates → LIVE TEAM SYNC when the page runs inside claude.ai (the artifact's shared store, db capability: everyone who can open the tracker reads the same entries live; only people shared with edit access write) → per-browser storage when it runs anywhere else → Claude reads approved entries at each refresh and bakes them below → baked ids auto-clear from every browser and from the store ──
+// On each bake, Claude appends the synced entry ids to SYNCED_INPUT_IDS. Any browser-stored or store-held entry with a matching id is purged on load (and deleted from the store by the next editor's page).
 var SYNCED_INPUT_IDS = [1785864176262, 1785867667640];
 var INPUTS_LS_KEY = "ecx_tracker_inputs_v1";
-function loadInputEntries() {
-  var list = [];
+var INPUTS_SYNC_KEY = INPUTS_LS_KEY + "-synced";
+var INPUT_SAFE_SEG = /^(?!\.\.?$)[A-Za-z0-9_\-.~:@+]{1,200}$/;
+var INPUT_TEXT_MAX = 20000, INPUT_AUTHOR_MAX = 80, INPUT_LENDERS_MAX = 60;
+function INPUT_has(o, k) { return !!o && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, k); }
+function INPUT_safeId(id) { return typeof id === "string" && INPUT_SAFE_SEG.test(id) && id !== "__proto__" && id !== "constructor" && id !== "prototype"; }
+function INPUT_num(v) { return (typeof v === "number" && isFinite(v) && v > 0 && v < 4102444800000) ? Math.floor(v) : 0; }
+function INPUT_str(v, max) { if (v == null || typeof v === "object") return ""; var s = String(v); return max && s.length > max ? s.slice(0, max) : s; }
+function INPUT_isSynced(id) { for (var i = 0; i < SYNCED_INPUT_IDS.length; i++) { if (String(SYNCED_INPUT_IDS[i]) === String(id)) return true; } return false; }
+function INPUT_created(e) { return INPUT_num(Number(e.id)) || e.at || 0; }
+function INPUT_sort(list) { return list.sort(function (a, b) { return (INPUT_created(b) - INPUT_created(a)) || (a.id < b.id ? 1 : a.id > b.id ? -1 : 0); }); }
+// Normalise one entry — from this browser's storage or from the shared store, which other people write. Every field a renderer
+// touches is coerced; the record's id is pinned to the storage key; field order is fixed so JSON.stringify is a stable identity.
+function INPUT_clean(id, b) {
+  if (!b || typeof b !== "object" || Array.isArray(b)) return null;
+  var sid = id == null ? "" : String(id);
+  if (!INPUT_safeId(sid)) return null;
+  var date = INPUT_str(b.date, 20), dm = date.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  if (!dm || +dm[1] < 1 || +dm[1] > 12 || +dm[2] < 1 || +dm[2] > 31) date = "";   // M/D/YY as the tab writes it; anything else is dropped
+  return {
+    id: sid,
+    status: b.status === "approved" ? "approved" : "pending",
+    date: date,
+    ts: INPUT_str(b.ts, 40),
+    author: INPUT_str(b.author, INPUT_AUTHOR_MAX),
+    text: INPUT_str(b.text, INPUT_TEXT_MAX),
+    lenders: Array.isArray(b.lenders) ? b.lenders.map(function (x) { return INPUT_str(x, 120); }).filter(Boolean).slice(0, INPUT_LENDERS_MAX) : [],
+    isCall: !!b.isCall,
+    at: INPUT_num(b.at) || INPUT_num(Number(sid))
+  };
+}
+function INPUT_cleanList(list) {
+  var out = [], seen = {};
+  (Array.isArray(list) ? list : []).forEach(function (e) {
+    var c = INPUT_clean(e && e.id, e);
+    if (!c || INPUT_isSynced(c.id)) return;
+    if (INPUT_has(seen, c.id)) { if (c.at > out[seen[c.id]].at) out[seen[c.id]] = c; return; }
+    seen[c.id] = out.length; out.push(c);
+  });
+  return out;
+}
+// INPUTS.list     the entries this page shows (this browser's copy; under live sync the merged view)
+// INPUTS.view     JSON per id of what the store last showed (definitive snapshots and confirmed writes). Persisted, so a reload
+//                 can still tell "the store once showed this id and now lacks it" (a teammate deleted it: follow the deletion)
+//                 from "the store never saw this record" (a pending local edit: push it)
+// INPUTS.synced   server-confirmed bodies only (snapshots that echo this page's own unconfirmed write skip it) — what a
+//                 view-only account falls back to. Persisted.
+// INPUTS.removed  ids removed on this page whose delete has not landed yet (epoch ms), so a snapshot arriving in the debounce
+//                 window cannot resurrect them. Persisted.
+var INPUTS = { list: [], view: {}, synced: {}, removed: {} };
+var SYNC = { db: null, live: false, dead: false, canWrite: true, status: "local", lastUserSave: 0, timer: null, unsubs: [], busy: false, failures: 0, definitive: false, seen: false, parked: {} };
+// Team mode: the store is (or was, until the connection died) the truth for this page.
+function ECX_teamMode() { return SYNC.live || SYNC.dead; }
+function INPUT_loadLocal() {
+  var raw = null;
+  try { raw = JSON.parse(window.localStorage.getItem(INPUTS_LS_KEY) || "null"); } catch (e) { raw = null; }
+  return INPUT_sort(INPUT_cleanList(raw));
+}
+function INPUT_loadMemory() {
+  var view = {}, synced = null, removed = {};
   try {
-    var raw = window.localStorage.getItem(INPUTS_LS_KEY);
-    list = raw ? JSON.parse(raw) : [];
-  } catch (e) { return []; }
-  var filtered = list.filter(function (e) { return SYNCED_INPUT_IDS.indexOf(e.id) === -1; });
-  if (filtered.length !== list.length) {
-    try { window.localStorage.setItem(INPUTS_LS_KEY, JSON.stringify(filtered)); } catch (e2) {}
-  }
-  return filtered;
+    var p = JSON.parse(window.localStorage.getItem(INPUTS_SYNC_KEY) || "null");
+    var jsonMap = function (m) {
+      var out = {};
+      if (m && typeof m === "object" && !Array.isArray(m)) Object.keys(m).forEach(function (id) { if (INPUT_safeId(id) && typeof m[id] === "string") out[id] = m[id]; });
+      return out;
+    };
+    if (p && typeof p === "object") {
+      view = jsonMap(p.view);
+      synced = p.synced ? jsonMap(p.synced) : null;
+      if (p.removed && typeof p.removed === "object" && !Array.isArray(p.removed)) Object.keys(p.removed).forEach(function (id) { var at = INPUT_num(p.removed[id]); if (INPUT_safeId(id) && at) removed[id] = at; });
+    }
+  } catch (e) { console.error("load team sync memory", e); }
+  INPUTS.view = view; INPUTS.synced = synced || Object.assign({}, view); INPUTS.removed = removed;
 }
-function persistInputEntries(list) {
-  try { window.localStorage.setItem(INPUTS_LS_KEY, JSON.stringify(list)); return true; } catch (e) { return false; }
-}
-// ── Dynamic apply (v52) ──────────────────────────────────────────────────────
-// Approving an entry that is linked to lender(s) folds it into the live LENDERS data
-// immediately — note added (and lastContact bumped when marked as a documented call).
-// This applies in the approver's browser only (static file, no shared backend) and
-// re-applies on every open until the Claude sync bakes the entry into the published
-// version, at which point SYNCED_INPUT_IDS purges it from the local queue.
-var APPLIED_INPUT_IDS = {};
+function INPUT_persistLocal() { try { window.localStorage.setItem(INPUTS_LS_KEY, JSON.stringify(INPUTS.list)); return true; } catch (e) { return false; } }
+function INPUT_persistMemory() { try { window.localStorage.setItem(INPUTS_SYNC_KEY, JSON.stringify({ view: INPUTS.view, synced: INPUTS.synced, removed: INPUTS.removed })); } catch (e) { console.error("persist team sync memory", e); } }
+function INPUT_get() { return INPUTS.list.slice(); }
+function INPUT_notify(kind) { try { window.dispatchEvent(new CustomEvent("ecx-inputs-changed", { detail: kind })); } catch (e) {} }
+// Kept for older code paths: the browser copy of the queue.
+function loadInputEntries() { return INPUT_get(); }
+function persistInputEntries(list) { return INPUT_commit(list) === true; }
 function ECX_findProject(list, name) {
   if (!list || !name) return null;
   var exact = null;
@@ -12859,53 +12931,296 @@ function ECX_DATE_VAL(s) {
   if (y < 100) y += 2000;
   return y * 10000 + (+m[1]) * 100 + (+m[2]);
 }
+// ── Dynamic apply ────────────────────────────────────────────────────────────
+// Approved entries linked to lender(s) fold into the live LENDERS data: a note per lender, lastContact bumped when marked as a
+// documented call. The applied set is re-derived from scratch whenever the approved list changes (this page's approval, or a
+// teammate's approval / undo arriving as a snapshot), so the lender data always mirrors the current approved list exactly.
+function INPUT_todayVal() { var d = new Date(); return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(); }
+var APPLIED_INPUT_IDS = {};      // id → JSON of the entry as applied
+var BASE_LAST_CONTACT = {};      // lender → lastContact before any team input touched it
 function applyInputEntry(e) {
-  if (!e || e.status !== "approved" || APPLIED_INPUT_IDS[e.id]) return false;
-  APPLIED_INPUT_IDS[e.id] = true;
+  if (!e || e.status !== "approved" || INPUT_has(APPLIED_INPUT_IDS, e.id)) return false;
+  APPLIED_INPUT_IDS[e.id] = JSON.stringify(e);
   var touched = false;
   (e.lenders || []).forEach(function (ln) {
+    if (!INPUT_has(LENDERS, ln)) return;
     var info = LENDERS[ln];
-    if (!info) return;
-    if (!info.notes) info.notes = [];
-    var note = {
+    if (!info || typeof info !== "object") return;
+    if (!Array.isArray(info.notes)) info.notes = [];
+    if (!INPUT_has(BASE_LAST_CONTACT, ln)) BASE_LAST_CONTACT[ln] = info.lastContact;
+    info.notes.unshift({
       date: e.date || e.ts,
       source: "Team input — Inputs tab (" + (e.author || "team") + ", " + (e.date || e.ts) + ")" + (e.isCall ? "" : " — intel, not a documented call"),
       content: e.text,
       _inputId: e.id
-    };
-    if (e.isCall && e.date && ECX_DATE_VAL(e.date) > ECX_DATE_VAL(info.lastContact)) {
-      note._prevLastContact = info.lastContact || "";
-      info.lastContact = e.date;
-    }
-    info.notes.unshift(note);
+    });
+    // a documented call moves Last Contact forward, never backwards and never into the future (a scheduled call is not a contact yet)
+    if (e.isCall && e.date && ECX_DATE_VAL(e.date) > ECX_DATE_VAL(info.lastContact) && ECX_DATE_VAL(e.date) <= INPUT_todayVal()) info.lastContact = e.date;
     touched = true;
   });
   return touched;
 }
-function unapplyInputEntry(e) {
-  if (!e || !APPLIED_INPUT_IDS[e.id]) return;
-  Object.keys(LENDERS).forEach(function (ln) {
-    var info = LENDERS[ln];
-    if (!info || !info.notes) return;
-    for (var i = info.notes.length - 1; i >= 0; i--) {
-      if (info.notes[i]._inputId === e.id) {
-        if (info.notes[i]._prevLastContact !== undefined) info.lastContact = info.notes[i]._prevLastContact;
-        info.notes.splice(i, 1);
-      }
-    }
+function INPUT_unapplyAll() {
+  Object.keys(BASE_LAST_CONTACT).forEach(function (ln) {
+    var info = INPUT_has(LENDERS, ln) ? LENDERS[ln] : null;
+    if (!info || typeof info !== "object") return;
+    if (Array.isArray(info.notes)) for (var i = info.notes.length - 1; i >= 0; i--) { if (info.notes[i] && info.notes[i]._inputId !== undefined) info.notes.splice(i, 1); }
+    if (BASE_LAST_CONTACT[ln] === undefined) delete info.lastContact; else info.lastContact = BASE_LAST_CONTACT[ln];
   });
-  delete APPLIED_INPUT_IDS[e.id];
+  APPLIED_INPUT_IDS = {};
 }
-// Fold previously approved entries stored in this browser into the data before first render.
-loadInputEntries().forEach(applyInputEntry);
+// Returns true when the lender data changed.
+function INPUT_reconcileApplied() {
+  var approved = INPUTS.list.filter(function (e) { return e.status === "approved"; })
+    .sort(function (a, b) { return (ECX_DATE_VAL(a.date) - ECX_DATE_VAL(b.date)) || (INPUT_created(a) - INPUT_created(b)); });
+  var same = Object.keys(APPLIED_INPUT_IDS).length === approved.length && approved.every(function (e) { return APPLIED_INPUT_IDS[e.id] === JSON.stringify(e); });
+  if (same) return false;
+  INPUT_unapplyAll();
+  approved.forEach(applyInputEntry);
+  return true;
+}
+// ── Status, toast, edit gate ─────────────────────────────────────────────────
+var ECX_SYNC_PILL = {
+  local: { text: "Saved on this device", bg: "rgba(148,163,184,.18)", color: "#CBD5E1", border: "rgba(148,163,184,.45)", title: "Team inputs save in this browser only — live team sync is not available in this view" },
+  live: { text: "Live team sync", bg: "rgba(16,185,129,.18)", color: "#6EE7B7", border: "rgba(110,231,183,.5)", title: "Team inputs save to the shared tracker and appear for everyone who has it open. Writing needs edit access." },
+  viewonly: { text: "View only", bg: "rgba(251,191,36,.18)", color: "#FCD34D", border: "rgba(252,211,77,.5)", title: "You can read the live tracker but this account does not have edit access — ask Aditya Iyengar" },
+  dead: { text: "Sync lost — reload", bg: "rgba(248,113,113,.18)", color: "#FCA5A5", border: "rgba(252,165,165,.5)", title: "Live team sync was lost — reload the page to keep saving to the team" }
+};
+function SyncPill(props) {
+  var s = INPUT_has(ECX_SYNC_PILL, props.status) ? ECX_SYNC_PILL[props.status] : ECX_SYNC_PILL.local;
+  return /*#__PURE__*/React.createElement("span", { title: s.title, "data-sync-status": props.status, style: { display: "inline-flex", alignItems: "center", gap: 6, marginTop: 8, padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: s.bg, color: s.color, border: "1px solid " + s.border } },
+    /*#__PURE__*/React.createElement("span", { style: { width: 7, height: 7, borderRadius: "50%", background: s.color } }), s.text);
+}
+function ECX_setSyncStatus(s) { SYNC.status = s; try { window.dispatchEvent(new CustomEvent("ecx-sync-status", { detail: s })); } catch (e) {} }
+var ECX_TOAST_TIMER = null;
+function ECX_toast(msg) {
+  try {
+    var el = document.getElementById("ecx-toast");
+    if (!el) {
+      el = document.createElement("div"); el.id = "ecx-toast"; el.setAttribute("role", "status");
+      el.style.cssText = "position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#0F172A;color:#fff;padding:10px 18px;border-radius:999px;font-family:'DM Sans','Segoe UI',system-ui,sans-serif;font-size:12.5px;font-weight:600;z-index:10000;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center";
+      document.body.appendChild(el);
+    }
+    el.textContent = msg; el.style.opacity = "1";
+    clearTimeout(ECX_TOAST_TIMER); ECX_TOAST_TIMER = setTimeout(function () { el.style.opacity = "0"; }, 4500);
+  } catch (e) {}
+}
+function ECX_canEditNow() {
+  if (ECX_teamMode() && !SYNC.canWrite) { ECX_toast("View only — ask Aditya Iyengar for edit access to the tracker"); return false; }
+  return true;
+}
+// ── The single write path for the Inputs tab ─────────────────────────────────
+// Returns true (saved), false (browser storage is blocked — entries live for this session only) or null (this account has
+// view access only: the change was reverted to what the store holds).
+function INPUT_commit(list) {
+  SYNC.lastUserSave = Date.now();
+  if (ECX_teamMode() && !SYNC.canWrite) { INPUT_revertToStore(); ECX_toast("View only — that change was not saved. Ask Aditya Iyengar for edit access"); return null; }
+  var clean = INPUT_cleanList(list), seen = {}, now = Date.now();
+  clean.forEach(function (e) { seen[e.id] = true; });
+  // An entry removed on this page: remember it until the delete lands, so a snapshot arriving in between cannot bring it back.
+  if (ECX_teamMode()) Object.keys(INPUTS.view).forEach(function (id) { if (!INPUT_has(seen, id) && !INPUT_has(INPUTS.removed, id) && !INPUT_isSynced(id)) INPUTS.removed[id] = now; });
+  INPUTS.list = INPUT_sort(clean);
+  var ok = INPUT_persistLocal();
+  INPUT_persistMemory();
+  try { INPUT_reconcileApplied(); } catch (e) { console.error("apply team inputs", e); }
+  INPUT_notify("commit");
+  if (SYNC.live) INPUT_schedulePush();
+  return ok;
+}
+// ── Live team sync — the artifact's shared store (db capability) ─────────────
+// Store layout:   inputs/<id>   one document per Inputs & Review entry (same shape as the local entry)
+//                 shared/ping   a probe written only to tell a malformed write from a permission denial
+// A local record is PENDING (kept and pushed) only when the store has never shown this id, or when it is newer than the
+// store's copy. A record the store once showed and now lacks was deleted by a teammate — follow the deletion. A view-only
+// account never keeps local records. A cache (partial) snapshot proves nothing about absence, so callers skip this for
+// records it lacks.
+function INPUT_pending(mine, theirs) {
+  if (!mine || !SYNC.canWrite) return false;
+  if (JSON.stringify(mine) === INPUTS.view[mine.id]) return false;
+  if (theirs) return mine.at > theirs.at;
+  return !INPUT_has(INPUTS.view, mine.id);
+}
+function INPUT_applySnapshot(snap) {
+  var meta = (snap && snap.metadata) || {}, cache = !!meta.fromCache;
+  var remote = {}, byId = {};
+  ((snap && snap.docs) || []).forEach(function (d) {
+    if (!d || !d.exists) return;
+    var body = null;
+    try { body = typeof d.data === "function" ? d.data() : null; body = body ? JSON.parse(JSON.stringify(body)) : null; } catch (e) { return; }
+    var c = INPUT_clean(d.id, body);
+    if (!c) return;
+    remote[c.id] = c;
+    if (INPUT_isSynced(c.id)) return;                        // baked into this version: nobody shows it; the next diff deletes it from the store
+    var rm = INPUT_has(INPUTS.removed, c.id) ? INPUTS.removed[c.id] : 0;
+    if (rm && rm >= c.at) return;                            // removed on this page, delete not landed yet
+    if (rm) delete INPUTS.removed[c.id];                     // a teammate re-made it after our removal
+    byId[c.id] = c;
+  });
+  INPUTS.list.forEach(function (x) {
+    if (!x || INPUT_has(INPUTS.removed, x.id)) return;
+    if (cache && !INPUT_has(remote, x.id)) { if (SYNC.canWrite) byId[x.id] = x; return; }
+    if (INPUT_pending(x, remote[x.id])) byId[x.id] = x;
+  });
+  if (!cache) {
+    var json = {};
+    Object.keys(remote).forEach(function (id) { json[id] = JSON.stringify(remote[id]); });
+    INPUTS.view = json;
+    if (!meta.hasPendingWrites) INPUTS.synced = Object.assign({}, json);   // confirmed bodies only
+    SYNC.seen = true; SYNC.definitive = true;
+    Object.keys(INPUTS.removed).forEach(function (id) { if (!INPUT_has(remote, id)) delete INPUTS.removed[id]; });   // the delete landed
+    INPUT_persistMemory();
+  }
+  INPUTS.list = INPUT_sort(Object.keys(byId).map(function (id) { return byId[id]; }));
+  INPUT_persistLocal();
+  try { INPUT_reconcileApplied(); } catch (e) { console.error("apply team inputs", e); }
+  INPUT_notify("snapshot");
+  if (SYNC.definitive) INPUT_schedulePush();
+}
+// Push what differs from the store view. Debounced after every commit and after each snapshot, only once the definitive
+// snapshot has arrived (a stale cache can never overwrite a newer team edit), one write at a time, always recomputed from
+// current state — a retry never replays a body captured earlier. A write the store has refused for good (too large, the
+// store full) is parked until that record changes again.
+function INPUT_schedulePush(delay) {
+  if (!SYNC.live || !SYNC.canWrite) return;
+  clearTimeout(SYNC.timer);
+  SYNC.timer = setTimeout(INPUT_pushDiff, delay || 120);
+}
+function INPUT_pushDiff() {
+  if (!SYNC.live || !SYNC.canWrite || SYNC.busy || !SYNC.definitive) return;
+  var ops = [], cur = {};
+  INPUTS.list.forEach(function (e) { if (e && INPUT_safeId(e.id)) cur[e.id] = e; });
+  Object.keys(cur).forEach(function (id) {
+    var j = JSON.stringify(cur[id]);
+    if (j !== INPUTS.view[id] && SYNC.parked[id] !== j) ops.push({ id: id, verb: "set", body: cur[id], json: j, prev: INPUTS.view[id] });
+  });
+  Object.keys(INPUTS.view).forEach(function (id) {
+    if (!INPUT_has(cur, id) && SYNC.parked[id] !== "delete") ops.push({ id: id, verb: "delete", prev: INPUTS.view[id] });
+  });
+  if (ops.length) INPUT_runOps(ops);
+}
+function INPUT_runOps(ops) {
+  SYNC.busy = true;
+  var i = 0, transient = false, throttled = false, wrote = false;
+  var finish = function () {
+    SYNC.busy = false;
+    if (throttled || transient) {
+      SYNC.failures++;
+      if (SYNC.failures <= 4) INPUT_schedulePush((throttled ? 1500 : 500) * SYNC.failures + Math.random() * 800);
+      else { SYNC.failures = 0; ECX_toast("Could not save to the team tracker — check your connection and try the change again"); }
+      return;
+    }
+    if (wrote) INPUT_schedulePush();   // pick up anything edited while the writes were in flight
+  };
+  var step = function () {
+    if (i >= ops.length || !SYNC.live || !SYNC.canWrite) { finish(); return; }
+    var op = ops[i++], p;
+    try { var ref = SYNC.db.doc("inputs/" + op.id); p = op.verb === "set" ? ref.set(op.body) : ref.delete(); }
+    catch (e) { p = Promise.reject(e); }
+    Promise.resolve(p).then(function () { INPUT_noteWritten(op); wrote = true; SYNC.failures = 0; step(); }, function (e) {
+      var code = e && e.code ? e.code : (e instanceof TypeError ? "invalid_argument" : "unavailable");
+      if (code === "not_granted" || code === "revoked") { SYNC.busy = false; INPUT_becomeReadOnly(); return; }
+      if (code === "invalid_argument" || code === "transform_error") {
+        // the same code covers a denied write and a malformed one — tell them apart with a probe
+        if (op.json && op.json.length > 250000) { INPUT_park(op, "That entry is too long to save to the team tracker — shorten it"); step(); return; }
+        INPUT_probeWrite().then(function (ok) {
+          if (ok === false) { SYNC.busy = false; INPUT_becomeReadOnly(); return; }
+          INPUT_park(op, "One entry could not be saved to the team tracker"); step();
+        });
+        return;
+      }
+      if (code === "quota_exceeded") { INPUT_park(op, "The team tracker's store is full — tell Aditya"); step(); return; }
+      if (code === "resource_exhausted") throttled = true; else transient = true;
+      step();
+    });
+  };
+  step();
+}
+function INPUT_probeWrite() {
+  var p;
+  try { p = SYNC.db.doc("shared/ping").set({ at: Date.now(), by: "inputs-probe" }); } catch (e) { p = Promise.reject(e); }
+  return Promise.resolve(p).then(function () { return true; }, function (e) { var c = e && e.code; return (c === "invalid_argument" || c === "not_granted" || c === "revoked") ? false : null; });
+}
+function INPUT_park(op, msg) {
+  var mark = op.json || "delete";
+  if (SYNC.parked[op.id] === mark) return;
+  SYNC.parked[op.id] = mark;
+  ECX_toast(msg);
+}
+function INPUT_noteWritten(op) {
+  delete SYNC.parked[op.id];
+  if (op.verb === "set") { if (INPUTS.view[op.id] === op.prev) { INPUTS.view[op.id] = op.json; INPUTS.synced[op.id] = op.json; } }
+  else { if (INPUTS.view[op.id] === op.prev) { delete INPUTS.view[op.id]; delete INPUTS.synced[op.id]; } delete INPUTS.removed[op.id]; }
+  INPUT_persistMemory();
+}
+// Fall back to the server-confirmed store state (only once the store has actually shown its contents).
+function INPUT_revertToStore() {
+  try {
+    if (SYNC.seen) INPUTS.list = INPUT_sort(INPUT_cleanList(Object.keys(INPUTS.synced).map(function (id) { var e = JSON.parse(INPUTS.synced[id]); if (e && typeof e === "object") e.id = id; return e; })));
+  } catch (e) { console.error("revert to store", e); }
+  INPUTS.view = Object.assign({}, INPUTS.synced);
+  INPUTS.removed = {}; SYNC.parked = {};
+  INPUT_persistMemory(); INPUT_persistLocal();
+  try { INPUT_reconcileApplied(); } catch (e) { console.error("reapply team inputs", e); }
+  INPUT_notify("revert");
+}
+// A rejected write means this account can read but not write the shared tracker.
+function INPUT_becomeReadOnly() {
+  if (!SYNC.canWrite) return;
+  SYNC.canWrite = false;
+  clearTimeout(SYNC.timer);
+  INPUT_revertToStore();
+  ECX_setSyncStatus("viewonly");
+  ECX_toast(Date.now() - SYNC.lastUserSave < 8000
+    ? "View only — that change was not saved. Ask Aditya Iyengar for edit access"
+    : "View only — earlier edits on this device were not saved. Ask Aditya Iyengar for edit access");
+}
+// Called after the first render. claude.use("db") resolves the store namespace once this view can run it, or null when it
+// cannot (a saved copy, a plain browser, a viewer that did not grant it) — then the page keeps the per-browser behaviour.
+function ECX_initSync() {
+  var p = null;
+  try { p = (window.claude && typeof window.claude.use === "function") ? window.claude.use("db") : null; } catch (e) { p = null; }
+  if (!p || typeof p.then !== "function") return;
+  p.then(function (ns) {
+    if (!ns || SYNC.live || SYNC.dead) return;
+    SYNC.db = ns; SYNC.live = true;
+    ECX_setSyncStatus("live");
+    var onErr = function (e) {
+      if (SYNC.dead) return;
+      SYNC.live = false; SYNC.dead = true; clearTimeout(SYNC.timer);
+      SYNC.unsubs.forEach(function (u) { try { u(); } catch (x) {} }); SYNC.unsubs = [];
+      ECX_setSyncStatus("dead");
+      ECX_toast("Live team sync was lost — reload the page to keep saving to the team");
+    };
+    try { SYNC.unsubs.push(ns.collection("inputs").onSnapshot(INPUT_applySnapshot, onErr)); }
+    catch (e) { onErr({ code: (e && e.code) || "unavailable" }); }
+  }, function () {});
+}
+// Boot: this browser's copy first, so the page renders exactly as before; the store lights up after the first render.
+INPUT_loadMemory();
+INPUTS.list = INPUT_loadLocal();
+INPUT_persistLocal();
+INPUT_reconcileApplied();
 // ── Inputs & Review (v52) — one tab: compose, approve, and the approval applies the update
 // to the tracker data in this browser instantly. The Claude sync bakes approved entries into
 // the next published version (permanent for everyone) and auto-clears them from local queues.
 function InputsTab(_p) {
   var onDataChange = _p && _p.onDataChange;
   var h = React.createElement;
-  var st = React.useState(loadInputEntries);
+  var st = React.useState(INPUT_get);
   var entries = st[0], setEntries = st[1];
+  var tk = React.useState(0);
+  var setTick = tk[1];
+  // Entries live in the module-level store (INPUTS): re-read them on every change, from this tab or from a team snapshot.
+  React.useEffect(function () {
+    var onI = function () { setEntries(INPUT_get()); };
+    var onS = function () { setTick(function (x) { return x + 1; }); };
+    window.addEventListener("ecx-inputs-changed", onI);
+    window.addEventListener("ecx-sync-status", onS);
+    onI();
+    return function () { window.removeEventListener("ecx-inputs-changed", onI); window.removeEventListener("ecx-sync-status", onS); };
+  }, []);
+  var team = ECX_teamMode();
+  var readOnly = team && !SYNC.canWrite;
   var xs = React.useState("");
   var text = xs[0], setText = xs[1];
   var as = React.useState("");
@@ -12919,9 +13234,13 @@ function InputsTab(_p) {
   var ms = React.useState("");
   var msg = ms[0], setMsg = ms[1];
   var flash = function (m, t) { setMsg(m); setTimeout(function () { setMsg(""); }, t || 3500); };
+  // Every change goes through INPUT_commit: it normalises, saves, re-applies approved entries to the lender data and, under
+  // live team sync, pushes the difference to the shared store. null = this account has view access only (reverted).
   var persist = function (list) {
-    setEntries(list);
-    if (!persistInputEntries(list)) flash("Warning: could not save to browser storage — entries live for this session only.", 5000);
+    var r = INPUT_commit(list);
+    if (r === null) return false;
+    if (r === false) flash("Warning: could not save to browser storage — entries live for this session only.", 5000);
+    return true;
   };
   var fmtDate = function (iso) {
     if (!iso) return "";
@@ -12931,36 +13250,38 @@ function InputsTab(_p) {
   };
   var addEntry = function () {
     if (!text.trim()) return;
+    if (!ECX_canEditNow()) return;
     var now = new Date();
     var evDate = edate ? fmtDate(edate) : now.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit" });
-    var entry = { id: now.getTime(), status: "pending", date: evDate, ts: now.toLocaleString("en-US", { month: "numeric", day: "numeric", year: "2-digit", hour: "numeric", minute: "2-digit" }), author: author.trim(), text: text.trim(), lenders: linked.slice(), isCall: isCall };
-    persist([entry].concat(entries));
+    var entry = { id: String(now.getTime()), at: now.getTime(), status: "pending", date: evDate, ts: now.toLocaleString("en-US", { month: "numeric", day: "numeric", year: "2-digit", hour: "numeric", minute: "2-digit" }), author: author.trim(), text: text.trim(), lenders: linked.slice(), isCall: isCall };
+    if (!persist([entry].concat(entries))) return;
     setText(""); setLinked([]); setIsCall(false);
-    flash("Added — pending approval below.", 3000);
+    flash(team ? "Added — pending approval below. Everyone with the tracker open sees it now." : "Added — pending approval below.", 3000);
   };
   var approve = function (e) {
-    var upd = Object.assign({}, e, { status: "approved" });
-    persist(entries.map(function (x) { return x.id === e.id ? upd : x; }));
-    var applied = applyInputEntry(upd);
+    if (!ECX_canEditNow()) return;
+    var upd = Object.assign({}, e, { status: "approved", at: Date.now() });
+    if (!persist(entries.map(function (x) { return x.id === e.id ? upd : x; }))) return;
     if (onDataChange) onDataChange();
-    if (applied) flash("✔ Approved — applied to " + upd.lenders.join(", ") + " in this browser now. It becomes permanent for everyone at the next Claude sync.", 7000);
+    var applied = (upd.lenders || []).some(function (ln) { return INPUT_has(LENDERS, ln); });
+    if (applied) flash("✔ Approved — applied to " + upd.lenders.join(", ") + (team ? " for the whole team now. Claude bakes it into the next published version." : " in this browser now. It becomes permanent for everyone at the next Claude sync."), 7000);
     else flash("✔ Approved — queued for the next Claude sync." + (upd.lenders && upd.lenders.length ? "" : " Tip: link a lender when composing to see it applied in the tracker immediately."), 7000);
   };
   var backToPending = function (e) {
-    unapplyInputEntry(e);
-    persist(entries.map(function (x) { return x.id === e.id ? Object.assign({}, x, { status: "pending" }) : x; }));
+    if (!ECX_canEditNow()) return;
+    if (!persist(entries.map(function (x) { return x.id === e.id ? Object.assign({}, x, { status: "pending", at: Date.now() }) : x; }))) return;
     if (onDataChange) onDataChange();
-    flash("Moved back to pending — removed from the tracker data in this browser.");
+    flash(team ? "Moved back to pending — removed from the tracker data for the whole team." : "Moved back to pending — removed from the tracker data in this browser.");
   };
   var removeEntry = function (e) {
-    unapplyInputEntry(e);
-    persist(entries.filter(function (x) { return x.id !== e.id; }));
+    if (!ECX_canEditNow()) return;
+    if (!persist(entries.filter(function (x) { return x.id !== e.id; }))) return;
     if (onDataChange) onDataChange();
   };
   var pending = entries.filter(function (e) { return e.status !== "approved"; });
   var approved = entries.filter(function (e) { return e.status === "approved"; });
   var digest = function () {
-    return "ECX TRACKER — APPROVED TEAM INPUTS FOR SYNC (exported " + new Date().toLocaleString("en-US") + ")\nNote for Claude: fold each entry into the tracker data — entries tagged [lenders: …] were already applied live in the approver's browser (note per lender; lastContact bumped only when tagged as a documented call) — apply the same to the published data, then bake these entry ids into SYNCED_INPUT_IDS in the next version so they auto-clear from browsers.\n" + approved.map(function (e) {
+    return "ECX TRACKER — APPROVED TEAM INPUTS FOR SYNC (exported " + new Date().toLocaleString("en-US") + (team ? "; live team sync on — Claude can also read these straight from the shared store" : "") + ")\nNote for Claude: fold each entry into the tracker data — entries tagged [lenders: …] were already applied live " + (team ? "for the whole team" : "in the approver's browser") + " (note per lender; lastContact bumped only when tagged as a documented call) — apply the same to the published data, then bake these entry ids into SYNCED_INPUT_IDS in the next version so they auto-clear from browsers and from the store.\n" + approved.map(function (e) {
       var tags = "";
       if (e.lenders && e.lenders.length) tags += " [lenders: " + e.lenders.join(", ") + (e.isCall ? "; documented call" : "") + "]";
       else if (e.isCall) tags += " [documented call]";
@@ -12988,11 +13309,11 @@ function InputsTab(_p) {
     window.ECX_SAVE_FILE("ECX_Tracker_ApprovedInputs_" + new Date().toISOString().slice(0, 10) + ".txt", digest(), "text/plain");
     flash("Downloaded — share the file or paste its contents into the Claude tracker chat.", 5000);
   };
+  // A wipe of the whole queue has no undo; under live team sync it would clear the team's entries, so the button is not offered there.
   var clearAll = function () {
-    if (entries.length === 0) return;
+    if (entries.length === 0 || team) return;
     if (window.confirm("Clear ALL " + entries.length + " entries (pending and approved) from this browser? Applied entries are also removed from the tracker data here. Normally not needed — synced entries clear automatically in the next version.")) {
-      approved.forEach(unapplyInputEntry);
-      persist([]);
+      if (!persist([])) return;
       if (onDataChange) onDataChange();
       flash("All entries cleared.");
     }
@@ -13035,11 +13356,18 @@ function InputsTab(_p) {
         introLine("What this is", "EdgeConneX Capital Markets' live tracker of every bank relationship and the debt fundraising program — one shared link, always the latest version. It is the team's single view of who we've talked to, who's committed to what, who's being courted for which deal, what we've paid, and the full debt stack."),
         introLine("The tabs", "❓ Ask — plain-English questions answered from the tracker's own data. Active Lenders — every institution with full call history, commitments and pipeline involvement. Active Projects — live financings, largest first; grouped cards (Leroy, HoldCo, Salar) break out workstreams when opened. Closed 2025 & 2026 — completed deals with lender-level terms and fees. Lender Fees — fees paid by bank (Chris Wenger's file). Lender Commitments — the committed book, bank by facility, tied to Chris Wenger's quarterly commitments workbook. LC Syndication — the Project Liverpool syndication tracker. Global Cap Table — the debt stack, tied to the monthly Debt Overview. 📖 Guide — the full manual with every source file, owner and refresh cadence."),
         introLine("Reading a card", "Lender and project cards are deliberately short: badges, the headline numbers and up to four project pills. Click anywhere on a card (or its Open ↗ hint) to open the full record in a pop-out — call notes, projects, existing facilities, rejections and contacts for a lender; overview, workstreams, bank outreach and lender notes for a project. Long notes start folded behind Read more. Inside a pop-out, any name marked ↗ jumps straight to that lender's or project's pop-out. Esc, ✕ or a click outside closes it. The fee, commitment, LC syndication and cap-table tabs keep their tables as tables."),
-        introLine("This tab", "The team's capture inbox. 1. Add what just happened (a meeting, a rejection, an indication) — pick the date, link the lender(s), tick 'documented call' if it was a real meeting. 2. Approve it — it appears on those lender cards immediately in your browser. 3. Every so often, Copy sync digest and paste it into the Claude tracker chat — that bakes approved entries into the published version for the whole team and clears them from your queue automatically."),
+        introLine("This tab", team
+          ? "The team's capture inbox, shared live. 1. Add what just happened (a meeting, a rejection, an indication) — pick the date, link the lender(s), tick 'documented call' if it was a real meeting. Everyone with the tracker open sees it straight away. 2. Approve it — it appears on those lender cards for the whole team immediately. 3. At each refresh Claude reads the approved entries from the shared store and bakes them into the published version; they clear from the queue automatically. Adding and approving needs edit access to this tracker — viewers see everything live but cannot change it."
+          : "The team's capture inbox. 1. Add what just happened (a meeting, a rejection, an indication) — pick the date, link the lender(s), tick 'documented call' if it was a real meeting. 2. Approve it — it appears on those lender cards immediately in your browser. 3. Every so often, Copy sync digest and paste it into the Claude tracker chat — that bakes approved entries into the published version for the whole team and clears them from your queue automatically."),
         introLine("Backed by", "Call-notes emails to the DCM list + Outlook Bank Meetings, the CF Pipeline files and deal teasers, the EdgeConneX Commitments workbook, Chris Wenger's monthly Lender Fees Summary and Debt Overview — plus what the team drops in right here.")) : null),
     h("div", { style: { background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "20px 24px", marginBottom: 16 } },
       h("div", { style: { fontSize: 15, fontWeight: 800, color: "#111827", marginBottom: 4 } }, "✍️ Team Inputs & Review"),
-      h("div", { style: { fontSize: 12, color: "#6B7280", lineHeight: 1.6, marginBottom: 14 } }, "Drop updates the moment they happen. Link the lender(s) the update is about and, once approved below, the note is applied to those lender cards immediately in this browser — no waiting. The periodic Claude sync then bakes approved entries into the published tracker for the whole team and clears them from your queue automatically."),
+      readOnly ? h("div", { style: { background: "#FFFBEB", border: "1px solid #FCD34D", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#92400E", lineHeight: 1.6, marginBottom: 12 } }, "👁 View access — you see every team input live, but this account cannot add, approve or remove entries. Ask Aditya Iyengar for edit access.") : null,
+      team && !readOnly ? h("div", { style: { background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#065F46", lineHeight: 1.6, marginBottom: 12 } }, "🟢 Live team sync — entries save to the shared tracker as you add and approve them; everyone with the tracker open sees them straight away.") : null,
+      SYNC.status === "dead" ? h("div", { style: { background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#991B1B", lineHeight: 1.6, marginBottom: 12 } }, "⚠️ Live team sync was lost — reload the page before adding or approving anything, so your changes reach the team.") : null,
+      h("div", { style: { fontSize: 12, color: "#6B7280", lineHeight: 1.6, marginBottom: 14 } }, team
+        ? "Drop updates the moment they happen. Link the lender(s) the update is about and, once approved below, the note is applied to those lender cards for the whole team immediately — no waiting. At each refresh Claude reads the approved entries from the shared store, bakes them into the published tracker and clears them from the queue automatically."
+        : "Drop updates the moment they happen. Link the lender(s) the update is about and, once approved below, the note is applied to those lender cards immediately in this browser — no waiting. The periodic Claude sync then bakes approved entries into the published tracker for the whole team and clears them from your queue automatically."),
       h("div", { style: { display: "flex", gap: 12, marginBottom: 10, flexWrap: "wrap", alignItems: "flex-end" } },
         h("div", null,
           h("div", { style: { fontSize: 10, fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 } }, "Date of update / meeting"),
@@ -13069,27 +13397,29 @@ function InputsTab(_p) {
     pending.length === 0 ? h("div", { style: { background: "#F8FAFC", border: "1px dashed #CBD5E1", borderRadius: 12, padding: "16px 24px", textAlign: "center", color: "#9CA3AF", fontSize: 13, marginBottom: 22 } }, "Nothing awaiting approval.") : h("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 22 } }, pending.map(function (e) {
       return h("div", { key: e.id, style: { background: "#fff", border: "1px solid #FDE68A", borderLeft: "3px solid #F59E0B", borderRadius: 10, padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start" } },
         h("div", { style: { flex: 1 } }, meta(e), h("div", { style: { fontSize: 13, color: "#374151", lineHeight: 1.6, whiteSpace: "pre-wrap" } }, e.text)),
-        h("div", { style: { display: "flex", gap: 6, flexShrink: 0 } },
+        readOnly ? null : h("div", { style: { display: "flex", gap: 6, flexShrink: 0 } },
           btn("✔ Approve & apply", function () { approve(e); }, "approve"),
-          btn("✕", function () { if (window.confirm("Delete this entry?")) removeEntry(e); }, "danger")));
+          btn("✕", function () { if (window.confirm(team ? "Delete this entry for the whole team?" : "Delete this entry?")) removeEntry(e); }, "danger")));
     })),
     h("div", { style: { display: "flex", gap: 8, marginBottom: 12, alignItems: "center", flexWrap: "wrap" } },
-      h("div", { style: { fontSize: 12, fontWeight: 700, color: "#065F46", textTransform: "uppercase", letterSpacing: "0.06em" } }, "✅ Approved — live in this browser (" + approved.length + ")"),
+      h("div", { style: { fontSize: 12, fontWeight: 700, color: "#065F46", textTransform: "uppercase", letterSpacing: "0.06em" } }, (team ? "✅ Approved — live for the whole team (" : "✅ Approved — live in this browser (") + approved.length + ")"),
       h("div", { style: { marginLeft: "auto", display: "flex", gap: 8 } },
         btn("📋 Copy sync digest", copyAll, "primary"),
         btn("⬇ Download .txt", downloadAll),
-        btn("Clear all", clearAll, "danger"))),
+        team ? null : btn("Clear all", clearAll, "danger"))),
     approved.length === 0 ? h("div", { style: { background: "#F8FAFC", border: "1px dashed #CBD5E1", borderRadius: 12, padding: "16px 24px", textAlign: "center", color: "#9CA3AF", fontSize: 13 } }, "No approved entries yet — approve pending items above. Entries linked to a lender are applied to that lender's card the moment they are approved.") : h("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }, approved.map(function (e) {
       var appliedLive = e.lenders && e.lenders.length > 0;
       return h("div", { key: e.id, style: { background: "#F0FDF4", border: "1px solid #86EFAC", borderLeft: "3px solid #059669", borderRadius: 10, padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start" } },
         h("div", { style: { flex: 1 } }, meta(e),
           h("div", { style: { fontSize: 13, color: "#374151", lineHeight: 1.6, whiteSpace: "pre-wrap" } }, e.text),
-          h("div", { style: { fontSize: 10.5, color: appliedLive ? "#059669" : "#9CA3AF", fontWeight: 600, marginTop: 4 } }, appliedLive ? "⚡ Applied to " + e.lenders.join(", ") + " in this browser — permanent for everyone after the next Claude sync." : "Queued for the next Claude sync (no linked lender — nothing applied live).")),
-        h("div", { style: { display: "flex", gap: 6, flexShrink: 0 } },
+          h("div", { style: { fontSize: 10.5, color: appliedLive ? "#059669" : "#9CA3AF", fontWeight: 600, marginTop: 4 } }, appliedLive ? "⚡ Applied to " + e.lenders.join(", ") + (team ? " for the whole team — baked into the published version at the next refresh." : " in this browser — permanent for everyone after the next Claude sync.") : "Queued for the next Claude sync (no linked lender — nothing applied live).")),
+        readOnly ? null : h("div", { style: { display: "flex", gap: 6, flexShrink: 0 } },
           btn("↩ Undo", function () { backToPending(e); }),
-          btn("✕", function () { if (window.confirm("Delete this entry? It will also be removed from the tracker data in this browser.")) removeEntry(e); }, "danger")));
+          btn("✕", function () { if (window.confirm(team ? "Delete this entry for the whole team? It will also be removed from the tracker data everyone sees." : "Delete this entry? It will also be removed from the tracker data in this browser.")) removeEntry(e); }, "danger")));
     })),
-    h("div", { style: { marginTop: 14, padding: "10px 16px", background: "#FFFBEB", borderRadius: 8, border: "1px solid #FCD34D", fontSize: 11, color: "#92400E", lineHeight: 1.6 } }, "⚠️ How this works: 1. approved entries update the tracker you are looking at right now, in this browser only (static file — no shared backend). 2. Teammates see them once the sync digest is sent to Claude and the next version is published to this same link. 3. Synced entries auto-clear from every browser's queue via their baked-in ids."));
+    h("div", { style: { marginTop: 14, padding: "10px 16px", background: "#FFFBEB", borderRadius: 8, border: "1px solid #FCD34D", fontSize: 11, color: "#92400E", lineHeight: 1.6 } }, team
+      ? "ℹ️ How this works: 1. entries and approvals save to the tracker's shared store the moment you make them, and every open copy of the tracker updates live. 2. Approved entries update the lender cards for everyone straight away. 3. At each refresh Claude bakes approved entries into the published version; their ids then auto-clear from the queue and the store. Only people shared with edit access can add or approve — viewers see everything live."
+      : "⚠️ How this works: 1. approved entries update the tracker you are looking at right now, in this browser only (this copy runs outside claude.ai, so there is no shared store). 2. Teammates see them once the sync digest is sent to Claude and the next version is published to this same link. 3. Synced entries auto-clear from every browser's queue via their baked-in ids."));
 }
 
 function InputsTab_OLD_v51() {
@@ -15107,6 +15437,18 @@ function App() {
   var bumpDataVersion = function bumpDataVersion() {
     _dvS[1](function (x) { return x + 1; });
   };
+  // Live team sync: the header pill follows SYNC.status; any change to the team inputs (this tab or a teammate's snapshot)
+  // re-applies to the LENDERS data, so bump the memoized views.
+  var _ssS = _useState(SYNC.status);
+  var syncStatus = _ssS[0];
+  React.useEffect(function () {
+    var onS = function () { _ssS[1](SYNC.status); };
+    var onI = function () { bumpDataVersion(); };
+    window.addEventListener("ecx-sync-status", onS);
+    window.addEventListener("ecx-inputs-changed", onI);
+    onS();
+    return function () { window.removeEventListener("ecx-sync-status", onS); window.removeEventListener("ecx-inputs-changed", onI); };
+  }, []);
   var projectLenderMap = _useMemo(function () {
     var map = {};
     PROJECTS.forEach(function (p) {
@@ -15308,7 +15650,7 @@ function App() {
       marginTop: 5,
       fontWeight: 600
     }
-  }, "🔄 Last refreshed " + LAST_REFRESH + " \xB7 Outlook call notes folded in through " + SWEEP_THROUGH + " \xB7 refreshed on request; the stamp is taken from the clock at release")), /*#__PURE__*/React.createElement("div", {
+  }, "🔄 Last refreshed " + LAST_REFRESH + " \xB7 Outlook call notes folded in through " + SWEEP_THROUGH + " \xB7 refreshed on request; the stamp is taken from the clock at release"), /*#__PURE__*/React.createElement(SyncPill, { status: syncStatus })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 20,
@@ -15695,6 +16037,7 @@ function App() {
 var domContainer = document.getElementById('root');
 var root = ReactDOM.createRoot(domContainer);
 root.render(React.createElement(App));
+ECX_initSync();
   </script>
 <script>
 (function() {
@@ -15737,10 +16080,11 @@ root.render(React.createElement(App));
       var html = document.documentElement.outerHTML;
       var filename = 'ECX_Tracker_' + versionLabel + '_' + getTimestamp() + (isAuto ? '_auto' : '') + '.html';
       // Use Blob with TextEncoder - avoids InvalidCharacterError from encodeURIComponent
-      if (window.claude && window.claude.downloads && window.claude.downloads.save) {
-        window.claude.downloads.save({ filename: filename, data: html }).catch(function (err) {
+      var dl = window.ECX_DOWNLOADS;
+      if (dl && typeof dl.save === 'function') {
+        dl.save({ filename: filename, data: html }).catch(function (err) {
           if (err && (err.code === 'extension_not_enabled' || err.code === 'rejected_extension')) {
-            window.claude.downloads.save({ filename: filename + '.txt', data: html }).catch(function () {});
+            dl.save({ filename: filename + '.txt', data: html }).catch(function () {});
           }
         });
       } else {
@@ -15806,7 +16150,7 @@ root.render(React.createElement(App));
 
     // Autosave every 5 min if dirty (skipped in the artifact viewer: each save
     // prompts the viewer for confirmation there, so only manual saves make sense)
-    if (window.claude && window.claude.downloads) return;
+    if (window.ECX_IN_VIEWER) return;
     setInterval(function() {
       if (!isDirty) return;
       var ver = getNextVersion();
