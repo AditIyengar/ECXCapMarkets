@@ -812,3 +812,14 @@ Per Aditya (9/14): project cards carry high-level dated entries only — one or 
 - Condensed the three v88 project blocks (Guadalupe rating-agency scheduling, Scioto — Ashville 1 MS/Moody's call, Vendace Mistral financing options) to one-to-two-sentence entries. No lender data changed.
 
 Release: stamp `9/14/26, 11:27 AM ET (v89)` from the clock; `SWEEP_THROUGH` unchanged at 9/14/26; all 5 script blocks pass `node --check`; release smoke test PASS. Archived as `tracker/versions/ECX_Tracker_v89.html`. Published as `master-v89`.
+
+
+## v90 Changelog (9/14/26) — Mistral / Natixis follow-up
+
+Joe Harar's 11:19 AM ET reply on "Mistral financing ideas" landed just after the v88 sweep cut-off and is now captured.
+
+- **Lender note (1).** Natixis 9/14: advisory role under discussion with Robert Wallen and Pim Rothweiller for the Mistral 50MW financing (Natixis led Mistral's inaugural GPU financing; EQT recently invested in Mistral); Joe and Pierre Maitre met Mistral's Director of Structured Finance two weeks ago; plan is private credit plus Natixis and one or two banks, with a wrapper to be explored. Next steps extended. No Last Contact move (written, internal).
+- **Outreach (1, note-only).** Vendace / Natixis.
+- **Project block.** The Vendace Mistral entry (added v88, condensed v89) extended by one sentence with Joe's points; still high level.
+
+Release: stamp `9/14/26, 11:29 AM ET (v90)` from the clock; `SWEEP_THROUGH` unchanged at 9/14/26; all 5 script blocks pass `node --check`; release smoke test PASS. Archived as `tracker/versions/ECX_Tracker_v90.html`. Published as `master-v90`.
