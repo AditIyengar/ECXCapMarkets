@@ -803,3 +803,12 @@ Refresh from Aditya's Outlook (Inbox, Sent, Bank Meetings, calendar) from 9/11/2
 - **Ignored.** Internal interest-rate hedging request (Sander Borgers), calendar acceptances, HR/social invites.
 
 Release: stamp `9/14/26, 11:22 AM ET (v88)` from the clock; `SWEEP_THROUGH` → 9/14/26; all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 24 projects, 10 tabs, pop-out opens, zero console errors, zero external requests); Team Inputs code unchanged (db + downloads declaration carried forward on publish). Archived as `tracker/versions/ECX_Tracker_v88.html`. Published as `master-v88`.
+
+
+## v89 Changelog (9/14/26) — Project blocks kept high level
+
+Per Aditya (9/14): project cards carry high-level dated entries only — one or two sentences on what happened and what is next. Granular detail (attendee lists, time slots, permit-level items, advisor fee mechanics) belongs in lender notes where a bank is involved, or is left out. This is a standing rule for future sweeps.
+
+- Condensed the three v88 project blocks (Guadalupe rating-agency scheduling, Scioto — Ashville 1 MS/Moody's call, Vendace Mistral financing options) to one-to-two-sentence entries. No lender data changed.
+
+Release: stamp `9/14/26, 11:27 AM ET (v89)` from the clock; `SWEEP_THROUGH` unchanged at 9/14/26; all 5 script blocks pass `node --check`; release smoke test PASS. Archived as `tracker/versions/ECX_Tracker_v89.html`. Published as `master-v89`.
