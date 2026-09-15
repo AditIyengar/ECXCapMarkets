@@ -823,3 +823,15 @@ Joe Harar's 11:19 AM ET reply on "Mistral financing ideas" landed just after the
 - **Project block.** The Vendace Mistral entry (added v88, condensed v89) extended by one sentence with Joe's points; still high level.
 
 Release: stamp `9/14/26, 11:29 AM ET (v90)` from the clock; `SWEEP_THROUGH` unchanged at 9/14/26; all 5 script blocks pass `node --check`; release smoke test PASS. Archived as `tracker/versions/ECX_Tracker_v90.html`. Published as `master-v90`.
+
+
+## v91 Changelog (9/15/26) — Project Canyon (Copia) bank commitments added
+
+Per Aditya (9/15): add the Copia bank commitments to the relationship tracker. Sources: the executed "ECX - Copia Bridge - Commitment Letter" (7/9/26, Annex A) and the "Project Canyon – Summary" deck (June 2026) Aditya shared.
+
+- **Lender Commitments tab.** New facility column "Canyon (Copia) — committed" (North America): Bank of Montreal, BNP Paribas, Nomura Corporate Funding Americas and Royal Bank of Canada at $225m (25%) each of the $900m senior secured DDTL. BMO gets its first row; the BNP Paribas AM, Nomura and RBC rows are extended. Book total moves from $24,793.5m to $25,693.5m; the tab's source/as-of text now says the Canyon column is a 7/9/26 commitment outside Chris Wenger's Q2 file and not yet a closed facility.
+- **Lender cards (4).** BMO, BNP, Nomura, RBC: "Canyon (Copia) — committed: $225m" in Existing Facilities, a Project Canyon entry in Projects, a 9/15 document note with the key terms (80% LTC; 12+6+6 months; S+275 then S+375 after month 9; 25/25/100 bps fees; parent guarantee with $1.25bn net worth and $25m liquidity; K&S / Milbank; closing targeted Q4 2026) and a one-line next step. No Last Contact moves (document record, not a call).
+- **New project card "Project Canyon (Copia)".** High-level description (acquisition bridge for Copia's Harquahala and Crossroads land bank assets bought from EQT; option on the remaining assets), outreach rows for the four committed banks (lead), and a terms summary in the teaser metrics with Finance Size $900m so lender exposure statistics pick it up. Active Projects count 24 → 25. The Guadalupe note "Canyon/Copia has no tracker card" now points to the new card.
+- **Not added.** Lender Fees: no Canyon fees have been paid yet (fee letter executed 7/9/26; ticking fee starts after 120 days), so nothing goes into the fees tab until Chris Wenger's file shows them.
+
+Release: stamp `9/15/26, 3:29 PM ET (v91)` from the clock; `SWEEP_THROUGH` unchanged at 9/14/26 (no Outlook sweep in this release); all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 25 projects, 122 commitment rows, zero console errors); render check confirms the Canyon column, the BMO row and the new project card. Archived as `tracker/versions/ECX_Tracker_v91.html`. Published as `master-v91`.
