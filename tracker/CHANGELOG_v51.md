@@ -835,3 +835,17 @@ Per Aditya (9/15): add the Copia bank commitments to the relationship tracker. S
 - **Not added.** Lender Fees: no Canyon fees have been paid yet (fee letter executed 7/9/26; ticking fee starts after 120 days), so nothing goes into the fees tab until Chris Wenger's file shows them.
 
 Release: stamp `9/15/26, 3:29 PM ET (v91)` from the clock; `SWEEP_THROUGH` unchanged at 9/14/26 (no Outlook sweep in this release); all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 25 projects, 122 commitment rows, zero console errors); render check confirms the Canyon column, the BMO row and the new project card. Archived as `tracker/versions/ECX_Tracker_v91.html`. Published as `master-v91`.
+
+
+## v92 Changelog (9/15/26) — Look and feel restyle (cerulean accent)
+
+Skin-only release applying the "Tracker look and feel" handoff (AUS10 tracker reference) with a lighter cerulean blue accent in place of the handoff's green, per Aditya. No content, data, tabs, sections, rows or logic changed; the page text of all ten tabs is identical to v91 apart from labels no longer being forced to uppercase by CSS.
+
+- **Tokens.** Full light and dark token sets on `:root` / `:root[data-theme="dark"]` (ground, surfaces, ink, rules, accent, status pairs, shadows, type stacks, spacing, radii), plus tracker-specific additions: `--accent-line`, `--on-accent`, `-line` variants for each status pair, dusty `--plum` and `--rose` pairs for the former violet/pink badges, and `--backdrop`. Accent: `#4A9BCF` / soft `#E3EFF7` / ink `#2F6F94` (dark `#7FC1E8` / `#17303F` / `#A6D5F1`).
+- **Colour mapping.** Every one of the 109 hex literals and 27 rgba literals in the inline React style objects and the stylesheet now resolves to a token: Tailwind greys to ground/surface/rule/ink, the navy and blue family to the accent tokens, emerald to `--ok`, amber to `--warn`, orange to `--energy`, red to `--risk`, violet to `--plum`, pink to `--rose`. Gradients flattened to their lead colour. The only literals left are inside the token block.
+- **Masthead and tabs.** Navy gradient band replaced by a surface band with a hairline; eyebrow, subtitle and stat labels in muted grey; stat values in the monospace number stack; tabs are pills with an accent-soft active state (no underline); Baskerville title replaced by the system sans at weight 600 with negative tracking.
+- **Type.** Body 15.5px / 1.65 system sans; inline sizes bumped one step (9→10 … 15→15.5); weights softened (800→700, 700→600); uppercase and letter-spacing removed from labels (95 rules).
+- **Components.** Buttons pill-shaped with a 140ms hover transition; inputs and selects 9px radius with an accent focus ring; cards 14px radius with the two-layer shadow, lift and stronger border on hover; inline shadows tokenised; modal backdrop tokenised; `:focus-visible` ring; `prefers-reduced-motion` respected; print hides controls.
+- **Not done.** Table numeric cells were not given the monospace class (would touch many cells; can follow). The embedded DM Sans / Libre Baskerville fonts remain in the file but are no longer referenced.
+
+QA: all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 25 projects, 122 commitment rows, zero console errors); tab text identical to v91 (case-insensitive) on all 10 tabs; no page-level horizontal scroll at 400px; light and dark screenshots reviewed. Stamp `9/15/26, 6:01 PM ET (v92)`; `SWEEP_THROUGH` unchanged at 9/14/26. Archived as `tracker/versions/ECX_Tracker_v92.html`. Published as `master-v92`.
