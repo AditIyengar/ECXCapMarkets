@@ -849,3 +849,14 @@ Skin-only release applying the "Tracker look and feel" handoff (AUS10 tracker re
 - **Not done.** Table numeric cells were not given the monospace class (would touch many cells; can follow). The embedded DM Sans / Libre Baskerville fonts remain in the file but are no longer referenced.
 
 QA: all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 25 projects, 122 commitment rows, zero console errors); tab text identical to v91 (case-insensitive) on all 10 tabs; no page-level horizontal scroll at 400px; light and dark screenshots reviewed. Stamp `9/15/26, 6:01 PM ET (v92)`; `SWEEP_THROUGH` unchanged at 9/14/26. Archived as `tracker/versions/ECX_Tracker_v92.html`. Published as `master-v92`.
+
+
+## v93 Changelog (9/15/26) — Coffee mascot: blue jay
+
+Per Aditya, the Coffee Mascot handoff applied with a bird instead of the reference puppy: a blue jay holding a mug of coffee sits top-right of the masthead. Skin and chrome only; no tracker content, data or logic changed (tab text identical to v92 apart from the bubble word).
+
+- **Mascot.** One inline SVG (`.pup`, viewBox 0 0 240 210, `role="button"`, `tabindex="0"`, aria-label "A blue jay warming its wings on a mug of coffee. Press to say hello."). Shared parts kept identical to the handoff (ground circle in `--accent-soft`, drifting bird and mug in `--accent`, steam in `--muted`, speech bubble in `--surface` / `--rule-strong` with text in `--accent-ink`, same coordinate frame). Jay drawn with 14 simple shapes: blue crest with a dark stripe, blue head, white face mask, black necklace and eye stripes, dark beak (open pink-tongued beak when happy), blue back and wings with black bars and white spots, white belly, barred tail rooted at (160, 154), bird feet at y 196; wing tips hold the mug. Bubble word "jay jay!".
+- **Behaviour.** Idle steam, blink, tail wag, head sway and a bird drifting past; click or Enter/Space closes the eyes, opens the beak, bobs the head and shows the bubble for 1.9 s (delegated document listeners, so React re-renders cannot drop them). `prefers-reduced-motion` turns animation off and keeps the bubble. Focus ring on the mascot.
+- **Placement.** Mounted in the masthead's top row after the stats (`.pup-wrap`, 190px wide so it matches the text column height; the masthead text column now flexes so title, stats and mascot share one line at desktop width). Under 640px it drops to 150px above the title.
+
+QA: all 5 script blocks pass `node --check`; release smoke test PASS (zero console errors); click, Enter and 1.9 s reset verified; light, dark, 1400px, 1000px and 400px screenshots reviewed; no page-level horizontal scroll at 400px. Stamp `9/15/26, 11:47 PM ET (v93)`; `SWEEP_THROUGH` unchanged at 9/14/26. Archived as `tracker/versions/ECX_Tracker_v93.html`. Published as `master-v93`.
