@@ -860,3 +860,14 @@ Per Aditya, the Coffee Mascot handoff applied with a bird instead of the referen
 - **Placement.** Mounted in the masthead's top row after the stats (`.pup-wrap`, 190px wide so it matches the text column height; the masthead text column now flexes so title, stats and mascot share one line at desktop width). Under 640px it drops to 150px above the title.
 
 QA: all 5 script blocks pass `node --check`; release smoke test PASS (zero console errors); click, Enter and 1.9 s reset verified; light, dark, 1400px, 1000px and 400px screenshots reviewed; no page-level horizontal scroll at 400px. Stamp `9/15/26, 11:47 PM ET (v93)`; `SWEEP_THROUGH` unchanged at 9/14/26. Archived as `tracker/versions/ECX_Tracker_v93.html`. Published as `master-v93`.
+
+
+## v94 Changelog (9/15/26) — Blue jay: wings holding the mug, "chirp!"
+
+Per Aditya: the wings now visibly hold the cup, and the bubble word is more bird-like.
+
+- **Wings.** The two side wing ellipses were replaced by two thick curved wing strokes that sweep from the shoulders (78, 142) and (162, 142) down and inward to the mug, drawn behind the mug, plus three feathered wing-tip strokes on each side inside the mug group so the tips wrap over the cup at x 95-108 and 132-145 with fine dark feather lines. The blob "paws" are gone.
+- **Call.** Bubble word "jay jay!" → "chirp!"; aria-label now "A blue jay holding a mug of coffee in its wings. Press to say hello."
+- Everything else (shared parts, animations, placement, behaviour) unchanged from v93. No tracker content changed.
+
+QA: all 5 script blocks pass `node --check`; release smoke test PASS (zero console errors); click state verified; idle and happy close-ups reviewed at 2x. Stamp `9/15/26, 11:53 PM ET (v94)`; `SWEEP_THROUGH` unchanged at 9/14/26. Archived as `tracker/versions/ECX_Tracker_v94.html`. Published as `master-v94`.
