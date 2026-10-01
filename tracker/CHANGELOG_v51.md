@@ -887,7 +887,7 @@ Full sweep of Inbox, Sent Items, Bank Meetings and the calendar from 9/14/26 11:
 
 QA: all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 25 projects, 18 closed, 122 commitment rows, 74 market notes, 258 lender notes, zero console errors, no external requests). Stamp `9/16/26, 12:13 AM ET (v95)`; `SWEEP_THROUGH` → 9/15/26. Archived as `tracker/versions/ECX_Tracker_v95.html`. Published as `master-v95`.
 
-## v96 — 10/1/26, 9:39 AM ET — targeted lender feedback update (DBS, FAB, Huntington, KDB, KKR, Apollo, Blackstone, Truist)
+## v96 Changelog (10/1/26) — Targeted lender feedback: DBS, FAB, Huntington, KDB, KKR, Apollo, Blackstone, Truist
 
 This is a targeted update for the eight lenders named in the request, not a full mailbox sweep. `SWEEP_THROUGH` says so.
 
