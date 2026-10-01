@@ -886,3 +886,20 @@ Full sweep of Inbox, Sent Items, Bank Meetings and the calendar from 9/14/26 11:
 - **Not carried.** Counsel / advisor / agency traffic (Milbank, K&S, A&O Shearman, EY-P, B&V, PwC, rating agencies) stays out of lender cards; pure document, scheduling and calendar-reply traffic ignored. The Ares site visit concerns closed Project Walleye (New Albany South), so it is logged on the Narluga (HoldCo) card and the Ares card only.
 
 QA: all 5 script blocks pass `node --check`; release smoke test PASS (66 lenders, 25 projects, 18 closed, 122 commitment rows, 74 market notes, 258 lender notes, zero console errors, no external requests). Stamp `9/16/26, 12:13 AM ET (v95)`; `SWEEP_THROUGH` → 9/15/26. Archived as `tracker/versions/ECX_Tracker_v95.html`. Published as `master-v95`.
+
+## v96 — 10/1/26, 9:39 AM ET — targeted lender feedback update (DBS, FAB, Huntington, KDB, KKR, Apollo, Blackstone, Truist)
+
+This is a targeted update for the eight lenders named in the request, not a full mailbox sweep. `SWEEP_THROUGH` says so.
+
+- **New card: DBS** (Bank, lead LG). In-person meeting 9/25 at EQT NY with Suraj Shetty (MD & Country CEO, LA) and Will Zhou (FIG US). Guadalupe overview and Walleye lender presentation sent. Suraj looped in TMT (Amit Sinha, Gaspard Langlois) and portfolio teams, and Will is pursuing EQT fund-level financing. New Guadalupe outreach row added (dialogue).
+- **Lender notes (4).**
+  - FAB 9/25: verbal approval, including the Credit Executive Committee, for the full USD 300m Liverpool LC. Written commitment due after board approval. Exposure goal $1bn → $2bn. Randy Brouckman meeting 10/1.
+  - KKR 9/29: passed on Ashville 2 (9/28). Follow-up call feedback on ANT, power, BB pricing vs an IG / insurance-money route, and possible later Guadalupe interest.
+  - Blackstone 9/23: Leroy upsize to $2bn and Austin addition closed 9/21. Clay Macfarlane's Texas TCEQ permit-halt query is open. Bx is a possible third Guadalupe lead.
+  - Truist 9/18: Charlie Dann offered a call on Vantage VDC 2026-1 ABS.
+- **Next steps** rewritten for FAB, Huntington, KDB, KKR, Apollo, Blackstone and Truist. Huntington and KDB have no new feedback (chase / include in syndication). Apollo is mentioned only internally as a possible third Guadalupe lead.
+- **Outreach.** Scioto — Ashville 2 / KKR → declined. Notes appended for LC Facilities / FAB and Project Leroy II / Blackstone (statuses kept).
+- **Project entries (3, high level).** Project Leroy II (closed 9/21), LC Facilities (FAB verbal approval), Scioto — Ashville 2 (KKR pass).
+- **lastContact.** KKR 8/28 → 9/29/26 (calls 9/25 and 9/29). DBS created at 9/25/26 (in-person meeting). FAB, Blackstone and Truist are unchanged because their new traffic is written only.
+
+QA: all 5 script blocks pass `node --check`. Release smoke test PASS: 67 lenders, 25 projects, 18 closed, 122 commitment rows, 74 market notes, 263 lender notes, zero console errors, no external requests. Sync tests 86/86. Archived as `tracker/versions/ECX_Tracker_v96.html`.
