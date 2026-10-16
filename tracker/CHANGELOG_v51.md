@@ -922,3 +922,23 @@ Targeted update from today's LBBW-NY pipeline call (Fri 10/16/26, 2:30–3:00 PM
 - **Ask tab.** LBBW full-name aliases added in the array format the resolver reads. The v96 "dbs bank" and "european investment bank" aliases were in the wrong shape and never resolved; both are fixed.
 
 QA: all 5 script blocks pass `node --check`. The smoke test was rebuilt because the container reset cleared the earlier QC/sync tooling. It PASSES: 68 lenders, 25 projects, 18 closed, 122 commitment rows, 74 market notes, 264 lender notes, zero console errors, no external requests, all tabs render, the LBBW card opens with its note, Ask resolves LBBW/DBS/EIB by full name, LC_SYND links resolve, and the stamp is within the clock window. The 86-check sync suite could not be re-run: it was lost with the old container. This release changes data only (a node-vm comparison of all app-code globals showed none changed). The diff was reviewed adversarially before release (source fidelity, house rules, data safety). Stamp `10/16/26, 3:20 PM ET (v97)`. Archived as `tracker/versions/ECX_Tracker_v97.html`.
+
+## v98 Changelog (10/16/26) — Targeted update: CaixaBank call
+
+Targeted update from today's first CaixaBank call (Fri 10/16/26, 3:30–3:55 PM ET, Teams, organised by CaixaBank). Sources: Aditya's call notes, his sent readout "CaixaBank and LBBW call notes" (5:32 PM ET), the calendar invite and EQT's 10/5 intro thread (Eirik Dahle Benzon). This is not a mailbox sweep; `SWEEP_THROUGH` says so.
+
+- **New card: CaixaBank** (CaixaBank, S.A.; Bank, dialogue, lead AI; lastContact and lastFundraisingCall 10/16/26). AI is the lead because Aditya set the time, is the only confirmed ECX attendee and sent the readout.
+  - Contacts: Zahid R. Qureshi (Head of Structured Finance, Americas, NY Representative Office; direct and mobile), Sebastian Orillac and Rory Quigley (titles and office not confirmed).
+  - Call note:
+    - Guadalupe interest, perhaps in a JLA round.
+    - First real engagement with ECX: it had seen ECX as colo and only invests in hyperscale.
+    - Hold $500–750m, up to $1bn from a sizing view; $350m after syndication.
+    - Key lease points: assignability and transferability.
+    - Debt sizing: 1.15x DSCR modified gross / 1.10x NNN, and it takes extension risk.
+    - Credential: $1.5bn ticket in Project Jacquard, per CaixaBank.
+    - EQT background notes; December NDA outreach.
+  - Differences between the raw notes and the sent readout are flagged on the card.
+- **Outreach.** New CaixaBank row on Project Guadalupe (dialogue) and a one-sentence Guadalupe timeline entry.
+- **Ask tab.** CaixaBank aliases (caixabank, caixa bank, caixa, la caixa) in the array format the resolver reads.
+
+QA: all 5 script blocks pass `node --check`. Smoke test PASS: 69 lenders, 25 projects, 18 closed, 122 commitment rows, 74 market notes, 265 lender notes, zero console errors, no external requests, all tabs render, and the LBBW and CaixaBank cards open with their notes. Ask resolves LBBW, DBS, EIB and CaixaBank by full name, and the stamp is within the clock window. The diff was reviewed adversarially (source fidelity, house rules, data safety): a node-vm comparison showed all 175 functions identical and every existing card deep-equal to v97. Stamp `10/16/26, 5:53 PM ET (v98)`. Archived as `tracker/versions/ECX_Tracker_v98.html`.
