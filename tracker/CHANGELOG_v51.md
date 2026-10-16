@@ -903,3 +903,22 @@ This is a targeted update for the eight lenders named in the request, not a full
 - **lastContact.** KKR 8/28 → 9/29/26 (calls 9/25 and 9/29). DBS created at 9/25/26 (in-person meeting). FAB, Blackstone and Truist are unchanged because their new traffic is written only.
 
 QA: all 5 script blocks pass `node --check`. Release smoke test PASS: 67 lenders, 25 projects, 18 closed, 122 commitment rows, 74 market notes, 263 lender notes, zero console errors, no external requests. Sync tests 86/86. Archived as `tracker/versions/ECX_Tracker_v96.html`.
+
+## v97 Changelog (10/16/26) — Targeted update: LBBW New York call
+
+Targeted update from today's LBBW-NY pipeline call (Fri 10/16/26, 2:30–3:00 PM ET, Teams). Sources: Aditya's call notes, Laura Godschalx's "LBBW feedback" email (2:49 PM ET) and the calendar invite. This is not a mailbox sweep; `SWEEP_THROUGH` says so.
+
+- **New card: LBBW** (Landesbank Baden-Württemberg; Bank, dialogue, lead LG; lastContact and lastFundraisingCall 10/16/26).
+  - Contacts: Arndt Bruns (the notes' "Burns" corrected), Andre Sorokin and Oliver Langel (NY). Unconfirmed titles and Arndt's "Home"-labelled phone are marked for confirmation.
+  - Call note:
+    - Busy book still open; expects to close more before year-end; no capacity concerns.
+    - Introductions: Tarpon II (ATL11); Guadalupe as JLA (gas not a problem, TX / Dallas OK); Walleye II, a ~300MW copy of Walleye in Ohio.
+    - General appetite / rating points: whether the extension option counts in debt sizing; whether hedging covers only the loan tenor.
+    - 2025 relationship background.
+  - existingFacilities: Beluga $205.8m and Orca $17.1m, from LENDER_COMMITS (Q2).
+  - rejectedProjects: LC Facilities (7/23 decline, no capacity).
+- **Outreach.** New LBBW rows (dialogue) on Project Guadalupe, Tarpon II — Atlanta ATL11 and New Albany North. New Albany North gets its first outreach list. Walleye II = New Albany North per the Q3 BoD draft deck (24 Sep 2026, slide 8: "300MW New Albany North PF"). The LC Facilities LBBW note now reads "Lender card created 10/16/26", and the LC Syndication declined row links to the card.
+- **Project entries (3, one sentence each).** Guadalupe, Tarpon II, New Albany North.
+- **Ask tab.** LBBW full-name aliases added in the array format the resolver reads. The v96 "dbs bank" and "european investment bank" aliases were in the wrong shape and never resolved; both are fixed.
+
+QA: all 5 script blocks pass `node --check`. The smoke test was rebuilt because the container reset cleared the earlier QC/sync tooling. It PASSES: 68 lenders, 25 projects, 18 closed, 122 commitment rows, 74 market notes, 264 lender notes, zero console errors, no external requests, all tabs render, the LBBW card opens with its note, Ask resolves LBBW/DBS/EIB by full name, LC_SYND links resolve, and the stamp is within the clock window. The 86-check sync suite could not be re-run: it was lost with the old container. This release changes data only (a node-vm comparison of all app-code globals showed none changed). The diff was reviewed adversarially before release (source fidelity, house rules, data safety). Stamp `10/16/26, 3:20 PM ET (v97)`. Archived as `tracker/versions/ECX_Tracker_v97.html`.
