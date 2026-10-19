@@ -942,3 +942,24 @@ Targeted update from today's first CaixaBank call (Fri 10/16/26, 3:30–3:55 PM 
 - **Ask tab.** CaixaBank aliases (caixabank, caixa bank, caixa, la caixa) in the array format the resolver reads.
 
 QA: all 5 script blocks pass `node --check`. Smoke test PASS: 69 lenders, 25 projects, 18 closed, 122 commitment rows, 74 market notes, 265 lender notes, zero console errors, no external requests, all tabs render, and the LBBW and CaixaBank cards open with their notes. Ask resolves LBBW, DBS, EIB and CaixaBank by full name, and the stamp is within the clock window. The diff was reviewed adversarially (source fidelity, house rules, data safety): a node-vm comparison showed all 175 functions identical and every existing card deep-equal to v97. Stamp `10/16/26, 5:53 PM ET (v98)`. Archived as `tracker/versions/ECX_Tracker_v98.html`.
+
+## v99 Changelog (10/19/26) — Targeted update: SMBC declines Guadalupe
+
+Targeted update from today's SMBC feedback call (Mon 10/19/26, Teams, 3:30–4:00 PM ET; requested by Tom Zalewski that day). Sources: Aditya's call notes and follow-up ("would not be interested in a smaller underwrite"), Laura Godschalx's Teams readout, the calendar and email thread, and the 10/6–10/15 Guadalupe CLA thread for context. This is not a mailbox sweep; `SWEEP_THROUGH` says so.
+
+- **SMBC card.**
+  - New 10/19 note. After internal discussions and committees, Guadalupe did not get a greenlight to proceed at this time, and SMBC would not take a smaller underwrite either. Reasons:
+    - Syndication view of recent transactions and of why banks are falling away.
+    - Project-on-project risk: the third-party power plant and lease delivery requirements. The market view is that the risk must be wrapped in the lease; an earlier similar concept failed on this.
+    - Transaction size versus bank liquidity.
+    - Texas permitting.
+  - Context recorded: the 8/24 and 9/10 gating requirement, the 10/6 CLA-tier invite, the 10/9 call and the 10/15 permit tracker.
+  - lastContact 8/20 → 10/19/26. lastFundraisingCall left unchanged, following the convention for later Guadalupe calls.
+  - Guadalupe moved from `projects` to `rejectedProjects`, so it no longer counts toward SMBC's active pipeline.
+  - nextSteps rewritten: relay before the 10/20 bank-group call; confirm whether a JLA / participation ticket is also ruled out; the 11/6 London meeting; SMBC's place in the Guadalupe hedge group.
+  - Contacts refreshed from current signatures: Tom Zalewski (ED, Global Structured Finance, NA), Greg Beobide (VP, Global Structured Finance; second number added), Philip Green (MD, Head of Infrastructure, TMT and Acquisition Finance, EMEA; added with details). Mike Ball and Greg Beobide added to the contacts line.
+  - 9/15 note corrected: 11/6 London was proposed, not confirmed, and no invite has been seen.
+- **Guadalupe.** SMBC outreach row proposal → declined, with the 10/6, 10/9 and 10/19 steps appended. One-sentence timeline entry.
+- **Market note (Bank Market).** SMBC's syndication view on project-on-project risk for jumbo DC + BTM power financings, and the $1–2bn syndication-liquidity point from the 10/9 call.
+
+QA: all 5 script blocks pass `node --check`. Smoke test PASS: 69 lenders, 25 projects, 18 closed, 122 commitment rows, 75 market notes, 266 lender notes, zero console errors, no external requests, all tabs render, and the LBBW, CaixaBank and SMBC cards open with their notes. The SMBC wiring checks pass and the stamp is within the clock window. The diff was reviewed adversarially (source fidelity, house rules, data safety; app code unchanged) and the review's fixes were applied before release. Stamp `10/19/26, 4:22 PM ET (v99)`. Archived as `tracker/versions/ECX_Tracker_v99.html`.
