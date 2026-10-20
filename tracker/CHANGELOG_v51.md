@@ -963,3 +963,45 @@ Targeted update from today's SMBC feedback call (Mon 10/19/26, Teams, 3:30–4:0
 - **Market note (Bank Market).** SMBC's syndication view on project-on-project risk for jumbo DC + BTM power financings, and the $1–2bn syndication-liquidity point from the 10/9 call.
 
 QA: all 5 script blocks pass `node --check`. Smoke test PASS: 69 lenders, 25 projects, 18 closed, 122 commitment rows, 75 market notes, 266 lender notes, zero console errors, no external requests, all tabs render, and the LBBW, CaixaBank and SMBC cards open with their notes. The SMBC wiring checks pass and the stamp is within the clock window. The diff was reviewed adversarially (source fidelity, house rules, data safety; app code unchanged) and the review's fixes were applied before release. Stamp `10/19/26, 4:22 PM ET (v99)`. Archived as `tracker/versions/ECX_Tracker_v99.html`.
+
+## v100 Changelog (10/20/26) — Lender commitments and fees from Chris Wenger's Q3 2026 files
+
+Source: Chris Wenger's "Q3 Lender Commitments & Fees" email (10/15/26, to Johan Hylander, cc Joe Harar and DCM), with **EdgeConneX Commitments (Q3 2026)_VF.xlsx** (Overview, as of 9/30/26, EUR/USD 1.1327) and **Lender Fees Summary_Q3 2026.xlsx** (Deal Overview). Both files are the source of truth (v78 rule); this supersedes the Q2 commitments file and the 7.21.26 fees file.
+
+**Commitments**
+- **Tie-out.** 126 bank rows × 20 facilities. Every row ties to its Total and every column to the Grand Total of **$25,640.2m**. With the tracker-side Canyon (Copia) commitment ($900m) the tab total is **$26,540.2m** (Q2: $25,693.5m).
+- **Chris's notable changes.** Webster and AMS09 repaid, so the Webster and AMS RE columns drop out. Leroy upsized by $1.0bn to $2.0bn (shown as "Leroy"). SocGen down $345m: Vendace −$202m, Walleye −$82m, Beluga −$44m, Shiner −$17m.
+- **Banks.** In: Nonghyup, Farmer Mac, La Banque Postale, Macquarie, KB Securities, Kutxabank. Out: Hana Securities, National Cooperative Bank.
+- **Merges.** NatWest still absorbs "National Westminster Bank". The Q3 file already folds Credit Agricole into CACIB, so that tracker-side merge is retired.
+- **Carried forward.** The Blackstone −$600m / Morgan Stanley +$600m backleverage annotations.
+- **Lender cards.** 46 cards regenerated from the file (35 changed), keeping their facility labels and role text.
+  - New blocks for Huntington (Walleye $65m), DBS (Metropolis $83.4m), KKR (KKR Credit ABS $29.1m) and Principal (Principal Life, Shiner $49.5m).
+  - Kutxabank is now in the file ($22.7m / €20m).
+  - KfW's displayed block was a stale duplicate; it now shows Q3 figures.
+  - Goldman and SocGen Vendace role text uses € (€275m / €200m) so the card totals parse correctly. The Goldman card had been overstating by $125m.
+  - HSBC (not in either file) keeps its flagged carried figures.
+- **Text and lookups.**
+  - Commitments footer, Guide and code comments rewritten for Q3.
+  - Card-total FX label set to 1.1327.
+  - Cap table: Leroy snapshot note added; Ares HoldCo now links to Narwhal.
+  - Barclays LC row linked to its card.
+
+**Fees**
+- **Tie-out.** 70 banks × 14 deals (2025) and 9 deals (2026). The new 2026 deal is Leroy Upsize (Blackstone $22.5m). Every row and column ties.
+  - 2025 $103,576,093.83 (unchanged).
+  - 2026 $178,424,007.41 (was $155,924,007.40).
+  - Combined $282,000,101.24.
+- **Bank names.** Chris's cleaner Q3 labels are used; the duplicate BBVA / Banco Bilbao and Rabobank / Cooperatieve rows are gone.
+- **Text.** Fees footer and Guide source updated.
+
+**Ask tab fixes.** The commitment and fee lookups now match exact names first, then whole words. This fixes Morgan Stanley → JPMorgan, CitiBank → First Citizens, Deutsche Bank → KDB/DBS and PIMCO → IMCO. Alias additions:
+- CACIB: matches Crédit Agricole Corporate and Investment Bank.
+- NatWest: matches National Westminster Bank.
+
+A Guide helper that silently dropped paragraph bodies is also fixed.
+
+QA:
+- Two independent verification rounds re-parsed both files. They found 0 cell mismatches and checked card mappings, lookups and rendering.
+- A data-scope diff confirms only the commitments, fees, alias, cap-table-alias and LC-link data changed. On lender cards, only existingFacilities changed.
+- All 5 script blocks pass `node --check`. Smoke test PASS: 69 lenders, 126 commitment rows, zero console errors, no external requests.
+- Stamp `10/20/26, 12:39 PM ET (v100)`. Archived as `tracker/versions/ECX_Tracker_v100.html`.
