@@ -1005,3 +1005,50 @@ QA:
 - A data-scope diff confirms only the commitments, fees, alias, cap-table-alias and LC-link data changed. On lender cards, only existingFacilities changed.
 - All 5 script blocks pass `node --check`. Smoke test PASS: 69 lenders, 126 commitment rows, zero console errors, no external requests.
 - Stamp `10/20/26, 12:39 PM ET (v100)`. Archived as `tracker/versions/ECX_Tracker_v100.html`.
+
+## v101 Changelog (10/20/26) — Calmer, roomier, warmer; LC Syndication tab removed
+
+Aditya: "this tracker is way too busy … simplify and make this roomier and warmer, feel free to get rid of tags on the banks/syndication items. Remove details unless you click in", and "you can remove the LC Syndication tab".
+
+**No content changed** (restyle rule). A data-global diff against v100 shows only `PROJECTS` (the three LC Facilities pointers to the removed tab now point to the LC syndication panel on Lender Commitments and to the Closed tab's LC & Surety list), `LAST_REFRESH` and the `SWEEP_THROUGH` wording. An exhaustive text walk compared v100 and v101 with every modal, expand row and disclosure open. Every v100 fact outside the LC Syndication tab is still reachable; 222 lines differ only because their UI labels were rewritten.
+
+**Look**
+- **Palette:** warm paper neutrals with the same cerulean accent, now kept for links, the active tab and one key figure. DM Sans (already embedded, previously unused) is the UI font.
+- **Spacing:** roomier paddings and gaps, and a single 1340px content column.
+- **Contrast:** muted and warn text darkened to meet AA.
+- **Dark mode:** now follows the viewer's OS setting as well as the theme toggle, in warm charcoal.
+- **Phone width:** no sideways scroll at 390px.
+
+**Masthead**
+- Eyebrow, title and subtitle, then one line: "Updated <date> · <version> · <sync status> · Details".
+- The full refresh stamp and the six counts moved under Details.
+- Mascot smaller; tabs on one row.
+
+**Lenders**
+- **Cards:** logo and name, one quiet line (type · facilities or New lender · last contact, plus Capacity limited where it applies), then Active pipeline and Committed.
+- **Removed from cards:** badges, status, type and fundraising-call pills, project chips, filled tiles, the Open button and the ByteDance/Oracle ring and legend.
+- **Pop-out facts row:** status, pipeline with active-project count, committed, last fundraising call, ECX lead and "Notes mention ByteDance / Oracle". Closed projects are labelled.
+- **Notes:** all note text kept, with quieter styling.
+
+**Projects**
+- **Cards:** region · type, name, expected size and close.
+- **Pop-out:** a facts row; outreach chips are neutral, and tapping one shows that bank's note inline.
+- **Closed deals:** one summary card, a year switch, and a meta line per deal. The owner and full description sit in an Overview block when expanded.
+
+**Data tabs**
+- **Totals and tables:** quiet totals.
+- **Commitments:** backleverage and merge notes moved from chips into each row's expand.
+- **Source footers:** one line each, with the full text under "About this data".
+- **LC syndication pipeline:** a disclosure on the Commitments tab.
+- **Cap table:** the bank-chip column is gone; banks are listed in the expand.
+- **Inputs:** the intro is collapsed by default.
+- **Ask:** the banner is now a calm card.
+- **Guide:** updated to the new layout.
+
+**LC Syndication tab** is removed. Its data (`LC_SYND`) and helpers stay: the Commitments LC panel and the Ask tab still answer per-bank LC questions.
+
+QA:
+- Four area patches, each self-tested, applied in sequence. Then integrator tweaks and four fixes from an adversarial review (visual, content reachability, behaviour).
+- All 5 script blocks pass `node --check`. Smoke test PASS: all 9 tabs, the LBBW, CaixaBank and SMBC modals, zero console errors, no external requests.
+- Behaviour matches v100: search, filters and sort order, deep links, keyboard, Escape, Ask, Inputs, Save fallback, mascot, theme states and print.
+- Stamp `10/20/26, 2:49 PM ET (v101)`. Archived as `tracker/versions/ECX_Tracker_v101.html`.
