@@ -1083,3 +1083,57 @@ QA:
 - An adversarial review (data fidelity, sync and edit safety, meeting usability) followed; its fixes are applied. 57/58 adversarial checks pass; the remaining one is a near-simultaneous same-name add race, left as is.
 - All 5 script blocks pass `node --check`. Smoke test PASS, zero console errors, no external requests.
 - Stamp `10/29/26, 3:14 PM ET (v102)`. Archived as `tracker/versions/ECX_Tracker_v102.html`.
+
+## v103 Changelog (10/29/26) — CF Pipeline: process stage on every deal, bullet status updates
+
+Aditya: "Make it easier to make a status update and make each box clearer as where in the process they are. Status updates are typically multiple bullets."
+
+**Where each deal is in the process**
+- **Seven stages:** Preparation → Kick-off & sounding → Terms → Credit approvals → Documentation → Signing & closing → Closed. Each has a one-line hint, e.g. "Banks in credit; commitments pending".
+- **Stage track on every deal:** a seven-step track with the stage label and "N of 7", shown on every row, phone card, the detail panel and the first column of Sheet view.
+  - "Paused" (amber) mutes the track.
+  - Deals with no stage read "Stage not set", and editors get a "Set stage" control. The JVs, Corporate and Misc groups stay quiet.
+- **Call view:** a **Stage** column replaces Status; the sheet's Status text stays underneath, muted.
+- **Stage summary strip** above the tables gives the pipeline's shape at a glance, as counts per stage plus Paused. Each count is a filter, and there is also a Stage select in the toolbar.
+- **Setting a stage (editors):** click a step, or use the stage select or the Paused toggle in the panel. Changes are recorded in history ("Stage: Terms → Credit approvals") and show in "Changes since last call".
+- **Starting stages:** set by Claude from each deal's status and latest update. The team should correct any that are off.
+- **Export CSV:** columns A..AC are unchanged, so the paste-back at A6 still works. A new column AD, "Stage (tracker)", follows them.
+
+**Easier status updates**
+- **"Update" on every row** (editors) opens the deal straight into a new update, with the cursor in an empty bullet.
+- **The bullet editor** has one line per bullet:
+  - Enter starts the next bullet, and Backspace on an empty bullet removes it.
+  - ↑/↓ move between bullets, and Alt+↑/↓ reorder them.
+  - ⌘/Ctrl+Enter saves, and Esc cancels, with an in-page confirm if there are unsaved changes.
+- **Pasting from an email or notes** splits into bullets (•, -, * or the sheet's "x" convention).
+- **New update mode** shows the current bullets underneath, each with "↺ keep" to carry it over. **Edit current** edits the existing ones.
+- **Saving** writes back to the sheet's "x a x b" convention, so export round-trips.
+- **"Last updated … by …"** above the editor.
+- **Drafts are kept per deal**, and "Unsaved update on X" links back to a draft, clearing a filter if one hides it.
+- **The same editor** handles Key issues and the three Issues fields.
+- **Each row** previews the first two bullets of the latest update ("+N more") and shows "Updated 2d ago" after a team edit.
+
+**Guide** describes stages and the bullet editor. Existing data is unchanged: the content diff against v102 shows only PIPE_* globals (three new, two extended) and LAST_REFRESH.
+
+QA:
+- 166 v103 checks, run against an in-memory replica of the shared store with and without the stage data. They cover:
+  - every surface, the strip and the filters;
+  - every keyboard and paste path;
+  - keep-from-current, round-trip to "x a x b" and CSV;
+  - per-deal drafts;
+  - a teammate editing or moving the deal mid-edit;
+  - view-only, phone 390 and dark mode;
+  - zero console errors.
+- The v102 suite passes 149/149, with checks adapted only where v103 intentionally changed behaviour. 57/58 adversarial checks pass; the remaining one is the known same-name add race.
+- **A render slowdown in the new editor was found and fixed.** A teammate's save now costs 19 ms of main-thread time with the editor open, against 24 ms in v102.
+- **The independent review found eight issues, all fixed:**
+  - stage-track contrast raised to ≥3:1;
+  - ⌘/Ctrl+Enter and Esc now work anywhere in the editor;
+  - the draft link now works under filters;
+  - a stage pick made just before the panel closes is no longer lost;
+  - focus is kept when a teammate moves the deal;
+  - two bullet round-trip edge cases (a standalone "x" at the end of a bullet, and two adjacent markers);
+  - single-line paste markers are stripped;
+  - the stage set-up won't overwrite a stage the team has already set.
+- All 5 script blocks pass `node --check`. Smoke test PASS, zero console errors, no external requests.
+- Stamp `10/29/26, 7:33 PM ET (v103)`. Archived as `tracker/versions/ECX_Tracker_v103.html`.

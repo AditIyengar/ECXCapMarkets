@@ -322,7 +322,7 @@
       .ecx-facts { column-gap: 24px; }
     }
   
-    /* ── CF Pipeline tab (v102): the weekly pipeline call, live in the shared store ──────── */
+    /* ── CF Pipeline tab (v102, v103 stages + bullet editor): the weekly pipeline call, live in the shared store ──── */
     .ecx-pipe { min-width: 0; }
     .ecx-pipe-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 14px 28px; margin-bottom: 22px; }
     .ecx-pipe-headtext { flex: 1 1 420px; min-width: 0; }
@@ -364,7 +364,9 @@
     .ecx-pipe-sechead .ecx-pipe-n { font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
     .ecx-pipe-sechead:hover .ecx-pipe-seclabel { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule-strong); }
     .ecx-pipe-secempty { margin: 0; padding: 4px 0 0; font-size: 13px; color: var(--muted); }
-    .ecx-pipe-box { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); overflow: clip; }
+    /* isolation: each table box is its own paint layer, so the header mascot's animation (repainted every frame) re-uses the
+       boxes' cached paint instead of walking every row; the box already clips its content, so nothing stacks differently */
+    .ecx-pipe-box { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); overflow: clip; isolation: isolate; }
     @media (max-width: 1180px) { .ecx-pipe-box { overflow-x: auto; overflow-y: hidden; } }
     .ecx-pipe-table { width: 100%; min-width: 840px; border-collapse: collapse; font-size: 13.5px; line-height: 1.5; }
     .ecx-pipe-table > tbody > tr:last-child, .ecx-pipe-table > tbody > tr:last-child > td { border-bottom: 0 !important; }
@@ -425,7 +427,7 @@
     .ecx-pipe-empty { padding: 44px 24px; text-align: center; font-size: 14px; line-height: 1.6; color: var(--muted); }
     .ecx-pipe-empty b { display: block; margin-bottom: 4px; font-weight: 600; color: var(--ink-2); }
     .ecx-pipe-cards { display: flex; flex-direction: column; gap: 10px; }
-    .ecx-pipe-card { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+    .ecx-pipe-card { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; isolation: isolate; }   /* isolation: as .ecx-pipe-box */
     .ecx-pipe-cardhead { display: block; padding: 14px 16px; cursor: pointer; outline: none; }
     .ecx-pipe-cardhead:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); border-radius: 14px; }
     .ecx-pipe-cardtop { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
@@ -460,7 +462,7 @@
       .ecx-pipe-actions { gap: 6px; }
       .ecx-pipe-toolbar .ecx-pipe-view { flex: 1 0 100%; }
       .ecx-pipe-toolbar select.ecx-input { max-width: none; }
-      .ecx-pipe-sheet .is-stick { min-width: 132px !important; max-width: 150px !important; }
+      .ecx-pipe-sheet .is-stick2 { min-width: 132px !important; max-width: 150px !important; }
       .ecx-pipe-actions { justify-content: flex-start; }
       .ecx-pipe-long { display: none; }
       .ecx-pipe-toolbar .ecx-pipe-view { margin-left: 0; }
@@ -483,6 +485,162 @@
     @media (min-width: 641px) { .ecx-tabs { gap: 1px; } .ecx-tab { padding: 8px 10px; } }
     /* a row scrolled into view (after Add deal) clears the sticky table header */
     .ecx-pipe tr[data-row], .ecx-pipe .ecx-pipe-cardhead { scroll-margin-top: 56px; }
+
+    /* ── v103: the process stage on every deal box ── */
+    /* the track: 7 small segments, filled with the accent up to the current stage (an accent-ink edge keeps 3:1+ on the light
+       surface), the rest rule-coloured outlines; paused turns it muted and adds a warn "Paused" */
+    .ecx-pipe-stage { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: 9px; min-width: 0; line-height: 1.35; }
+    .ecx-pipe-track { display: inline-flex; flex: 0 0 auto; gap: 2px; margin-top: 5.5px; }
+    .ecx-pipe-track i { display: block; width: 11px; height: 6px; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--rule-strong); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted) 78%, transparent); }
+    .ecx-pipe-track i.is-on { background: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-ink); }
+    .ecx-pipe-stage.is-paused .ecx-pipe-track i.is-on, .ecx-pipe-stagehead.is-paused .ecx-pipe-seg.is-on .ecx-pipe-segbar { background: var(--muted); box-shadow: inset 0 0 0 1px var(--muted); }
+    .ecx-pipe-stagetext { display: inline-flex; flex: 0 1 auto; flex-wrap: wrap; align-items: baseline; gap: 0 7px; min-width: 0; }
+    .ecx-pipe-stagelabel { font-size: 13px; font-weight: 500; color: var(--ink); }
+    .ecx-pipe-stagelabel.is-unset { font-weight: 400; color: var(--muted); }
+    .ecx-pipe-stage.is-paused .ecx-pipe-stagelabel, .ecx-pipe-stagehead.is-paused .ecx-pipe-stagelabel { color: var(--muted); }
+    .ecx-pipe-stagepos { font-size: 12px; font-weight: 400; color: var(--muted); white-space: nowrap; }
+    .ecx-pipe-paused { font-size: 12px; font-weight: 600; color: var(--warn); white-space: nowrap; }
+    .ecx-pipe-stagenone { color: var(--muted); }
+    /* on a deal box the label holds the first line beside the track; "4 of 7" (and Paused) always sit on the line under it */
+    .ecx-pipe-stage.is-sm .ecx-pipe-stagelabel { flex: 1 0 100%; }
+    .ecx-pipe-stage.is-sm .ecx-pipe-stagepos, .ecx-pipe-stage.is-sm .ecx-pipe-paused { margin-top: 1px; }
+    .ecx-pipe-stagecell .ecx-pipe-stage { margin-top: 1px; }
+    .ecx-pipe-stagecell .ecx-pipe-status { margin-top: 5px; }
+    .ecx-pipe-setstage { display: inline-block; margin-top: 5px; font-size: 12.5px; font-weight: 500; }
+    /* the detail panel header: the same track, bigger; editors click a step or pick one, and toggle Paused */
+    .ecx-pipe-stagehead { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 24px; padding: 2px 0 16px; margin: 0 0 18px; border-bottom: 1px solid var(--rule); }
+    .ecx-pipe-shmain { display: flex; flex-direction: column; gap: 6px; flex: 1 1 340px; min-width: 0; }
+    .ecx-pipe-shlabel { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; line-height: 1.4; color: var(--muted); }
+    .ecx-pipe-shlabel .ecx-pipe-dot { width: 6px; height: 6px; background: var(--accent-ink); }
+    .ecx-pipe-shrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; min-width: 0; }
+    .ecx-pipe-shrow .ecx-pipe-stagelabel { font-size: 15px; font-weight: 600; }
+    .ecx-pipe-shrow .ecx-pipe-stagelabel.is-unset { font-size: 14px; font-weight: 400; }
+    .ecx-pipe-shrow .ecx-pipe-stagepos { font-size: 12.5px; }
+    .ecx-pipe-shrow .ecx-pipe-paused { font-size: 12.5px; }
+    .ecx-pipe-shhint { min-height: 19px; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+    .ecx-pipe-shcue { color: var(--ink-2); }
+    .ecx-pipe-segs { display: inline-flex; flex: 0 0 auto; gap: 3px; }
+    .ecx-pipe-seg { display: inline-flex; align-items: center; width: 28px; height: 24px; padding: 0; margin: 0; border: 0; border-radius: 5px; background: none; cursor: pointer; }
+    span.ecx-pipe-seg { cursor: default; }
+    .ecx-pipe-segbar { display: block; width: 100%; height: 8px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--rule-strong); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted) 78%, transparent); transition: background-color .12s, box-shadow .12s; }
+    .ecx-pipe-seg.is-on .ecx-pipe-segbar { background: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-ink); }
+    button.ecx-pipe-seg:hover .ecx-pipe-segbar { box-shadow: inset 0 0 0 1.5px var(--accent-ink); }
+    /* the keyboard ring hugs the step's bar (the shell rounds every button into a pill, which drew a circle round it) */
+    button.ecx-pipe-seg:focus-visible { outline: none; }
+    button.ecx-pipe-seg:focus-visible .ecx-pipe-segbar { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .ecx-pipe-shctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 24px; }
+    .ecx-pipe-stagesel { height: 30px; max-width: 230px; padding: 0 8px; border: 1px solid var(--rule-strong); background: var(--surface); color: var(--ink-2); font-family: inherit; font-size: 12.5px; cursor: pointer; }
+    .ecx-pipe-btn.ecx-pipe-pausebtn[aria-pressed="true"] { background: var(--warn-soft); border-color: var(--warn-line); color: var(--warn); font-weight: 600; }
+    .ecx-pipe-pauseicon { display: inline-block; box-sizing: border-box; width: 8px; height: 10px; border-left: 2.5px solid currentColor; border-right: 2.5px solid currentColor; opacity: .85; }
+    .ecx-pipe-stagehead > .ecx-pipe-ask { flex: 1 0 100%; margin-top: 0; }
+    /* the summary strip: deals per stage (Pipeline group by default) and Paused; each a toggle filter */
+    .ecx-pipe-strip { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 18px; margin: 0 0 20px; padding: 8px 10px 8px 8px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; }
+    .ecx-pipe-stripitems { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-width: 0; }
+    .ecx-pipe-stripbtn { display: inline-flex; align-items: baseline; gap: 6px; padding: 5px 9px; border: 1px solid transparent; border-radius: 999px; background: none; font-family: inherit; font-size: 13px; line-height: 1.3; color: var(--ink-2); white-space: nowrap; cursor: pointer; }
+    .ecx-pipe-stripbtn:hover { background: var(--surface-2); color: var(--ink); }
+    .ecx-pipe-stripn { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .ecx-pipe-stripbtn.is-zero, .ecx-pipe-stripbtn.is-zero .ecx-pipe-stripn { color: var(--muted); font-weight: 400; cursor: default; }
+    .ecx-pipe-stripbtn.is-zero:hover { background: none; }
+    .ecx-pipe-stripbtn.is-paused .ecx-pipe-striplabel { color: var(--warn); }
+    .ecx-pipe-stripbtn[aria-pressed="true"], .ecx-pipe-stripbtn[aria-pressed="true"]:hover { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-ink); }
+    .ecx-pipe-stripbtn[aria-pressed="true"] .ecx-pipe-stripn { color: var(--accent-ink); }
+    .ecx-pipe-stripbtn.is-paused[aria-pressed="true"], .ecx-pipe-stripbtn.is-paused[aria-pressed="true"]:hover { background: var(--warn-soft); border-color: var(--warn-line); }
+    .ecx-pipe-stripbtn.is-paused[aria-pressed="true"] .ecx-pipe-stripn { color: var(--warn); }
+    .ecx-pipe-stripsep { padding: 0 1px; font-size: 13px; color: var(--rule-strong); }
+    .ecx-pipe-stripdiv { width: 1px; height: 18px; margin: 0 8px; background: var(--rule-strong); }
+    .ecx-pipe-stripnote { padding-left: 6px; font-size: 12.5px; color: var(--muted); }
+    /* the call-view row: the latest status update's first two bullets, muted, two lines each */
+    .ecx-pipe-preview { margin-top: 8px; max-width: 62ch; font-size: 12.5px; font-weight: 400; line-height: 1.5; color: var(--muted); }
+    .ecx-pipe-preview ul { display: flex; flex-direction: column; gap: 3px; margin: 0; padding: 0; list-style: none; }
+    .ecx-pipe-preview li { position: relative; padding-left: 12px; }
+    .ecx-pipe-preview li::before, .ecx-pipe-reftext::before { content: ""; position: absolute; left: 2px; top: .62em; width: 4px; height: 4px; border-radius: 50%; background: var(--muted); opacity: .7; }
+    .ecx-pipe-preview li > span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+    .ecx-pipe-prevfoot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-top: 4px; font-size: 12px; }
+    .ecx-pipe-preview ul + .ecx-pipe-prevfoot .ecx-pipe-more { padding-left: 12px; }
+    .ecx-pipe-updated { font-size: 12px; font-weight: 400; color: var(--muted); white-space: nowrap; }
+    .ecx-pipe-chgmove { white-space: normal; }
+    .ecx-pipe-drafttag { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-size: 11.5px; font-weight: 500; line-height: 1.5; white-space: nowrap; vertical-align: 1px; }
+    .ecx-pipe-draftitem + .ecx-pipe-draftitem::before { content: "\00B7"; margin: 0 10px; color: var(--muted); }
+    .ecx-pipe-detail > .ecx-pipe-draftnote { margin-bottom: 16px; }
+    /* "Update": the call's main action, quiet but always there */
+    .ecx-pipe-btn.ecx-pipe-update { height: 30px; padding: 0 14px; font-size: 12.5px; color: var(--accent-ink); border-color: var(--rule-strong); }
+    .ecx-pipe-btn.ecx-pipe-update:hover { color: var(--accent-ink); background: var(--accent-soft); border-color: var(--accent-line); }
+    .ecx-pipe-updcell { vertical-align: top; }
+    /* narrower tables (tablets, small laptops): Region / Sponsor and Lenders give their room to the deal; both are in its panel */
+    @media (max-width: 1180px) {
+      .ecx-pipe-table .ecx-pipe-col-rs, .ecx-pipe-table .ecx-pipe-col-ld { display: none; }
+      .ecx-pipe-table th.ecx-pipe-col-amt { width: 10% !important; }
+      .ecx-pipe-table th.ecx-pipe-col-fund { width: 12% !important; }
+      .ecx-pipe-table th.ecx-pipe-col-stage { width: 25% !important; }
+      .ecx-pipe-table th.ecx-pipe-col-ecx { width: 10% !important; }
+    }
+    .ecx-pipe-stagetext, .ecx-pipe-stagelabel { overflow-wrap: normal; }
+    .ecx-pipe-cardstage { margin-top: 10px; }
+    .ecx-pipe-cardstage .ecx-pipe-status { margin-top: 4px; }
+    .ecx-pipe-card .ecx-pipe-preview { margin-top: 10px; }
+    .ecx-pipe-cardfoot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px 9px 16px; border-top: 1px solid var(--rule); }
+    .ecx-pipe-cardfootl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-width: 0; }
+    .ecx-pipe-cardfoot .ecx-pipe-setstage { margin-top: 0; }
+    /* sheet view: the tracker-only Stage column leads, and stays put with Project Name while the grid scrolls */
+    .ecx-pipe-sheet .is-stage { box-sizing: border-box; width: 204px; min-width: 204px; max-width: 204px; }
+    .ecx-pipe-sheet .is-stick.is-stage { box-shadow: none; border-right: 1px solid var(--rule); }
+    .ecx-pipe-sheet .is-stick2 { position: sticky; left: 204px; z-index: 1; box-shadow: inset -1px 0 0 var(--rule-strong); border-right: 0; }
+    .ecx-pipe-sheet th.is-stick2 { z-index: 3; }
+    .ecx-pipe-sheet td.is-stage .ecx-pipe-stage { gap: 3px 7px; }
+    .ecx-pipe-sheet td.is-stage .ecx-pipe-stagelabel { font-size: 12.5px; }
+    .ecx-pipe-trackeronly { border-bottom: 1px dotted var(--muted); cursor: help; }
+    @media (max-width: 640px) {
+      .ecx-pipe-sheet .is-stick.is-stage { position: static; }
+      .ecx-pipe-sheet .is-stick2 { left: 0; }
+      .ecx-pipe-sheet .is-stage { width: 176px; min-width: 176px; max-width: 176px; }
+      .ecx-pipe-toolbar select.ecx-input { flex: 1 1 calc(50% - 6px); }
+      .ecx-pipe-strip { padding: 6px; }
+      /* phones: the stages as a tidy two-column list, still in process order */
+      .ecx-pipe-stripitems { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2px 6px; flex: 1 0 100%; }
+      .ecx-pipe-stripsep, .ecx-pipe-stripdiv { display: none; }
+      .ecx-pipe-stripbtn { justify-content: space-between; min-width: 0; }
+      .ecx-pipe-striplabel { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+      .ecx-pipe-stripnote { flex: 1 0 100%; padding: 2px 9px 2px; }
+      .ecx-pipe-shctl { padding-top: 0; }
+    }
+    /* ── v103: the bullet editor (one row per bullet) ── */
+    .ecx-pipe-editor.ecx-pipe-beditor { max-width: 720px; gap: 10px; }
+    .ecx-pipe-modes { display: flex; }
+    .ecx-pipe-blist { margin: 0; padding: 3px 0; list-style: none; background: var(--surface); border: 1px solid var(--rule-strong); border-radius: 12px; }
+    .ecx-pipe-blist:focus-within { border-color: var(--accent); }
+    .ecx-pipe-brow { display: flex; align-items: flex-start; gap: 2px; padding: 0 4px 0 10px; }
+    .ecx-pipe-brow + .ecx-pipe-brow { box-shadow: inset 0 1px 0 var(--rule); }
+    .ecx-pipe-brow:focus-within { background: var(--surface-2); }
+    .ecx-pipe-bmark { flex: 0 0 auto; width: 12px; padding-top: 7px; font-size: 14px; line-height: 1.55; text-align: center; color: var(--muted); }
+    .ecx-pipe-brow:focus-within .ecx-pipe-bmark { color: var(--accent-ink); }
+    /* contain: paint keeps the blinking caret's composited layer to the bullet itself: without it, everything painted after
+       the caret (the rest of the panel, every row's Update below) is squashed into one page-tall layer re-built on every key */
+    .ecx-pipe-editor .ecx-pipe-brow textarea { flex: 1 1 auto; width: auto; min-width: 0; min-height: 0; height: 36px; padding: 7px 6px; border: 0; border-radius: 0; background: transparent; resize: none; overflow: hidden; contain: paint; font-size: 13.5px; line-height: 1.55; color: var(--ink); }
+    .ecx-pipe-editor .ecx-pipe-brow textarea:focus { border-color: transparent !important; box-shadow: none !important; outline: none; }
+    .ecx-pipe-editor .ecx-pipe-brow textarea::placeholder { color: var(--muted); }
+    .ecx-pipe-bctl { display: flex; flex: 0 0 auto; gap: 0; padding-top: 5px; }
+    .ecx-pipe-bbtn { width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: none; font-family: inherit; font-size: 13px; line-height: 1; color: var(--muted); cursor: pointer; }
+    .ecx-pipe-bbtn:hover { background: var(--surface-3); color: var(--ink); }
+    .ecx-pipe-bbtn.is-remove { font-size: 15px; }
+    .ecx-pipe-bbtn.is-remove:hover { color: var(--risk); }
+    .ecx-pipe-bbtn.is-move { opacity: 0; transition: opacity .12s; }
+    .ecx-pipe-brow:hover .ecx-pipe-bbtn.is-move, .ecx-pipe-brow:focus-within .ecx-pipe-bbtn.is-move { opacity: 1; }
+    .ecx-pipe-brow .ecx-pipe-bbtn:disabled { opacity: .3; cursor: default; background: none; }
+    .ecx-pipe-brow:not(:hover):not(:focus-within) .ecx-pipe-bbtn.is-move:disabled { opacity: 0; }
+    @media (hover: none) { .ecx-pipe-bbtn.is-move { opacity: 1; } }
+    .ecx-pipe-addrow { display: flex; margin-top: -2px; }
+    .ecx-pipe-addb { padding: 2px 2px; font-size: 13px; font-weight: 500; }
+    .ecx-pipe-addb:disabled { opacity: .5; cursor: default; }
+    .ecx-pipe-ref { padding: 12px 14px 12px; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 12px; }
+    .ecx-pipe-refhead { margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--muted); }
+    .ecx-pipe-reflist { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+    .ecx-pipe-reflist li { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+    .ecx-pipe-reftext { position: relative; flex: 1 1 auto; min-width: 0; padding-left: 12px; overflow-wrap: anywhere; }
+    .ecx-pipe-keep { flex: 0 0 auto; padding: 2px 10px; border: 1px solid var(--rule-strong); border-radius: 999px; background: var(--surface); font-family: inherit; font-size: 12px; font-weight: 500; line-height: 1.5; color: var(--accent-ink); white-space: nowrap; cursor: pointer; }
+    .ecx-pipe-keep:hover { background: var(--accent-soft); border-color: var(--accent-line); }
+    .ecx-pipe-keep.is-kept { background: var(--accent-soft); border-color: var(--accent-line); }
+    .ecx-pipe-fieldmeta { font-weight: 400; color: var(--muted); }
+    .ecx-pipe-field.is-bediting .ecx-pipe-fieldhead { margin-bottom: 2px; }
 
     /* Coffee mascot (blue jay) */
     .pup-wrap { order: 2; margin-left: auto; align-self: center; display: flex; flex: 0 0 auto; }
@@ -6462,7 +6620,7 @@ var BOND_MARKET_NOTES = [
   });
 })();
 // Updated on every refresh/sync (incl. the weekday-evening automated Outlook sweep) — shown in the header.
-var LAST_REFRESH = "10/29/26, 3:14 PM ET (v102)";
+var LAST_REFRESH = "10/29/26, 7:33 PM ET (v103)";
 // Outlook coverage cut-off: the last day whose call notes and bank emails have been folded in.
 // Set at release together with LAST_REFRESH; both are read by the header and by ASK_asOf().
 var SWEEP_THROUGH = "9/15/26 (full sweep); targeted updates through 9/29/26 (DBS, FAB, Huntington, KDB, KKR, Apollo, Blackstone, Truist), 10/16/26 (LBBW, CaixaBank) and 10/19/26 (SMBC); lender commitments and fees per Chris Wenger’s Q3 2026 files (as of 9/30/26)";
@@ -13143,7 +13301,7 @@ function GuideTab() {
     { data: "Fees paid by bank (Lender Fees tab)", src: "Lender Fees Summary workbook \u2014 currently Lender Fees Summary_Q3 2026.xlsx (Deal Overview sheet, circulated 10/15/26): 70 banks \u00D7 14 deals in 2025 and 9 in 2026. Mirrored cell-for-cell: null = not in the deal, $0 = in the deal with no fee.", loc: "SharePoint \u203A 12. Portfolio Management \u203A 04. Debt Overviews \u203A 09. Lender Fees \u203A Sent to EQT", own: "Chris Wenger \u2014 monthly. Ask Claude to refresh the tab when a new file lands." },
     { data: "Debt stack, pricing, maturities & hedges (Global Cap Table)", src: "June 2026 Debt Overview.xlsx \u2014 Notes Payable Overview sheet ONLY (21 facilities, $22.06bn commitments as of 6/30/26, EUR at 1.14315), plus the Hedging Summary sheet in the same workbook for the swap fixed rates and cap strikes behind the \u201CRate \u2014 Paying\u201D column.", loc: "SharePoint \u203A 12. Portfolio Management \u203A 04. Debt Overviews \u203A 08. EQT \u203A 7.16.26 ECX Debt Slide", own: "Chris Wenger \u2014 monthly. Each refresh must tie total commitments to the confirmed figure (incl. King and the $50m RCF, which the file\u2019s own total row misses)." },
     { data: "Active projects: sizes, expected close dates & lead banks", src: "Corporate Finance Pipeline_NEW.xlsx \u2014 Pipeline (transactions) sheet. The Expected size figure on each card and the largest-first ordering read the Finance Size figure; the expected close reads the Funding Date column.", loc: "SharePoint \u203A Corporate Finance_Team \u203A 03. Finance Process \u203A CF Pipeline (the canonical copy \u2014 older copies exist under M&A meeting-material folders)", own: "Deal owners (Laura Godschalx / Marjolein Heida / Sander Borgers) \u2014 updated around the weekly CF Pipeline meeting." },
-    { data: "Weekly CF Pipeline call (CF Pipeline tab)", src: "Corporate Finance Pipeline_NEW.xlsx \u2014 Pipeline (transactions) sheet, loaded once by Claude cell for cell (every deal, column and section label verbatim) and edited in the tracker from then on. The tab\u2019s header shows the day the sheet was loaded (the sheet\u2019s own Date cell is =TODAY(), so it has no as-of date of its own) and the last call marked held.", loc: "The tracker\u2019s shared store (the same live store as team inputs). Export CSV on the tab writes it back out in the sheet\u2019s own columns, headers and section rows.", own: "The deal team, during and around the weekly CF Pipeline call \u2014 edit access to change it, view access sees it live. Ask Claude to reload it if the Excel is updated separately." },
+    { data: "Weekly CF Pipeline call (CF Pipeline tab)", src: "Corporate Finance Pipeline_NEW.xlsx \u2014 Pipeline (transactions) sheet, loaded once by Claude cell for cell (every deal, column and section label verbatim) and edited in the tracker from then on. The tab\u2019s header shows the day the sheet was loaded (the sheet\u2019s own Date cell is =TODAY(), so it has no as-of date of its own) and the last call marked held. Each deal\u2019s Stage (and Paused) is the tracker\u2019s own field, not a sheet column: Claude set a first stage from each deal\u2019s status and latest update, and the team keeps it current.", loc: "The tracker\u2019s shared store (the same live store as team inputs). Export CSV on the tab writes it back out in the sheet\u2019s own columns, headers and section rows, with the stage added as column AD.", own: "The deal team, during and around the weekly CF Pipeline call \u2014 edit access to change it, view access sees it live. Ask Claude to reload it if the Excel is updated separately." },
     { data: "Bank Outreach per project \u2014 who we\u2019ve approached and who declined", src: "The same CF Pipeline workbook: lead/support lender columns, the Bank Matrix II sheet (including its explicit \u201Cdeclined\u201D cells) and the Ashville Wallet sheet for invite tiers \u2014 combined with decline reasons captured in call notes.", loc: "SharePoint \u203A 03. Finance Process \u203A CF Pipeline (Bank Matrix II / Ashville Wallet sheets)", own: "Corporate Finance team. Reflected onto each bank\u2019s own card automatically, so the two views always agree." },
     { data: "Closed deals (Closed 2025 & 2026 tab)", src: "Deal records at close \u2014 lender-by-lender commitments, draws, pricing, fee detail and funds-flow summaries; EUR deals converted at the rate noted on the tab.", loc: "Deal folders (funds-flow workbooks, Loan Overview.xlsx) + Lender Fees Summary", own: "Static once closed; new closings added on sync." },
     { data: "Quick team updates (Inputs & Review tab)", src: "Typed straight into this tracker by anyone on the team \u2014 a rejection, a meeting that just happened, a new indication. Link the lender(s) it concerns when composing.", loc: "When the sync status in the header reads Live team sync, entries live in the tracker's shared store: adding or approving one updates every open copy of the tracker at once, and approval applies it to the linked lender cards for everyone. Claude bakes approved entries into the next published version. When it reads Saved on this device (this view has no shared store, e.g. a downloaded copy), entries stay in that browser until a sync digest is sent.", own: "Anyone with edit access adds and approves; viewers see everything live. Claude reads the shared store at each refresh." }
@@ -13174,7 +13332,7 @@ function GuideTab() {
       hd("How the tracker gets updated"),
       p(h("b", null, "Only on request \u2014 nothing runs on a schedule. "), "When someone asks Claude to refresh, it sweeps the mailbox and the Bank Meetings folder for call and meeting notes since the last sweep, folds them into the right lender and project cards, runs the quality checks, republishes this page and moves both header dates forward: the refresh stamp (taken from the clock at release) and the last day of call notes folded in. If the header date looks old, the tracker is old \u2014 ask for a refresh."),
       p(h("b", null, "As things happen \u2014 the Inputs & Review tab. "), "Drop a note, link the lender it concerns, approve it, and it appears on that lender\u2019s card immediately \u2014 for the whole team when the sync status in the header reads Live team sync, or in your browser alone when it reads Saved on this device. Claude bakes approved entries into the next published version at each refresh."),
-      p(h("b", null, "During the weekly pipeline call \u2014 the CF Pipeline tab. "), "The call is run from the tracker instead of the Excel: anyone with edit access updates a deal as it is discussed, everyone with the tracker open sees the change straight away, and each change is kept in the deal\u2019s history. Mark call held at the end, and next week \u201CChanges since last call\u201D shows what moved in between."),
+      p(h("b", null, "During the weekly pipeline call \u2014 the CF Pipeline tab. "), "The call is run from the tracker instead of the Excel: anyone with edit access presses Update on the deal being discussed and types the new status bullets (and moves its stage on when it has progressed), everyone with the tracker open sees the change straight away, and each change is kept in the deal\u2019s history. Mark call held at the end, and next week \u201CChanges since last call\u201D shows what moved in between."),
       p(h("b", null, "On request \u2014 just ask Claude. "), "In plain language: \u201Csync the latest call notes\u201D, \u201Crefresh the Lender Fees tab from Chris\u2019s latest file\u201D, \u201Cupdate the cap table from the July Debt Overview\u201D, \u201Cadd a card for [bank]\u201D. Claude reads the source files, updates the data, runs the quality checks and republishes to this same link."),
       p(h("b", null, "Versions. "), "The page name never changes. Each release bumps the version inside the header stamp, is archived as a copy in the team repo (tracker/versions/), and stays reachable through the page\u2019s own version history \u2014 so rollback is always possible without ever circulating a differently-named file.")),
     h("div", { style: card },
@@ -13182,7 +13340,7 @@ function GuideTab() {
       tab("Inputs & Review", "The team capture inbox and the landing tab. Compose (date \u00B7 initials \u00B7 linked lenders \u00B7 documented-call flag) \u2192 approve \u2192 applied live to the linked cards, with undo. Under Live team sync (the sync status in the header, next to the Updated date) entries are shared live across the team \u2014 edit access to add and approve, view access sees everything; a copy that shows Saved on this device keeps them in that browser until a sync bakes them in."),
       tab("Active Lenders", "One calm card per institution, sorted by active pipeline exposure (largest first): the name, one quiet line (type, facility count or New lender, last contact) and the Active pipeline figure (total size of the live deals they are on), with Committed (their facility commitments) beside it. Click anywhere on the card to open the full record in a pop-out: a facts row (status, last fundraising call, pipeline and commitments), call notes with attendees and materials, projects, existing facilities, rejections and contacts; long notes start folded behind Read more. Project names marked \u2197 jump to that project\u2019s pop-out; names without the arrow are closed deals or facilities with no project card. Toggle Cards \u2194 Table top-right."),
       tab("Active Projects", "The live pipeline, largest expected size first. Each card shows the region (a deal can carry more than one, e.g. Global + NA) and deal type, the name, the Expected size and the expected close. Click anywhere on the card for the pop-out: a facts row (expected size and close, banks approached, lenders with notes, workstreams), the full overview rendered as sections and dated updates, \u25A4 workstreams for grouped programmes (Leroy, HoldCo, Salar), the Bank Outreach panel \u2014 every bank approached, grouped Lead / Invited / Support / In dialogue / Proposal received / Declined (struck through), tap or click a bank to show its note, click \u2197 to open the bank\u2019s pop-out \u2014 and each lender\u2019s latest read on the deal."),
-      tab("CF Pipeline", "The weekly CF Pipeline call, run here instead of the Excel. It mirrors Corporate Finance Pipeline_NEW.xlsx \u203A Pipeline (transactions): seeded from the sheet by Claude, then kept current by the team in the tracker\u2019s shared store \u2014 edit access to change it, and everyone with the tracker open sees each change live. Call view groups the deals as the sheet does (Pipeline, JVs, Corporate, Miscellaneous, with Closed and Removed folded away); click a deal for its description, status update, key issues, issues, lenders and terms. Editors get a quiet Edit beside every field (status updates and key issues one bullet per line), Move to and \u2191 \u2193 to regroup, Remove, Add deal and Mark call held; Changes since last call filters to what moved since then. Sheet view is the full grid exactly as in the Excel, and Export CSV takes it back to Excel. Lender names that resolve open that lender\u2019s card, and Open project card \u2197 jumps to the Active Projects pop-out."),
+      tab("CF Pipeline", "The weekly CF Pipeline call, run here instead of the Excel. It mirrors Corporate Finance Pipeline_NEW.xlsx \u203A Pipeline (transactions): seeded from the sheet by Claude, then kept current by the team in the tracker\u2019s shared store \u2014 edit access to change it, and everyone with the tracker open sees each change live. Call view groups the deals as the sheet does (Pipeline, JVs, Corporate, Miscellaneous, with Closed and Removed folded away). Each deal shows where it is in the process on a seven-step stage track (Preparation \u203A Kick-off & sounding \u203A Terms \u203A Credit approvals \u203A Documentation \u203A Signing & closing \u203A Closed; muted, with \u201CPaused\u201D, when a deal is on hold) next to the first bullets of its latest status update, and the strip above the tables counts the Pipeline group by stage \u2014 click a stage to filter. Click a deal for its description, status update, key issues, issues, lenders and terms. Editors get Update on every row: it opens the status update in the bullet editor as a new update, one row per bullet (Enter starts the next, \u2318/Ctrl+Enter saves, and the current bullets sit below to keep any that still hold); the same editor edits key issues and the issues lists. They also set a deal\u2019s stage by clicking a step or picking it, mark it Paused, and get a quiet Edit beside every other field, Move to and \u2191 \u2193 to regroup, Remove, Add deal and Mark call held; Changes since last call filters to what moved since then, stage moves included. Sheet view is the full grid exactly as in the Excel, after a tracker-only Stage column, and Export CSV takes it back to Excel (the stage goes in column AD). Lender names that resolve open that lender\u2019s card, and Open project card \u2197 jumps to the Active Projects pop-out."),
       tab("Closed 2025 & 2026", "Completed transactions by year with lender-by-lender commitments, draws, fees withheld, key terms and funds-flow summaries. Repeat facilities are grouped: the Wahoo DevCo RCF shows as one card that opens to all four closings."),
       tab("Lender Fees", "What we have paid each institution across 2025 and 2026, largest first; click a bank to expand its deal-by-deal breakdown, or switch to the by-deal matrix. \u201C\u2014\u201D means not in the deal; $0 means in the deal with no fee."),
       tab("Lender Commitments", "The mirror image: what each institution has committed, across the file’s 20 facilities plus the tracker-side Canyon (Copia) commitment. Click a bank for its facility-by-facility breakdown, or switch to the full matrix with column totals. The breakdown also carries the tracker-side Blackstone / Morgan Stanley backleverage annotations and notes any merged source row. Below the table, the Project Liverpool LC syndication pipeline opens from a collapsed panel (booked LCs, participation, probability, fronting and timing per bank) and stays outside every total; it replaces the former LC Syndication tab, and the Ask tab answers per-bank status, accordion candidates and declines."),
@@ -15942,6 +16100,8 @@ function LCS_feesPanel() {
 // (transactions); nothing here is hard-coded. One collection listener + one doc listener, started at boot next to the
 // Inputs sync and kept apart from it: no SYNC.unsubs, no ECX_setSyncStatus, its own error state. Writes are single-field
 // update()s with a capped history array; new deals are set() under a slug id; deletes only from Removed.
+// v103: every deal carries a process stage (stage + paused, tracker-only fields, shown as a 7-step track on every deal box,
+// counted in a summary strip) and status updates are written in a bullet editor (one row per bullet, Update on every row).
 var PIPE_SECTIONS_DEFAULT = [
   { key: "pipeline", label: "Pipeline", order: 0, labelInSheet: false, folded: false },
   { key: "jvs", label: "JVs", order: 1, labelInSheet: true, folded: false },
@@ -15973,8 +16133,21 @@ var PIPE_LABELS = {
   fundingDate: "Funding date", fundingMonth: "Funding month", status: "Status", fundingAtClose: "Funding @close (USD)", ecxLead: "ECX lead", ecxSupport: "ECX support",
   description: "Description", statusUpdate: "Status update", keyIssues: "Key issues / gating items", lendersLead: "Lead lenders", lendersOther: "Other lenders",
   issuesTechnical: "Technical issues", issuesLegal: "Legal issues", issuesOther: "Other issues", tenor: "Tenor", ltc: "LTC", marginFee: "Margin / fee",
-  upfrontFee: "Upfront fee", capacity: "Capacity", section: "Section", order: "Position", created: "Added"
+  upfrontFee: "Upfront fee", capacity: "Capacity", section: "Section", order: "Position", created: "Added", stage: "Stage", paused: "Paused"
 };
+// The deal's place in the financing process (default list; pipelineMeta/config.stages, same shape, overrides it).
+var PIPE_STAGES = [
+  { key: "prep", label: "Preparation", hint: "Materials, model, DD, structuring" },
+  { key: "launch", label: "Kick-off & sounding", hint: "First bank outreach, market sounding, RFP / teaser out" },
+  { key: "terms", label: "Terms", hint: "Term sheets in, negotiating terms, lead / club selection" },
+  { key: "credit", label: "Credit approvals", hint: "Banks in credit; commitments pending" },
+  { key: "docs", label: "Documentation", hint: "Docs, ratings, OM, final DD" },
+  { key: "closing", label: "Signing & closing", hint: "Signing, CPs, funding" },
+  { key: "closed", label: "Closed", hint: "Signed and funded" }
+];
+// Groups whose deals are financings, so a missing stage is worth saying out loud ("Stage not set"); elsewhere it is a quiet dash.
+var PIPE_STAGED_SECTIONS = { pipeline: 1, closed: 1 };
+var PIPE_STAGE_CSV_LABEL = "Stage (tracker)";
 var PIPE_NUMERIC = { amount: 1, amountUsd: 1, fundingAtClose: 1, tenor: 1, ltc: 1, marginFee: 1, upfrontFee: 1, capacity: 1 };
 var PIPE_BULLET_FIELDS = { statusUpdate: 1, keyIssues: 1, issuesTechnical: 1, issuesLegal: 1, issuesOther: 1 };
 var PIPE_LONG_FIELDS = { description: 1 };
@@ -15989,7 +16162,7 @@ var PIPE = {
   phase: "idle", started: false, db: null, rows: [], byId: {}, meta: null, metaKnown: false, definitive: false, pending: false,
   slow: false, stopped: false, errorCode: "", metaStopped: false, canEdit: false, canEditKnown: false, denied: false,
   initials: "", ask: null, save: {}, unsubRows: null, unsubMeta: null, rowsResub: false, metaResub: false, connectTimer: null, slowUntil: 0, creating: {},
-  snaps: 0, cacheSnaps: 0, drafts: {}
+  snaps: 0, cacheSnaps: 0, drafts: {}, intent: null, focusReq: null, bid: 0, bfocus: null
 };
 // db.d.ts error codes (plus INPUT_errCode's own "programming_error"); anything else is treated as "unavailable"
 var PIPE_CODES = { invalid_argument: 1, resource_exhausted: 1, quota_exceeded: 1, unavailable: 1, revoked: 1, not_granted: 1, capability_disabled: 1, capability_removed: 1, transform_error: 1, programming_error: 1 };
@@ -16022,6 +16195,9 @@ function PIPE_clean(id, d) {
   r.marker = PIPE_str(src.marker);
   r.updatedAt = typeof src.updatedAt === "string" ? src.updatedAt : "";
   r.updatedBy = PIPE_str(src.updatedBy);
+  // v103 fields; absent before the migration (and on deals added since): no stage, not paused
+  r.stage = typeof src.stage === "string" ? src.stage : "";
+  r.paused = src.paused === true;
   r.history = Array.isArray(src.history) ? src.history.filter(PIPE_isObj).slice(0, 200).map(function (x) {
     return { at: PIPE_str(x.at), by: PIPE_str(x.by), field: PIPE_str(x.field), from: PIPE_str(x.from), to: PIPE_str(x.to) };
   }) : [];
@@ -16035,9 +16211,42 @@ function PIPE_cleanMeta(d) {
     title: PIPE_str(d.title), source: PIPE_str(d.source), asOf: PIPE_str(d.asOf), seededAt: PIPE_str(d.seededAt),
     sections: Array.isArray(d.sections) ? d.sections.filter(PIPE_isObj).map(function (s) { return { key: PIPE_str(s.key), label: PIPE_str(s.label), order: typeof s.order === "number" ? s.order : 0 }; }) : [],
     lastCall: call(d.lastCall),
-    calls: Array.isArray(d.calls) ? d.calls.map(call).filter(Boolean) : []
+    calls: Array.isArray(d.calls) ? d.calls.map(call).filter(Boolean) : [],
+    stages: PIPE_cleanStages(d.stages)
   };
 }
+// pipelineMeta/config.stages: [{key, label, hint}] with unique keys, or null (then the default list applies).
+function PIPE_cleanStages(v) {
+  if (!Array.isArray(v) || !v.length || v.length > 12) return null;
+  var seen = {}, out = [];
+  for (var i = 0; i < v.length; i++) {
+    var s = v[i];
+    if (!PIPE_isObj(s) || typeof s.key !== "string" || !s.key || INPUT_has(seen, s.key) || typeof s.label !== "string" || !s.label.trim()) return null;
+    seen[s.key] = 1;
+    out.push({ key: s.key, label: s.label.trim(), hint: PIPE_str(s.hint).trim() });
+  }
+  return out;
+}
+function PIPE_stageList() { return PIPE.meta && PIPE.meta.stages ? PIPE.meta.stages : PIPE_STAGES; }
+function PIPE_stageIdx(key) {
+  if (!key) return -1;
+  var st = PIPE_stageList();
+  for (var i = 0; i < st.length; i++) if (st[i].key === key) return i;
+  return -1;
+}
+// {i, n, key, label, hint} for a deal's stage, or null (not set, or a key the stage list does not know)
+function PIPE_stageOf(r) {
+  var st = PIPE_stageList(), i = PIPE_stageIdx(r && r.stage);
+  return i < 0 ? null : { i: i, n: st.length, key: st[i].key, label: st[i].label, hint: st[i].hint };
+}
+function PIPE_stageLabel(key) { var i = PIPE_stageIdx(key); return i < 0 ? "" : PIPE_stageList()[i].label; }
+function PIPE_stageAria(r) {
+  var s = PIPE_stageOf(r);
+  if (!s) return (PIPE_STAGED_SECTIONS[r.section] ? "Stage not set" : "No stage") + (r.paused ? " (paused)" : "");
+  return "Stage " + (s.i + 1) + " of " + s.n + ": " + s.label + (r.paused ? " (paused)" : "");
+}
+// Column AD of the export: the stage label, plus " (paused)" when paused.
+function PIPE_stageCsv(r) { var l = PIPE_stageLabel(r.stage); return r.paused ? (l ? l + " (paused)" : "Paused") : l; }
 function PIPE_secIndex(key) { var s = PIPE_sections(); for (var i = 0; i < s.length; i++) if (s[i].key === key) return i; return s.length; }
 function PIPE_cmp(a, b) {
   var sa = PIPE_secIndex(a.section), sb = PIPE_secIndex(b.section);
@@ -16115,6 +16324,8 @@ function PIPE_onRows(snap) {
     }
     rows.sort(PIPE_cmp);
     PIPE.rows = rows; PIPE.byId = byId;
+    // an unsaved draft on a deal a teammate deleted has nothing left to land on
+    if (!(snap.metadata && snap.metadata.fromCache)) for (var dk in PIPE.drafts) if (!byId[dk.slice(0, dk.lastIndexOf(":"))]) delete PIPE.drafts[dk];
     PIPE.pending = !!(snap.metadata && snap.metadata.hasPendingWrites);
     PIPE.snaps++;
     if (snap.metadata && snap.metadata.fromCache) PIPE.cacheSnaps++;
@@ -16202,7 +16413,7 @@ function PIPE_fromDraft(field, draft, original) {
     if (lines.length === 1 && (!wasEmpty || !(field === "statusUpdate" || field === "keyIssues"))) return lines[0];
     m = "x";
   }
-  var guard = m === "x" ? function (s) { return s.replace(/(\s)x(\s)/g, "$1\u00D7$2"); } : function (s) { return s.replace(/(\s)-(\s)/g, "$1\u2013$2"); };
+  var guard = m === "x" ? function (s) { return s.replace(/(^|\s)x(?=\s|$)/g, "$1\u00D7"); } : function (s) { return s.replace(/(^|\s)-(?=\s|$)/g, "$1\u2013"); };
   return m + " " + lines.map(guard).join(" " + m + " ");
 }
 function PIPE_sameValue(field, a, b) {
@@ -16230,6 +16441,66 @@ function PIPE_fmtStamp(v) {
 }
 function PIPE_localDay() { var d = new Date(); return d.getFullYear() + "-" + PIPE_pad(d.getMonth() + 1) + "-" + PIPE_pad(d.getDate()); }
 function PIPE_t(v) { var t = Date.parse(v); return isNaN(t) ? 0 : t; }
+// "just now", "12 min ago", "3h ago", "yesterday", "4d ago", then the date
+function PIPE_ago(v) {
+  var t = PIPE_t(v);
+  if (!t) return "";
+  var s = Math.max(0, Math.floor((Date.now() - t) / 1000));
+  if (s < 60) return "just now";
+  var m = Math.floor(s / 60);
+  if (m < 60) return m + " min ago";
+  var hr = Math.floor(m / 60);
+  if (hr < 24) return hr + "h ago";
+  var d = Math.floor(hr / 24);
+  if (d === 1) return "yesterday";
+  return d < 14 ? d + "d ago" : "on " + PIPE_fmtDate(v);
+}
+// The newest history line for one field (history is newest first), or null.
+function PIPE_fieldLast(r, f) { for (var i = 0; i < r.history.length; i++) if (r.history[i].field === f) return r.history[i]; return null; }
+// The newest change the team made since the sheet was loaded (a reorder alone is not news), or null.
+function PIPE_lastTeamEdit(r) {
+  var t0 = PIPE.meta ? PIPE_t(PIPE.meta.seededAt) : 0;
+  for (var i = 0; i < r.history.length; i++) {
+    var e = r.history[i];
+    if (e.field && e.field !== "order" && PIPE_t(e.at) > t0) return e;
+  }
+  return null;
+}
+// ── Bullet editor model: a list of {k, t}; k is a stable React key so focus survives moves ────────────────────────────
+function PIPE_item(t) { PIPE.bid += 1; return { k: "b" + PIPE.bid, t: String(t == null ? "" : t) }; }
+function PIPE_itemsOf(text) { var b = PIPE_bullets(text); return b.length ? b.map(PIPE_item) : [PIPE_item("")]; }
+function PIPE_texts(list) { return (list || []).map(function (x) { return String(x.t || "").trim(); }).filter(Boolean); }   // internal spacing kept as typed
+// Pasted (or otherwise inserted) text as bullets: the sheet's "x a x b" when it starts with "x ", else one bullet per line
+// with a leading "• ", "- ", "* " or "– " marker stripped. Bullets are single paragraphs.
+function PIPE_parsePaste(text) {
+  var t = String(text || "").replace(/\r\n?/g, "\n"), tr = t.trim();
+  if (!tr) return [];
+  var one = function (s) { return s.replace(/\s*\n\s*/g, " ").replace(/\t/g, " ").trim(); };
+  if (/^x\s/.test(tr)) return tr.split(/(?:^|\s+)x\s+/).map(one).filter(Boolean);
+  return t.split("\n").map(function (l) { return one(l.replace(/^\s*[\u2022*\-\u2013]\s+/, "")); }).filter(Boolean);
+}
+// The sheet value a bullet list saves as ("x a x b", "- a - b" where the cell used dashes; v102's guards for a standalone x / -)
+function PIPE_listValue(f, list, original) { return PIPE_fromDraft(f, PIPE_texts(list).join("\n"), original); }
+function PIPE_bulletsDirty(ed) {
+  if (!ed || ed.kind !== "bullets") return false;
+  if (PIPE_texts(ed.neu).length) return true;
+  return !!ed.cur && PIPE_texts(ed.cur).join("\n") !== PIPE_bullets(ed.base).join("\n");
+}
+function PIPE_draftDirty(key, ed) {
+  if (!ed) return false;
+  if (ed.kind === "bullets") return PIPE_bulletsDirty(ed);
+  var f = key.slice(key.lastIndexOf(":") + 1);
+  return String(ed.draft) !== PIPE_toDraft(f, ed.base);
+}
+// Unsaved drafts on deals still in the store: [{key, id, field, row}]
+function PIPE_dirtyDrafts() {
+  var out = [];
+  for (var k in PIPE.drafts) {
+    var i = k.lastIndexOf(":"), id = k.slice(0, i), row = PIPE.byId[id];
+    if (row && PIPE_draftDirty(k, PIPE.drafts[k])) out.push({ key: k, id: id, field: k.slice(i + 1), row: row });
+  }
+  return out;
+}
 // Split a Lenders cell into text runs and lender tokens, keeping every character of the original visible.
 function PIPE_findLender(token) {
   var n = ASK_norm(token);
@@ -16475,14 +16746,15 @@ function PIPE_csvCell(v) {
   return /[",\r\n]|^\s|\s$/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
 // The sheet as rows of cells: super-header row, header row, then each section (blank row + label row where the sheet has one).
+// Columns A..AC are exactly the sheet's (so a paste at A6 lands where it belongs); AD is the tracker-only stage.
 function PIPE_sheetLines(rows) {
-  var cols = PIPE_SHEET_COLS, lines = [], blank = cols.map(function () { return ""; });
-  lines.push(cols.map(function (c) { return c.span ? c.group : ""; }));
-  lines.push(cols.map(function (c) { return c.label; }));
+  var cols = PIPE_SHEET_COLS, lines = [], blank = cols.map(function () { return ""; }).concat([""]);
+  lines.push(cols.map(function (c) { return c.span ? c.group : ""; }).concat([PIPE_STAGE_CSV_LABEL]));
+  lines.push(cols.map(function (c) { return c.label; }).concat([PIPE_STAGE_CSV_LABEL]));
   PIPE_sections().forEach(function (s) {
-    if (s.labelInSheet) { lines.push(blank); if (s.key === "closed") lines.push(blank); lines.push(cols.map(function (c) { return c.key === "project" ? s.label : ""; })); }   // the sheet has two blank rows (45-46) above Closed
+    if (s.labelInSheet) { lines.push(blank); if (s.key === "closed") lines.push(blank); lines.push(cols.map(function (c) { return c.key === "project" ? s.label : ""; }).concat([""])); }   // the sheet has two blank rows (45-46) above Closed
     rows.filter(function (r) { return r.section === s.key; }).forEach(function (r) {
-      lines.push(cols.map(function (c) { return c.key === "leadB" || c.key === "spacerU" ? "" : PIPE_str(r[c.key]); }));
+      lines.push(cols.map(function (c) { return c.key === "leadB" || c.key === "spacerU" ? "" : PIPE_str(r[c.key]); }).concat([PIPE_stageCsv(r)]));
     });
   });
   return lines;
@@ -16493,7 +16765,7 @@ function PIPE_tsv(rows) { return PIPE_sheetLines(rows).map(function (l) { return
 function PIPE_copyForExcel() {
   var rows = PIPE.rows.slice();
   return PIPE_copyText(PIPE_tsv(rows)).then(function (ok) {
-    ECX_toast(ok ? "Copied " + rows.length + " deals in the sheet's columns \u2014 paste into Excel at cell A6." : "Copy was blocked by the browser in this view.");
+    ECX_toast(ok ? "Copied " + rows.length + " deals in the sheet's columns (plus the tracker's stage in AD) \u2014 paste into Excel at cell A6." : "Copy was blocked by the browser in this view.");
     return ok;
   });
 }
@@ -16579,48 +16851,97 @@ function PIPE_LenderText(p) {
   }));
 }
 // One field of the detail panel: its value, a quiet Edit, and (while editing) the editor with save state and conflict note.
+// Bullet fields (status update, key issues, the three issues) edit in PIPE_BulletEditor; the others in an input or textarea.
 function PIPE_Field(p) {
   var h = React.createElement;
-  var r = p.row, f = p.field, live = r[f] || "", key = r.id + ":" + f;
+  var r = p.row, f = p.field, live = r[f] || "", key = r.id + ":" + f, bulletF = !!PIPE_BULLET_FIELDS[f];
   // the draft lives outside this component too: a teammate moving the deal re-mounts its panel, and the editor comes back
   var es = React.useState(function () { return PIPE.drafts[key] || null; }), edState = es[0], setEdLocal = es[1];
   var setEd = function (v) { if (v) PIPE.drafts[key] = v; else delete PIPE.drafts[key]; setEdLocal(v); };
-  var taRef = React.useRef(null);
+  var taRef = React.useRef(null), inRef = React.useRef(null), editRef = React.useRef(null), retRef = React.useRef(null);
   React.useLayoutEffect(function () {   // grow the textarea with its (wrapped) text, up to most of the screen
     var t = taRef.current;
     if (!t) return;
     t.style.height = "auto";
     t.style.height = Math.min(t.scrollHeight + 2, Math.max(220, Math.round(window.innerHeight * 0.6))) + "px";
   });
+  React.useLayoutEffect(function () {   // after Save / Cancel: focus back where the edit started (the row's Update, or this Edit)
+    if (!retRef.current || edState) return;
+    var from = retRef.current, el = null;
+    retRef.current = null;
+    if (from === "row") el = document.querySelector('.ecx-pipe [data-row="' + r.id + '"] .ecx-pipe-update');
+    if (!el) el = editRef.current;
+    try { if (el) el.focus({ preventScroll: from !== "row" }); } catch (e) {}
+  });
   var save = PIPE.save[key] || null, saving = !!(save && save.s === "saving");
   var label = p.label || PIPE_LABELS[f] || f;
   var editable = p.editable && !(p.fixed);
   var ed = editable ? edState : null;
-  var open = function () {
-    PIPE_withInitials("field:" + key, function () { setEd({ draft: PIPE_toDraft(f, PIPE.byId[r.id] ? PIPE.byId[r.id][f] : live), base: PIPE.byId[r.id] ? PIPE.byId[r.id][f] : live }); PIPE_setSave(key, null); });
-  };
-  var cancel = function () { setEd(null); if (save && save.s === "error") PIPE_setSave(key, null); };
-  var commit = function () {
-    if (!ed || saving) return;
-    var nv = PIPE_fromDraft(f, ed.draft, live);
-    if (PIPE_sameValue(f, nv, live)) { setEd(null); return; }
-    PIPE_setSave(key, "saving");
-    PIPE_saveFields(r.id, (function () { var o = {}; o[f] = nv; return o; })(), PIPE.initials).then(function (res) {
-      if (res.ok) { PIPE_setSave(key, "saved"); setEd(null); }
-      else PIPE_setSave(key, "error", res.msg);
+  var open = function (mode, from) {
+    PIPE_withInitials("field:" + key, function () {
+      var cur = PIPE.byId[r.id] ? PIPE.byId[r.id][f] : live;
+      if (bulletF) {
+        var m = mode === "new" && String(cur || "").trim() ? "new" : "cur";
+        setEd({ kind: "bullets", mode: m, cur: m === "cur" ? PIPE_itemsOf(cur) : null, neu: [PIPE_item("")], base: cur, from: from || "field" });
+        PIPE.focusReq = { key: key };
+      } else setEd({ draft: PIPE_toDraft(f, cur), base: cur, from: from || "field" });
+      PIPE_setSave(key, null);
     });
   };
-  var draftValue = ed ? PIPE_fromDraft(f, ed.draft, live) : "";
+  // "Update" on a row / "Unsaved update on X": open this field's editor (or bring back the draft already open here)
+  React.useEffect(function () {
+    var it = PIPE.intent;
+    if (!it || it.id !== r.id || it.field !== f || Date.now() - it.at > 4000) return;
+    PIPE.intent = null;
+    if (!editable) return;
+    if (edState) {
+      if (edState.kind === "bullets" && it.mode === "new" && edState.mode !== "new" && !PIPE_bulletsDirty(edState) && String(live).trim())
+        setEd(Object.assign({}, edState, { mode: "new", from: it.from || edState.from }));
+      if (edState.kind === "bullets") { PIPE.focusReq = { key: key }; PIPE_notify(); }
+      else { var el = taRef.current || inRef.current; try { if (el) el.focus(); } catch (e) {} }
+      return;
+    }
+    if (!it.resume) open(it.mode, it.from);
+  });
+  var close = function () { retRef.current = (ed && ed.from) || "field"; setEd(null); };
+  var cancel = function () { close(); if (save && save.s === "error") PIPE_setSave(key, null); };
+  var write = function (nv) {
+    PIPE_setSave(key, "saving");
+    PIPE_saveFields(r.id, (function () { var o = {}; o[f] = nv; return o; })(), PIPE.initials).then(function (res) {
+      if (res.ok) { PIPE_setSave(key, "saved"); close(); }
+      else { PIPE_setSave(key, "error", res.msg); if (bulletF) { PIPE.focusReq = { key: key }; PIPE_notify(); } }
+    });
+  };
+  var commit = function () {
+    if (!ed || saving) return;
+    if (ed.kind === "bullets") {
+      var texts = PIPE_texts(ed.mode === "new" ? ed.neu : ed.cur);
+      if (ed.mode === "new" && !texts.length) { close(); return; }   // nothing typed: an empty new update must not wipe the field
+      if (ed.mode !== "new" && texts.join("\n") === PIPE_bullets(live).join("\n")) { close(); return; }   // unchanged: writes nothing
+      var bv = PIPE_fromDraft(f, texts.join("\n"), live);
+      if (PIPE_sameValue(f, bv, live)) { close(); return; }
+      write(bv);
+      return;
+    }
+    var nv = PIPE_fromDraft(f, ed.draft, live);
+    if (PIPE_sameValue(f, nv, live)) { close(); return; }
+    write(nv);
+  };
+  var draftValue = !ed ? "" : ed.kind === "bullets" ? PIPE_listValue(f, ed.mode === "new" ? ed.neu : ed.cur, live) : PIPE_fromDraft(f, ed.draft, live);
   var conflict = ed && !saving && live !== ed.base && !PIPE_sameValue(f, live, draftValue);
   var multi = !!(PIPE_BULLET_FIELDS[f] || PIPE_LONG_FIELDS[f]);
   var chg = p.changed;
   // an empty block field reads as one quiet line ("Legal —") instead of a label over a lone dash
   var emptyInline = p.layout !== "fact" && !ed && !String(live).trim();
+  // "last updated 2d ago by AI" (from this field's own history line), or "from the sheet"
+  var last = bulletF && (ed || f === "statusUpdate") ? PIPE_fieldLast(r, f) : null;
+  var metaTxt = !bulletF ? "" : last ? "last updated " + PIPE_ago(last.at) + (last.by ? " by " + last.by : "") : ed ? (r.sheetRow ? "from the sheet" : "not updated yet") : "";
   var head = h("div", { className: "ecx-pipe-fieldhead" },
     h("span", null, label),
+    metaTxt ? h("span", { className: "ecx-pipe-fieldmeta", title: last ? PIPE_fmtStamp(last.at) + (last.by ? " \u00B7 " + last.by : "") : "" }, "\u00B7 " + metaTxt) : null,
     emptyInline ? h("span", { className: "ecx-pipe-none", "aria-label": "empty" }, "\u2014") : null,
     chg ? h("span", { className: "ecx-pipe-dot", role: "img", "aria-label": "changed " + (p.since || "since last call"), title: "Changed " + (p.since || "since last call") + (chg.by ? " by " + chg.by : "") + " \u2014 was: " + (PIPE_trunc(chg.first, 160) || "(empty)") }) : null,
-    editable && !ed ? h("button", { type: "button", className: "ecx-pipe-edit", "aria-label": "Edit " + label, onClick: open }, "Edit") : null,
+    editable && !ed ? h("button", { type: "button", ref: editRef, className: "ecx-pipe-edit", "aria-label": "Edit " + label, onClick: function () { open(bulletF ? "cur" : "", "field"); } }, "Edit") : null,
     save ? h("span", { className: "ecx-pipe-state is-" + save.s, role: "status" }, save.s === "saving" ? "Saving\u2026" : save.s === "saved" ? "Saved" : (save.msg || "Not saved")) : null);
   var view;
   if (p.render) view = p.render(live);
@@ -16629,33 +16950,242 @@ function PIPE_Field(p) {
     view = bl.length ? h("ul", { className: "ecx-pipe-bullets" }, bl.map(function (b, i) { return h("li", { key: i }, b); })) : h("div", { className: "ecx-pipe-value is-empty" }, "\u2014");
   } else if (p.layout === "fact") view = h("div", { className: "ecx-pipe-factval" + (PIPE_NUMERIC[f] ? " ecx-tnum" : "") + (live ? "" : " is-empty") }, live || "\u2014");
   else view = h("div", { className: "ecx-pipe-value" + (live ? "" : " is-empty") }, live || "\u2014");
+  var conflictNote = conflict ? h("div", { className: "ecx-pipe-conflict", role: "alert" },
+    h("span", null, "Updated by " + (PIPE_lastBy(r, f) || "a teammate") + " while you were editing"),
+    h("button", { type: "button", className: "ecx-pipe-btn is-small is-quiet", onClick: function () { setEd(Object.assign({}, ed, { base: live })); } }, "Keep mine"),
+    h("button", { type: "button", className: "ecx-pipe-btn is-small is-quiet", onClick: function () {
+      if (ed.kind === "bullets") { setEd(Object.assign({}, ed, { mode: "cur", cur: PIPE_itemsOf(live), neu: [PIPE_item("")], base: live })); PIPE.focusReq = { key: key }; }
+      else setEd({ draft: PIPE_toDraft(f, live), base: live, from: ed.from });
+    } }, "Use theirs"),
+    h("span", { className: "ecx-pipe-theirs" }, "Theirs: " + (PIPE_trunc(bulletF ? PIPE_bullets(live).join(" \u00B7 ") : live, 240) || "(empty)"))) : null;
   var editor = null;
-  if (ed) {
+  if (ed && ed.kind === "bullets") {
+    editor = h(PIPE_BulletEditor, { fkey: key, field: f, label: label, ed: ed, live: live, row: r, saving: saving, onChange: setEd, onSave: commit, onCancel: cancel, conflict: conflictNote });
+  } else if (ed) {
     var onKey = function (e) {
       if (e.key === "Escape") { e.stopPropagation(); e.preventDefault(); cancel(); return; }
       if (e.key === "Enter" && (!multi || e.metaKey || e.ctrlKey)) { e.preventDefault(); commit(); }
     };
     var lines = String(ed.draft || "").split("\n").length;
     editor = h("div", { className: "ecx-pipe-editor" },
-      multi ? h("textarea", { ref: taRef, value: ed.draft, autoFocus: true, disabled: saving, rows: Math.max(3, Math.min(14, lines + 1)), "aria-label": label, onChange: function (e) { setEd({ draft: e.target.value, base: ed.base }); }, onKeyDown: onKey })
-        : h("input", { value: ed.draft, autoFocus: true, disabled: saving, "aria-label": label, onChange: function (e) { setEd({ draft: e.target.value, base: ed.base }); }, onKeyDown: onKey }),
-      conflict ? h("div", { className: "ecx-pipe-conflict", role: "alert" },
-        h("span", null, "Updated by " + (PIPE_lastBy(r, f) || "a teammate") + " while you were editing"),
-        h("button", { type: "button", className: "ecx-pipe-btn is-small is-quiet", onClick: function () { setEd({ draft: ed.draft, base: live }); } }, "Keep mine"),
-        h("button", { type: "button", className: "ecx-pipe-btn is-small is-quiet", onClick: function () { setEd({ draft: PIPE_toDraft(f, live), base: live }); } }, "Use theirs"),
-        h("span", { className: "ecx-pipe-theirs" }, "Theirs: " + (PIPE_trunc(live, 240) || "(empty)"))) : null,
+      multi ? h("textarea", { ref: taRef, value: ed.draft, autoFocus: true, disabled: saving, rows: Math.max(3, Math.min(14, lines + 1)), "aria-label": label, onChange: function (e) { setEd({ draft: e.target.value, base: ed.base, from: ed.from }); }, onKeyDown: onKey })
+        : h("input", { ref: inRef, value: ed.draft, autoFocus: true, disabled: saving, "aria-label": label, onChange: function (e) { setEd({ draft: e.target.value, base: ed.base, from: ed.from }); }, onKeyDown: onKey }),
+      conflictNote,
       h("div", { className: "ecx-pipe-editrow" },
         h("button", { type: "button", className: "ecx-pipe-btn is-small is-primary", disabled: saving, onClick: commit }, saving ? "Saving\u2026" : "Save"),
         h("button", { type: "button", className: "ecx-pipe-btn is-small is-quiet", disabled: saving, onClick: cancel }, "Cancel"),
-        h("span", { className: "ecx-pipe-hint" }, PIPE_BULLET_FIELDS[f] ? "One bullet per line \u00B7 \u2318/Ctrl+Enter saves \u00B7 Esc cancels" : multi ? "\u2318/Ctrl+Enter saves \u00B7 Esc cancels" : "Enter saves \u00B7 Esc cancels")));
+        h("span", { className: "ecx-pipe-hint" }, multi ? "\u2318/Ctrl+Enter saves \u00B7 Esc cancels" : "Enter saves \u00B7 Esc cancels")));
   }
-  var cls = p.layout === "fact" ? "ecx-pipe-fact" + (ed || (PIPE.ask && PIPE.ask.where === "field:" + key) ? " is-editing" : "") : "ecx-pipe-field";
+  var cls = p.layout === "fact" ? "ecx-pipe-fact" + (ed || (PIPE.ask && PIPE.ask.where === "field:" + key) ? " is-editing" : "") : "ecx-pipe-field" + (ed && ed.kind === "bullets" ? " is-bediting" : "");
   return h("div", { className: cls, "data-field": f }, head, ed ? editor : emptyInline ? null : view, PIPE_askHere("field:" + key));
+}
+// The bullet editor: one row per bullet (marker, auto-growing single-paragraph textarea, ↑ ↓ ×), two modes (Edit current /
+// New update), paste that splits lists into bullets, and keyboard paths for everything. The list is the field's draft, so it
+// survives the panel re-mounting and switching deals; Save writes one update() in the sheet's "x a x b" convention.
+function PIPE_BulletEditor(p) {
+  var h = React.createElement;
+  var ed = p.ed, f = p.field, mode = ed.mode === "new" ? "new" : "cur", list = (mode === "new" ? ed.neu : ed.cur) || [];
+  var refs = React.useRef({}), btns = React.useRef({}), pend = React.useRef(null), boxRef = React.useRef(null), lastK = React.useRef(null), keepRef = React.useRef(null);
+  var cs = React.useState(false), confirm = cs[0], setConfirm = cs[1];
+  var ws = React.useState(0), widthGen = ws[0], bump = ws[1];
+  var sized = React.useRef({}), sizedGen = React.useRef(-1);
+  var hintId = "pipe-bh-" + String(p.fkey).replace(/[^A-Za-z0-9_-]/g, "_");
+  var curList = PIPE_bullets(p.live);
+  React.useEffect(function () {   // the panel's width changes (window, modal) or the web font lands: re-measure the rows
+    var el = boxRef.current, alive = true;
+    try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (alive) bump(function (x) { return x + 1; }); }); } catch (e) {}
+    if (!el || typeof ResizeObserver !== "function") return function () { alive = false; };
+    var w = el.clientWidth, ro = new ResizeObserver(function () { if (el.clientWidth !== w) { w = el.clientWidth; bump(function (x) { return x + 1; }); } });
+    ro.observe(el);
+    return function () { alive = false; ro.disconnect(); };
+  }, []);
+  React.useLayoutEffect(function () {   // re-mounted while typing (a teammate moved the deal): focus goes back to the same bullet and caret
+    var bf = PIPE.bfocus;
+    if (bf && bf.fkey === p.fkey && Date.now() - bf.at < 3000) { PIPE.bfocus = null; pend.current = { k: bf.k, pos: bf.pos }; }
+    return function () {   // runs before the rows leave the DOM: note the bullet that has focus, if any
+      var a = document.activeElement, m = refs.current;
+      for (var k in m) if (m[k] && m[k] === a) { PIPE.bfocus = { fkey: p.fkey, k: k, pos: a.selectionStart, at: Date.now() }; return; }
+    };
+  }, []);
+  React.useLayoutEffect(function () {
+    // Grow each bullet to its text. Only the rows whose text changed (all of them after a width change) are measured, every
+    // write before every read: a keystroke costs one layout, and a teammate's snapshot arriving mid-edit costs none.
+    var m = refs.current, all = sizedGen.current !== widthGen, grow = [], seen = {};
+    sizedGen.current = widthGen;
+    for (var k in m) { var t = m[k]; if (!t) continue; seen[k] = t.value; if (all || sized.current[k] !== t.value) grow.push(t); }
+    grow.forEach(function (t) { t.style.height = "auto"; });
+    var hs = grow.map(function (t) { return t.scrollHeight + t.offsetHeight - t.clientHeight; });
+    grow.forEach(function (t, i) { t.style.height = hs[i] + "px"; });
+    sized.current = seen;
+    var fr = PIPE.focusReq;
+    if (fr && fr.key === p.fkey) { PIPE.focusReq = null; pend.current = { k: list.length ? list[0].k : null, pos: "end", reveal: true }; }
+    var pd = pend.current;
+    if (!pd || p.saving || confirm) return;
+    pend.current = null;
+    var el = pd.btn ? btns.current[pd.k + ":" + pd.btn] : m[pd.k];
+    if (pd.btn && (!el || el.disabled)) el = m[pd.k];
+    if (!el) return;
+    try {
+      el.focus();
+      if (!pd.btn && el.setSelectionRange) { var at = pd.pos === "start" ? 0 : typeof pd.pos === "number" ? Math.min(pd.pos, el.value.length) : el.value.length; el.setSelectionRange(at, at); }
+      // opened from a row's Update (or a draft link): bring the editor to a comfortable height, not the screen's bottom edge
+      if (pd.reveal) { var rr = el.getBoundingClientRect(), vh = window.innerHeight || 800; if (rr.bottom > vh * 0.7 || rr.top < 72) el.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    } catch (e) {}
+  });
+  var put = function (nl, focus) {
+    var n = Object.assign({}, ed);
+    if (mode === "new") n.neu = nl; else n.cur = nl;
+    if (focus) pend.current = focus;
+    p.onChange(n);
+  };
+  var focusItem = function (k, pos) {
+    var el = refs.current[k];
+    if (!el) return;
+    el.focus();
+    var at = pos === "start" ? 0 : el.value.length;
+    try { el.setSelectionRange(at, at); } catch (e) {}
+  };
+  // a newline that got into a bullet some other way (drag and drop, autofill, IME): it starts the next bullet
+  var setText = function (i, t) {
+    var nl = list.slice();
+    if (/[\r\n]/.test(t)) {
+      var parts = t.replace(/\r\n?/g, "\n").split("\n");
+      var add = parts.slice(1).map(function (s) { return s.replace(/^\s*[\u2022*\-\u2013]\s+/, ""); }).filter(function (s) { return s.trim(); }).map(PIPE_item);
+      nl[i] = { k: list[i].k, t: parts[0] };
+      nl.splice.apply(nl, [i + 1, 0].concat(add));
+      put(nl, { k: (add.length ? add[add.length - 1] : nl[i]).k, pos: "end" });
+      return;
+    }
+    nl[i] = { k: list[i].k, t: t };
+    put(nl);
+  };
+  var split = function (i, s, e) {   // Enter: a new bullet after this one (the text after the caret moves with it)
+    var v = list[i].t, nl = list.slice(), it = PIPE_item(v.slice(e).replace(/^\s+/, ""));
+    nl[i] = { k: list[i].k, t: v.slice(0, s).replace(/[ \t]+$/, "") };
+    nl.splice(i + 1, 0, it);
+    put(nl, { k: it.k, pos: "start" });
+  };
+  var remove = function (i, towards) {
+    var nl = list.slice();
+    nl.splice(i, 1);
+    if (!nl.length) nl = [PIPE_item("")];
+    var tgt = towards === "next" ? nl[Math.min(i, nl.length - 1)] : nl[Math.max(0, i - 1)];
+    put(nl, { k: tgt.k, pos: towards === "next" ? "start" : "end" });
+  };
+  var mergeUp = function (i) {   // Backspace at the start of a bullet joins it to the one above (with the space a split took)
+    var a = list[i - 1], b = list[i], nl = list.slice();
+    var gap = a.t && b.t && !/\s$/.test(a.t) && !/^\s/.test(b.t) ? " " : "";
+    nl.splice(i - 1, 2, { k: a.k, t: a.t + gap + b.t });
+    put(nl, { k: a.k, pos: a.t.length + gap.length });
+  };
+  var move = function (i, d, focus) {
+    var j = i + d;
+    if (j < 0 || j >= list.length) return;
+    var nl = list.slice(), x = nl[i];
+    nl[i] = nl[j]; nl[j] = x;
+    put(nl, focus);
+  };
+  var add = function () { var it = PIPE_item(""); put(list.concat([it]), { k: it.k, pos: "start" }); };
+  var dirty = PIPE_bulletsDirty(ed);
+  var esc = function () { if (p.saving) return; if (dirty) setConfirm(true); else p.onCancel(); };
+  var back = function () { setConfirm(false); pend.current = { k: lastK.current && refs.current[lastK.current] ? lastK.current : (list[0] && list[0].k), pos: "end" }; };
+  var onKey = function (i, e) {
+    var el = e.target, v = el.value, s = el.selectionStart, en = el.selectionEnd, mod = e.metaKey || e.ctrlKey;
+    if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); esc(); return; }
+    if (e.key === "Enter") { e.preventDefault(); if (mod) p.onSave(); else if (!p.saving) split(i, s, en); return; }
+    if (e.key === "Backspace" && !mod && !e.altKey && !e.shiftKey) {
+      if (!v) { if (i > 0) { e.preventDefault(); remove(i, "prev"); } else if (list.length > 1) { e.preventDefault(); remove(i, "next"); } return; }
+      if (s === 0 && en === 0 && i > 0) { e.preventDefault(); mergeUp(i); }
+      return;
+    }
+    if (e.key === "Delete" && !mod && !e.altKey && !e.shiftKey && s === v.length && en === v.length && i < list.length - 1) { e.preventDefault(); mergeUp(i + 1); return; }
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      var up = e.key === "ArrowUp";
+      if (e.altKey && !mod && !e.shiftKey) { e.preventDefault(); move(i, up ? -1 : 1, { k: list[i].k, pos: s }); return; }
+      if (e.altKey || mod || e.shiftKey) return;
+      if (up && s === 0 && en === 0 && i > 0) { e.preventDefault(); focusItem(list[i - 1].k, "end"); }
+      else if (!up && s === v.length && en === v.length && i < list.length - 1) { e.preventDefault(); focusItem(list[i + 1].k, "start"); }
+    }
+  };
+  var onPaste = function (i, e) {
+    var text = e.clipboardData ? e.clipboardData.getData("text/plain") : "";
+    if (!text || (!/[\r\n]/.test(text) && !/^\s*(?:x|[\u2022*\-\u2013])\s/.test(text))) return;   // one plain line without a bullet marker: an ordinary paste
+    e.preventDefault();
+    var items = PIPE_parsePaste(text);
+    if (!items.length) return;
+    var el = e.target, v = list[i].t, before = v.slice(0, el.selectionStart), after = v.slice(el.selectionEnd), nl = list.slice();
+    if (items.length === 1) { nl[i] = { k: list[i].k, t: before + items[0] + after }; put(nl, { k: list[i].k, pos: before.length + items[0].length }); return; }
+    nl[i] = { k: list[i].k, t: before + items[0] };
+    var more = items.slice(1).map(function (t, j, all) { return PIPE_item(t + (j === all.length - 1 ? after : "")); });
+    nl.splice.apply(nl, [i + 1, 0].concat(more));
+    put(nl, { k: more[more.length - 1].k, pos: items[items.length - 1].length });
+  };
+  var setMode = function (m) {
+    if (m === mode || p.saving) return;
+    var n = Object.assign({}, ed, { mode: m });
+    if (m === "cur" && !n.cur) { n.cur = PIPE_itemsOf(p.live); if (!PIPE_texts(n.neu).length) n.base = p.live; }
+    if (m === "new" && !(n.neu && n.neu.length)) n.neu = [PIPE_item("")];
+    PIPE.focusReq = { key: p.fkey };
+    p.onChange(n);
+  };
+  var kept = {};
+  (ed.neu || []).forEach(function (x) { var t = String(x.t || "").trim(); if (t) kept[t] = 1; });
+  var keep = function (t) {   // \u21BA keep copies a current bullet into the new update (pressed again, it takes the copy out)
+    var tt = t.trim(), n = Object.assign({}, ed);
+    if (kept[tt]) { n.neu = ed.neu.filter(function (x) { return String(x.t || "").trim() !== tt; }); if (!n.neu.length) n.neu = [PIPE_item("")]; }
+    else n.neu = (ed.neu || []).concat([PIPE_item(t)]);
+    p.onChange(n);
+  };
+  var src = PIPE_fieldLast(p.row, f);
+  var fromTxt = src ? "from " + PIPE_fmtDate(src.at) + (src.by ? " \u00B7 " + src.by : "") : p.row.sheetRow ? "from the sheet" : "";
+  var lbl = p.label;
+  // Cmd/Ctrl+Enter and Esc also work from the editor's buttons (keep, + Add bullet, the modes), not only inside a bullet
+  var onBoxKey = function (e) {
+    if (e.defaultPrevented || confirm || (e.target && e.target.tagName === "TEXTAREA")) return;
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); p.onSave(); }
+    else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); esc(); }
+  };
+  return h("div", { className: "ecx-pipe-editor ecx-pipe-beditor", ref: boxRef, onKeyDown: onBoxKey },
+    curList.length ? h("div", { className: "ecx-pipe-modes" }, ECXD_seg(h, [["cur", "Edit current"], ["new", "New update"]], mode, setMode, "How to update " + lbl)) : null,
+    h("ul", { className: "ecx-pipe-blist" + (mode === "new" ? " is-new" : "") }, list.map(function (x, i) {
+      return h("li", { key: x.k, className: "ecx-pipe-brow" },
+        h("span", { className: "ecx-pipe-bmark", "aria-hidden": "true" }, "\u2022"),
+        h("textarea", { ref: function (el) { if (el) refs.current[x.k] = el; else delete refs.current[x.k]; }, rows: 1, value: x.t, disabled: p.saving,
+          "aria-label": i === 0 ? lbl : lbl + ", bullet " + (i + 1), "aria-describedby": hintId,
+          placeholder: i === 0 && mode === "new" ? "What\u2019s new on this deal?" : i === 0 && list.length === 1 ? "First bullet" : "",
+          onChange: function (e) { setText(i, e.target.value); }, onKeyDown: function (e) { onKey(i, e); }, onPaste: function (e) { onPaste(i, e); }, onFocus: function () { lastK.current = x.k; } }),
+        h("span", { className: "ecx-pipe-bctl" },
+          h("button", { type: "button", tabIndex: -1, ref: function (el) { btns.current[x.k + ":up"] = el; }, className: "ecx-pipe-bbtn is-move", "aria-label": "Move bullet " + (i + 1) + " up", title: "Move up (Alt+\u2191)", disabled: p.saving || i === 0, onClick: function () { move(i, -1, { k: x.k, btn: "up" }); } }, "\u2191"),
+          h("button", { type: "button", tabIndex: -1, ref: function (el) { btns.current[x.k + ":down"] = el; }, className: "ecx-pipe-bbtn is-move", "aria-label": "Move bullet " + (i + 1) + " down", title: "Move down (Alt+\u2193)", disabled: p.saving || i === list.length - 1, onClick: function () { move(i, 1, { k: x.k, btn: "down" }); } }, "\u2193"),
+          h("button", { type: "button", tabIndex: -1, className: "ecx-pipe-bbtn is-remove", "aria-label": "Remove bullet " + (i + 1), title: "Remove this bullet", disabled: p.saving, onClick: function () { remove(i, i > 0 ? "prev" : "next"); } }, "\u00D7")));
+    })),
+    h("div", { className: "ecx-pipe-addrow" }, h("button", { type: "button", className: "ecx-pipe-link ecx-pipe-addb", disabled: p.saving, onClick: add }, "+ Add bullet")),
+    mode === "new" && curList.length ? h("div", { className: "ecx-pipe-ref", role: "group", "aria-label": "Current update, for reference" },
+      h("div", { className: "ecx-pipe-refhead" }, "Current update" + (fromTxt ? " (" + fromTxt + ")" : "")),
+      h("ul", { className: "ecx-pipe-reflist" }, curList.map(function (t, i) {
+        var on = !!kept[t.trim()];
+        return h("li", { key: i + ":" + t },
+          h("span", { className: "ecx-pipe-reftext" }, t),
+          h("button", { type: "button", className: "ecx-pipe-keep" + (on ? " is-kept" : ""), "aria-pressed": on ? "true" : "false", "aria-label": "Keep in the new update: " + PIPE_trunc(t, 80), disabled: p.saving, onClick: function () { keep(t); } }, on ? "\u2713 kept" : "\u21BA keep"));
+      }))) : null,
+    p.conflict,
+    confirm ? h("div", { className: "ecx-pipe-confirm is-inline", role: "alertdialog", "aria-label": "Discard changes?", ref: keepRef,
+      onKeyDown: function (e) { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); back(); } } },
+      h("span", null, "Discard changes?"),
+      h("button", { type: "button", className: "ecx-pipe-btn is-small is-danger is-solid", onClick: function () { setConfirm(false); p.onCancel(); } }, "Discard"),
+      h("button", { type: "button", className: "ecx-pipe-btn is-small is-quiet", autoFocus: true, onClick: back }, "Keep editing")) : null,
+    h("div", { className: "ecx-pipe-editrow" },
+      h("button", { type: "button", className: "ecx-pipe-btn is-small is-primary", "aria-label": "Save " + lbl, disabled: p.saving, onClick: p.onSave }, p.saving ? "Saving\u2026" : "Save"),
+      h("button", { type: "button", className: "ecx-pipe-btn is-small is-quiet", "aria-label": "Cancel " + lbl, disabled: p.saving, onClick: esc }, "Cancel"),
+      h("span", { className: "ecx-pipe-hint", id: hintId }, "Enter adds a bullet \u00B7 Alt+\u2191/\u2193 moves it \u00B7 \u2318/Ctrl+Enter saves \u00B7 Esc cancels")));
 }
 function PIPE_History(p) {
   var h = React.createElement, r = p.row;
   var fmt = function (e) {
     if (e.field === "created") return [h("b", { key: "b" }, "Added"), " as \u201C" + PIPE_trunc(e.to, 80) + "\u201D"];
+    // "Stage: Terms \u2192 Credit approvals" and "Paused: yes / no"
+    if (e.field === "stage") return [h("b", { key: "b" }, "Stage:"), " " + (PIPE_stageLabel(e.from) || e.from || "not set") + " \u2192 " + (PIPE_stageLabel(e.to) || e.to || "not set")];
+    if (e.field === "paused") return [h("b", { key: "b" }, "Paused:"), e.to === "true" ? " yes" : " no"];
     var lab = PIPE_LABELS[e.field] || e.field;
     var from = e.field === "section" ? PIPE_sectionLabel(e.from) : e.from, to = e.field === "section" ? PIPE_sectionLabel(e.to) : e.to;
     return [h("b", { key: "b" }, lab), " ", h("span", { key: "f", title: from }, PIPE_trunc(from, 70) || "\u2014"), " \u2192 ", h("span", { key: "t", title: to }, PIPE_trunc(to, 70) || "\u2014")];
@@ -16665,6 +17195,127 @@ function PIPE_History(p) {
     h("ul", { className: "ecx-pipe-hist" }, r.history.slice(0, PIPE_HISTORY_MAX).map(function (e, i) {
       return h("li", { key: i }, fmt(e), h("span", { style: { color: "var(--muted)" } }, " \u00B7 " + (e.by || "\u2014") + " \u00B7 " + PIPE_fmtStamp(e.at)));
     })));
+}
+// The stage track on a deal box: 7 small segments (filled up to the current stage), the stage label beside it with "4 of 7"
+// muted, and a warn "Paused" when paused. A deal without a stage reads "Stage not set" in the financing groups, a quiet dash
+// elsewhere (JVs, Corporate, Misc and Removed may have none).
+function PIPE_Track(p) {
+  var h = React.createElement, r = p.row, st = PIPE_stageList(), s = PIPE_stageOf(r), paused = !!r.paused;
+  var cls = "ecx-pipe-stage is-" + (p.size || "sm") + (paused ? " is-paused" : "") + (s ? "" : " is-unset");
+  var pausedTag = paused ? h("span", { key: "p", className: "ecx-pipe-paused" }, "Paused") : null;
+  if (!s && !PIPE_STAGED_SECTIONS[r.section]) return h("div", { className: cls + " is-none", role: "img", "aria-label": PIPE_stageAria(r) }, h("span", { className: "ecx-pipe-stagenone", "aria-hidden": "true" }, "\u2014"), pausedTag);
+  return h("div", { className: cls, role: "img", "aria-label": PIPE_stageAria(r), title: s ? s.label + (s.hint ? " \u2014 " + s.hint : "") : "No stage set yet" },
+    h("span", { className: "ecx-pipe-track", "aria-hidden": "true" }, st.map(function (x, i) { return h("i", { key: x.key, className: s && i <= s.i ? "is-on" : null }); })),
+    h("span", { className: "ecx-pipe-stagetext", "aria-hidden": "true" },
+      s ? h("span", { className: "ecx-pipe-stagelabel" }, s.label) : h("span", { className: "ecx-pipe-stagelabel is-unset" }, "Stage not set"),
+      s ? h("span", { className: "ecx-pipe-stagepos ecx-tnum" }, (s.i + 1) + " of " + s.n) : null,
+      pausedTag));
+}
+// The detail panel's header: the stage track (editors click a step, or pick from the select), the Paused toggle, and the hint
+// of the step under the pointer or keyboard focus. The select writes after a short pause, so arrowing through it is one change.
+function PIPE_StageHead(p) {
+  var h = React.createElement, r = p.row, st = PIPE_stageList(), ed = !!p.editable;
+  var hs = React.useState(-1), hov = hs[0], setHov = hs[1];
+  var ps = React.useState(null), pend = ps[0], setPend = ps[1];
+  var timer = React.useRef(null), selRef = React.useRef(null), segRefs = React.useRef([]);
+  // no unmount cleanup for the select's pause: a pick still waiting when the panel goes (Esc on the pop-out, a teammate's move) is written, not dropped
+  React.useEffect(function () {   // "Set stage" on a row lands here
+    var it = PIPE.intent;
+    if (!it || it.id !== r.id || it.focus !== "stage" || Date.now() - it.at > 4000) return;
+    PIPE.intent = null;
+    try { if (selRef.current) selRef.current.focus(); } catch (e) {}
+  });
+  var shown = pend !== null ? Object.assign({}, r, { stage: pend }) : r, s = PIPE_stageOf(shown), curIdx = s ? s.i : -1;
+  var write = function (field, value) {
+    PIPE_withInitials("stage:" + r.id, function (by) {
+      var k = r.id + ":" + field, cur = PIPE.byId[r.id];
+      if (!cur || (field === "stage" ? cur.stage === value : cur.paused === value)) { setPend(null); return; }
+      var o = {}; o[field] = value;
+      PIPE_setSave(k, "saving");
+      PIPE_saveFields(r.id, o, by).then(function (res) {
+        if (res.ok) { PIPE_setSave(k, "saved"); setTimeout(function () { setPend(null); }, 1500); }   // the snapshot normally clears it first
+        else { setPend(null); PIPE_setSave(k, "error", res.msg); }
+      });
+    });
+  };
+  React.useEffect(function () { if (pend !== null && !timer.current && r.stage === pend) setPend(null); });
+  var flush = function () { if (timer.current) { clearTimeout(timer.current); timer.current = null; if (pend !== null) write("stage", pend); } };
+  var onSelect = function (e) {
+    var v = e.target.value;
+    setPend(v);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(function () { timer.current = null; write("stage", v); }, 450);
+  };
+  var segKey = function (i, e) {
+    var n = st.length, j = -1;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") j = Math.min(n - 1, i + 1);
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = Math.max(0, i - 1);
+    else if (e.key === "Home") j = 0;
+    else if (e.key === "End") j = n - 1;
+    if (j < 0) return;
+    e.preventDefault();
+    var el = segRefs.current[j];
+    if (el) el.focus();
+  };
+  var save = PIPE.save[r.id + ":stage"] || PIPE.save[r.id + ":paused"] || null;
+  // under the track: the current step's hint (its label is right above); a step under the pointer or keyboard focus is named,
+  // and for editors says how to take it, so arrowing along the steps never reads as having changed anything
+  var other = hov >= 0 && st[hov] && hov !== curIdx ? st[hov] : null;
+  var hint = other ? other.label + (other.hint ? ": " + other.hint : "") : s ? (s.hint || "") : ed ? "Click a step, or pick one, to set where this deal is in the process." : PIPE_STAGED_SECTIONS[r.section] ? "No stage set yet." : "";
+  var cue = other && ed ? h("span", { className: "ecx-pipe-shcue" }, " \u00B7 click or press Enter to set") : null;
+  var chg = p.changed;
+  var track = ed
+    ? h("div", { className: "ecx-pipe-segs", role: "toolbar", "aria-label": "Set stage" }, st.map(function (x, i) {
+        var on = curIdx >= 0 && i <= curIdx;
+        return h("button", { key: x.key, type: "button", ref: function (el) { segRefs.current[i] = el; }, className: "ecx-pipe-seg" + (on ? " is-on" : "") + (i === curIdx ? " is-cur" : ""),
+          tabIndex: i === (curIdx >= 0 ? curIdx : 0) ? 0 : -1, "aria-current": i === curIdx ? "step" : undefined,
+          "aria-label": x.label + " (step " + (i + 1) + " of " + st.length + ")" + (x.hint ? ": " + x.hint : ""),
+          onMouseEnter: function () { setHov(i); }, onMouseLeave: function () { setHov(-1); }, onFocus: function () { setHov(i); }, onBlur: function () { setHov(-1); },
+          onKeyDown: function (e) { segKey(i, e); },
+          onClick: function () { clearTimeout(timer.current); timer.current = null; if (i !== curIdx) { setPend(x.key); write("stage", x.key); } } }, h("span", { className: "ecx-pipe-segbar" }));
+      }))
+    : h("span", { className: "ecx-pipe-segs", "aria-hidden": "true" }, st.map(function (x, i) {
+        return h("span", { key: x.key, className: "ecx-pipe-seg" + (curIdx >= 0 && i <= curIdx ? " is-on" : ""), title: x.label + (x.hint ? ": " + x.hint : ""), onMouseEnter: function () { setHov(i); }, onMouseLeave: function () { setHov(-1); } }, h("span", { className: "ecx-pipe-segbar" }));
+      }));
+  var label = s ? [h("span", { key: "l", className: "ecx-pipe-stagelabel" }, s.label), h("span", { key: "n", className: "ecx-pipe-stagepos ecx-tnum" }, (s.i + 1) + " of " + s.n)]
+    : h("span", { className: "ecx-pipe-stagelabel is-unset" }, PIPE_STAGED_SECTIONS[r.section] ? "Stage not set" : "No stage");
+  return h("div", { className: "ecx-pipe-stagehead" + (r.paused ? " is-paused" : "") + (s ? "" : " is-unset"), "data-stage": r.stage || "" },
+    h("div", { className: "ecx-pipe-shmain" },
+      h("div", { className: "ecx-pipe-shlabel" }, "Stage",
+        chg ? h("span", { className: "ecx-pipe-dot", role: "img", "aria-label": "changed " + (p.since || "since last call"), title: "Changed " + (p.since || "since last call") + (chg.by ? " by " + chg.by : "") }) : null),
+      h("div", { className: "ecx-pipe-shrow", role: ed ? null : "img", "aria-label": ed ? null : PIPE_stageAria(shown) },
+        track,
+        h("span", { className: "ecx-pipe-stagetext", "aria-hidden": ed ? null : "true" }, label, r.paused ? h("span", { className: "ecx-pipe-paused" }, "Paused") : null)),
+      hint || ed ? h("div", { className: "ecx-pipe-shhint" }, hint, cue) : null),
+    ed ? h("div", { className: "ecx-pipe-shctl" },
+      h("select", { ref: selRef, className: "ecx-pipe-stagesel", "aria-label": "Stage of " + (r.project || "this deal"), value: s ? s.key : "", onChange: onSelect, onBlur: flush,
+        onKeyDown: function (e) { if (e.key === "Enter") flush(); } },
+        [h("option", { key: "", value: "" }, "Stage not set")].concat(st.map(function (x, i) { return h("option", { key: x.key, value: x.key }, (i + 1) + ". " + x.label); }))),
+      h("button", { type: "button", className: "ecx-pipe-btn is-small is-quiet ecx-pipe-pausebtn", "aria-pressed": r.paused ? "true" : "false", title: r.paused ? "Paused \u2014 press to resume" : "Mark this deal as paused", onClick: function () { write("paused", !r.paused); } },
+        h("span", { className: "ecx-pipe-pauseicon", "aria-hidden": "true" }), "Paused"),
+      save ? h("span", { className: "ecx-pipe-state is-" + save.s, role: "status" }, save.s === "saving" ? "Saving\u2026" : save.s === "saved" ? "Saved" : (save.msg || "Not saved")) : null) : null,
+    PIPE_askHere("stage:" + r.id, "Your initials for the change log"));
+}
+// One quiet row above the tables: the deals at each stage (Pipeline group by default), plus Paused; each is a toggle filter.
+function PIPE_StageStrip(p) {
+  var h = React.createElement, st = PIPE_stageList(), c = p.counts, out = [];
+  var item = function (val, label, n, title, extra) {
+    var on = p.value === val;
+    return h("button", { key: val, type: "button", className: "ecx-pipe-stripbtn" + (extra || "") + (n ? "" : " is-zero"), "aria-pressed": on ? "true" : "false", disabled: !n && !on, title: title, onClick: function () { p.onPick(on ? "" : val); } },
+      h("span", { className: "ecx-pipe-striplabel" }, label), h("span", { className: "ecx-pipe-stripn ecx-tnum" }, n));
+  };
+  st.forEach(function (s, i) {
+    if (i) out.push(h("span", { key: "s" + i, className: "ecx-pipe-stripsep", "aria-hidden": "true" }, "\u203A"));
+    out.push(item(s.key, s.label, c[s.key] || 0, (s.hint || s.label) + " \u2014 show " + (c[s.key] === 1 ? "this deal" : "these deals")));
+  });
+  out.push(h("span", { key: "div", className: "ecx-pipe-stripdiv", "aria-hidden": "true" }));
+  out.push(item("__paused", "Paused", c.__paused || 0, "Deals marked paused", " is-paused"));
+  if (c.__none || p.value === "__none") out.push(item("__none", "Not set", c.__none || 0, "Deals with no stage yet", " is-none"));
+  return h("div", { className: "ecx-pipe-strip", role: "group", "aria-label": "Deals by stage" },
+    h("div", { className: "ecx-pipe-stripitems" }, out),
+    h("div", { className: "ecx-pipe-stripnote" },
+      p.scope === "all" ? "Counting every group \u00B7 " : "Counting the Pipeline group \u00B7 ",
+      h("button", { type: "button", className: "ecx-pipe-link", onClick: function () { p.onScope(p.scope === "all" ? "pipeline" : "all"); } }, p.scope === "all" ? "Pipeline group only" : "count every group")));
 }
 // The deal's full record: inline under its row (Call view) or in a pop-out (Sheet view). Editors get a quiet Edit per field.
 function PIPE_Detail(p) {
@@ -16693,6 +17344,8 @@ function PIPE_Detail(p) {
     : r.sheetRow ? "As loaded from the sheet (row " + r.sheetRow + ")" + (r.updatedAt ? " \u00B7 " + PIPE_fmtDate(r.updatedAt) : "")
     : r.updatedAt ? "Updated " + PIPE_fmtStamp(r.updatedAt) + (r.updatedBy ? " by " + r.updatedBy : "") : "";
   return h("div", { className: "ecx-pipe-detail" },
+    p.draftNote || null,
+    h(PIPE_StageHead, { row: r, editable: ed, since: since, changed: showChg ? (chg.fields.stage || chg.fields.paused || null) : null }),
     topLeft.length ? h("div", { className: "ecx-pipe-top" }, h("div", null, topLeft)) : null,
     h("div", { className: "ecx-pipe-panel" },
       h("div", { className: "ecx-pipe-col" }, F("description"), F("statusUpdate"), F("keyIssues")),
@@ -16767,12 +17420,6 @@ function PIPE_AddDeal(p) {
         h("button", { type: "submit", className: "ecx-pipe-btn is-primary", disabled: !ok }, busy ? "Adding\u2026" : "Add deal"),
         h("button", { type: "button", className: "ecx-pipe-btn is-quiet", onClick: p.onClose }, "Cancel"))));
 }
-function PIPE_statusColor(s) {
-  var t = String(s || "").trim().toLowerCase();
-  if (/^(signed|done|closed|on track)$/.test(t)) return "var(--ok)";
-  if (/^paused/.test(t)) return "var(--warn)";
-  return "var(--ink-2)";
-}
 function PIPE_amountLabel(r) {
   var a = r.amount, c = String(r.currency || "").trim();
   if (!a) return "";
@@ -16787,7 +17434,8 @@ function PIPE_Tab(props) {
     var on = function () { setTick(function (x) { return x + 1; }); };
     window.addEventListener("ecx-pipeline-changed", on);
     window.addEventListener("ecx-downloads-ready", on);
-    return function () { window.removeEventListener("ecx-pipeline-changed", on); window.removeEventListener("ecx-downloads-ready", on); };
+    var clock = setInterval(on, 60000);   // keeps "Updated 2d ago" / "last updated 5 min ago" current
+    return function () { window.removeEventListener("ecx-pipeline-changed", on); window.removeEventListener("ecx-downloads-ready", on); clearInterval(clock); };
   }, []);
   var narrow = PIPE_useNarrow();
   var vs = React.useState("call"), view = vs[0], setView = vs[1];
@@ -16795,6 +17443,8 @@ function PIPE_Tab(props) {
   var rgs = React.useState(""), region = rgs[0], setRegion = rgs[1];
   var lds = React.useState(""), lead = lds[0], setLead = lds[1];
   var sts = React.useState(""), status = sts[0], setStatus = sts[1];
+  var sgs = React.useState(""), stageF = sgs[0], setStageF = sgs[1];
+  var scs = React.useState("pipeline"), stageScope = scs[0], setStageScope = scs[1];
   var chs = React.useState(false), onlyChanged = chs[0], setOnlyChanged = chs[1];
   var exs = React.useState(null), expanded = exs[0], setExpanded = exs[1];
   var mds = React.useState(null), modalId = mds[0], setModalId = mds[1];
@@ -16816,7 +17466,7 @@ function PIPE_Tab(props) {
   var S = ECXD_styles();
   var phase = PIPE.phase, rows = PIPE.rows, editable = PIPE_editable();
   var meta = PIPE.meta, base = PIPE_baseline();
-  var sections = PIPE_sections();
+  var sections = PIPE_sections(), stages = PIPE_stageList();
   // a separator the line may wrap after (the items themselves never break inside)
   var sep = function (k) { return [" ", h("span", { key: "s" + k, className: "ecx-sep", "aria-hidden": "true" }, "\u00B7"), " "]; };
   var title = h("h2", { className: "ecx-pipe-title" }, "CF Pipeline");
@@ -16855,21 +17505,39 @@ function PIPE_Tab(props) {
   var leads = {}, statuses = {}, noStatus = false;
   rows.forEach(function (r) { var l = r.ecxLead.trim(); if (l) leads[l] = 1; var s = r.status.trim(); if (s) statuses[s] = 1; else noStatus = true; });
   var words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  // the stage filter (toolbar select and summary strip are one filter) covers the strip's groups: Pipeline only by default
+  var stageMatch = function (r) {
+    if (!stageF) return true;
+    if (stageScope !== "all" && r.section !== "pipeline") return false;
+    if (stageF === "__paused") return r.paused;
+    if (stageF === "__none") return !PIPE_stageOf(r);
+    return r.stage === stageF && PIPE_stageIdx(r.stage) >= 0;
+  };
   var match = function (r) {
     if (region && r.region.trim() !== region) return false;
     if (lead && r.ecxLead.trim() !== lead) return false;
     if (status && (status === "__none__" ? r.status.trim() !== "" : r.status.trim() !== status)) return false;
+    if (!stageMatch(r)) return false;
     if (onlyChanged && !(changeMap[r.id] && changeMap[r.id].n)) return false;
     if (words.length) {
-      var hay = [r.project, r.site, r.description, r.statusUpdate, r.keyIssues, r.lendersLead, r.lendersOther, r.ecxLead, r.ecxSupport, r.status, r.sponsor].join(" \n ").toLowerCase();
+      var hay = [r.project, r.site, r.description, r.statusUpdate, r.keyIssues, r.lendersLead, r.lendersOther, r.ecxLead, r.ecxSupport, r.status, r.sponsor, PIPE_stageLabel(r.stage)].join(" \n ").toLowerCase();
       for (var i = 0; i < words.length; i++) if (hay.indexOf(words[i]) < 0) return false;
     }
     return true;
   };
-  var filtered = !!(words.length || region || lead || status || onlyChanged);
+  var filtered = !!(words.length || region || lead || status || stageF || onlyChanged);
   var shown = rows.filter(match);
-  var clearAll = function () { setQ(""); setRegion(""); setLead(""); setStatus(""); setOnlyChanged(false); };
+  var clearAll = function () { setQ(""); setRegion(""); setLead(""); setStatus(""); setStageF(""); setOnlyChanged(false); };
   var canSave = !window.ECX_IN_VIEWER || (!!window.ECX_DOWNLOADS && !PIPE.saveUnavailable);
+  // the strip's counts: every deal of the counted groups, whatever the other filters say (it is the pipeline's shape)
+  var counts = { __paused: 0, __none: 0 };
+  rows.forEach(function (r) {
+    if (stageScope !== "all" && r.section !== "pipeline") return;
+    var s = PIPE_stageOf(r);
+    if (s) counts[s.key] = (counts[s.key] || 0) + 1; else counts.__none++;
+    if (r.paused) counts.__paused++;
+  });
+  var stageName = stageF === "__paused" ? "paused" : stageF === "__none" ? "no stage set" : PIPE_stageLabel(stageF);
   // ── header ──
   var live = PIPE.definitive && !PIPE.stopped;
   var metaLine = h("div", { className: "ecx-meta ecx-pipe-meta" },
@@ -16916,21 +17584,46 @@ function PIPE_Tab(props) {
       q ? h("button", { type: "button", className: "ecx-clear", "aria-label": "Clear search", onClick: function () { setQ(""); } }, "Clear") : null),
     h("select", { className: "ecx-input", "aria-label": "Region", value: region, onChange: function (e) { setRegion(e.target.value); } }, [selOpt("", "All regions")].concat(PIPE_REGIONS.map(function (x) { return selOpt(x, x); }))),
     h("select", { className: "ecx-input", "aria-label": "ECX lead", value: lead, onChange: function (e) { setLead(e.target.value); } }, [selOpt("", "All ECX leads")].concat(Object.keys(leads).sort().map(function (x) { return selOpt(x, x); }))),
+    h("select", { className: "ecx-input", "aria-label": "Stage", title: stageScope === "all" ? "Stage, in every group" : "Stage, in the Pipeline group (as counted in the strip below)", value: stageF, onChange: function (e) { setStageF(e.target.value); } },
+      [selOpt("", "All stages")].concat(stages.map(function (s, i) { return selOpt(s.key, (i + 1) + ". " + s.label); }), [selOpt("__paused", "Paused"), selOpt("__none", "Stage not set")])),
     h("select", { className: "ecx-input", "aria-label": "Status", value: status, onChange: function (e) { setStatus(e.target.value); } }, [selOpt("", "All statuses")].concat(Object.keys(statuses).sort().map(function (x) { return selOpt(x, x); }), noStatus ? [selOpt("__none__", "No status")] : [])),
     h("div", { className: "ecx-pipe-view" }, ECXD_seg(h, [["call", "Call view"], ["sheet", "Sheet view"]], view, function (v) { setView(v); setExpanded(null); }, "Pipeline view"))) : null;
+  var onlyChg = onlyChanged && !words.length && !region && !lead && !status && !stageF;
   var summary = filtered ? h("div", { className: "ecx-pipe-summary", role: "status" },
-    h("span", null, onlyChanged && !words.length && !region && !lead && !status
+    h("span", null, onlyChg
       ? (shown.length ? shown.length + (shown.length === 1 ? " deal" : " deals") + " changed since " + (base && base.kind === "call" ? "the last call (" + PIPE_fmtStamp(base.at) + ")" : "the sheet was loaded") : "Nothing has changed since " + (base && base.kind === "call" ? "the last call (" + PIPE_fmtStamp(base.at) + ")." : "the sheet was loaded."))
-      : "Showing " + shown.length + " of " + rows.length + " deals" + (onlyChanged ? " \u00B7 changed since " + (base && base.kind === "call" ? "the last call" : "the sheet was loaded") : "")),
-    h("button", { type: "button", className: "ecx-pipe-link", onClick: clearAll }, onlyChanged && !words.length && !region && !lead && !status ? "Show all deals" : "Clear filters")) : null;
+      : "Showing " + shown.length + " of " + rows.length + " deals" + (stageF ? " \u00B7 " + (stageF === "__paused" || stageF === "__none" ? stageName : "stage " + stageName) + (stageScope === "all" ? "" : " in the Pipeline group") : "") + (onlyChanged ? " \u00B7 changed since " + (base && base.kind === "call" ? "the last call" : "the sheet was loaded") : "")),
+    h("button", { type: "button", className: "ecx-pipe-link", onClick: clearAll }, onlyChg ? "Show all deals" : "Clear filters")) : null;
   // ── empty store ──
   if (PIPE.definitive && !rows.length) {
     return h("div", { className: "ecx-pipe" }, header, confirmBar,
       calm("No pipeline rows yet.", " Ask Claude to load the latest CF Pipeline sheet.", editable ? h("div", { style: { marginTop: 16 } }, h("button", { type: "button", className: "ecx-pipe-btn is-primary", onClick: function () { setAdding(true); } }, "Add deal")) : null),
       adding ? h(PIPE_AddDeal, { onClose: function () { setAdding(false); }, onDone: function (id) { setAdding(false); setExpanded(id); } }) : null);
   }
+  var strip = h(PIPE_StageStrip, { counts: counts, value: stageF, onPick: setStageF, scope: stageScope, onScope: setStageScope });
+  // ── unsaved drafts: kept per deal; "Unsaved update on X" links back to them ──
+  var drafts = editable ? PIPE_dirtyDrafts() : [], draftIds = {};
+  drafts.forEach(function (d) { draftIds[d.id] = d.field === "statusUpdate" ? "update" : "edit"; });
+  var openDraft = function (d) {
+    PIPE.intent = { id: d.id, field: d.field, resume: true, at: Date.now() };
+    if (view === "sheet") { setModalId(d.id); return; }
+    if (!match(d.row)) clearAll();   // a filter that hides the deal would leave the link doing nothing
+    var n = Object.assign({}, secOpen); n[d.row.section] = true; setSecOpen(n);
+    if (expanded !== d.id) setExpanded(d.id); else PIPE_notify();
+  };
+  var draftNote = function (exceptId) {
+    var list = drafts.filter(function (d) { return d.id !== exceptId; });
+    if (!list.length) return null;
+    return h("div", { className: "ecx-pipe-note ecx-pipe-draftnote", role: "status" }, list.map(function (d, i) {
+      return h("span", { key: d.key, className: "ecx-pipe-draftitem" },
+        d.field === "statusUpdate" ? "Unsaved update on " : "Unsaved edit (" + (PIPE_LABELS[d.field] || d.field).toLowerCase() + ") on ",
+        h("button", { type: "button", className: "ecx-pipe-link", title: "Open it and carry on", onClick: function () { openDraft(d); } }, d.row.project || d.id));
+    }));
+  };
+  var openId = view === "sheet" ? modalId : expanded;
+  var openShown = !!openId && !!PIPE.byId[openId] && (view === "sheet" || shown.some(function (r) { return r.id === openId; }));
   var detailFor = function (r) {
-    return h(PIPE_Detail, { key: "d-" + r.id, row: r, editable: editable, base: base, changes: changeMap[r.id], onSelectProject: props.onSelectProject, onSelectLender: props.onSelectLender,
+    return h(PIPE_Detail, { key: "d-" + r.id, row: r, editable: editable, base: base, changes: changeMap[r.id], onSelectProject: props.onSelectProject, onSelectLender: props.onSelectLender, draftNote: draftNote(r.id),
       onMoved: function (label, to) {
         if (label) ECX_toast(label + " \u2014 \u201C" + (r.project || r.id) + "\u201D");
         var sec = sections.filter(function (s) { return s.key === to; })[0];
@@ -16942,9 +17635,45 @@ function PIPE_Tab(props) {
     var c = changeMap[r.id];
     if (!c || !c.n) return null;
     var names = Object.keys(c.fields).map(function (k) { return k === "created" ? "added" : PIPE_LABELS[k] || k; });
-    return h("span", { className: "ecx-pipe-changed", title: "Changed since " + (base && base.kind === "call" ? "the last call" : "the sheet was loaded") + ": " + names.join(", ") },
-      h("span", { className: "ecx-pipe-dot", "aria-hidden": "true" }), h("span", { className: "ecx-pipe-sr" }, "changed"));
+    // a stage change reads in the marker itself: "Terms → Credit approvals"
+    var sc = c.fields.stage, move = sc && sc.first !== sc.last ? (PIPE_stageLabel(sc.first) || "Not set") + " \u2192 " + (PIPE_stageLabel(sc.last) || "Not set") : "";
+    return h("span", { className: "ecx-pipe-changed", title: "Changed since " + (base && base.kind === "call" ? "the last call" : "the sheet was loaded") + ": " + names.join(", ") + (move ? " (stage " + move + ")" : "") },
+      h("span", { className: "ecx-pipe-dot", "aria-hidden": "true" }), move ? h("span", { className: "ecx-pipe-chgmove" }, move) : null, h("span", { className: "ecx-pipe-sr" }, "changed"));
   };
+  var draftTag = function (r) { return draftIds[r.id] ? h("span", { className: "ecx-pipe-drafttag" }, draftIds[r.id] === "update" ? "Unsaved update" : "Unsaved edit") : null; };
+  // the latest status update at a glance: its first two bullets (two lines each), "+N more" (and, in the table, "Updated 2d ago")
+  var previewFor = function (r, withUpd) {
+    var b = PIPE_bullets(r.statusUpdate), upd = withUpd ? updatedFor(r) : null;
+    if (!b.length && !upd) return null;
+    var more = b.length > 2 ? h("span", { key: "m", className: "ecx-pipe-more" }, "+" + (b.length - 2) + " more") : null;
+    return h("div", { className: "ecx-pipe-preview" },
+      b.length ? h("ul", null, b.slice(0, 2).map(function (t, i) { return h("li", { key: i }, h("span", null, t)); })) : null,
+      more || upd ? h("div", { className: "ecx-pipe-prevfoot" }, more, more && upd ? h("span", { key: "s", className: "ecx-sep", "aria-hidden": "true" }, "\u00B7") : null, upd) : null);
+  };
+  var updatedFor = function (r) {
+    var e = PIPE_lastTeamEdit(r);
+    if (!e) return null;
+    return h("span", { key: "u", className: "ecx-pipe-updated", title: (e.field === "created" ? "Added" : "Last change: " + (PIPE_LABELS[e.field] || e.field)) + " \u00B7 " + PIPE_fmtStamp(e.at) + (e.by ? " by " + e.by : "") }, "Updated " + PIPE_ago(e.at) + (e.by ? " by " + e.by : ""));
+  };
+  var statusLine = function (r) {   // the sheet's free-text Status, muted under the stage (a bare "Paused" says what the track says)
+    var s = r.status.trim();
+    if (!s || (r.paused && /^paused$/i.test(s))) return null;
+    return h("span", { className: "ecx-pipe-sub ecx-pipe-status", title: "Status (the sheet\u2019s own column)" }, r.status);
+  };
+  var stopKeys = function (e) { if (e.key === "Enter" || e.key === " ") e.stopPropagation(); };
+  // "Update" on a row: its panel opens with the status update in the bullet editor (New update), focus in the new bullet
+  var startUpdate = function (r) {
+    PIPE.intent = { id: r.id, field: "statusUpdate", mode: "new", from: "row", at: Date.now() };
+    if (expanded !== r.id) setExpanded(r.id); else PIPE_notify();
+  };
+  var updateBtn = function (r) {
+    return h("button", { type: "button", className: "ecx-pipe-btn is-small ecx-pipe-update", "aria-label": "Update " + (r.project || "this deal"), title: "Write this deal\u2019s status update", onClick: function (e) { e.stopPropagation(); startUpdate(r); }, onKeyDown: stopKeys }, "Update");
+  };
+  var setStageBtn = function (r) {
+    if (!editable || PIPE_stageOf(r) || !PIPE_STAGED_SECTIONS[r.section]) return null;
+    return h("button", { type: "button", className: "ecx-pipe-link ecx-pipe-setstage", "aria-label": "Set stage for " + (r.project || "this deal"), onClick: function (e) { e.stopPropagation(); PIPE.intent = { id: r.id, focus: "stage", at: Date.now() }; if (expanded !== r.id) setExpanded(r.id); else PIPE_notify(); }, onKeyDown: stopKeys }, "Set stage");
+  };
+  var nCols = editable ? 9 : 8;
   // ── Call view ──
   var callView = function () {
     return h("div", null, sections.map(function (s) {
@@ -16959,27 +17688,31 @@ function PIPE_Tab(props) {
       if (open && !list.length) body = h("p", { className: "ecx-pipe-secempty" }, "No deals in " + s.label + ".");
       else if (open && narrow) body = h("div", { className: "ecx-pipe-cards" }, list.map(function (r) {
         var isOpen = expanded === r.id, toggle = function () { setExpanded(isOpen ? null : r.id); };
-        var usd = PIPE_amountUsd(r);
-        return h("div", { key: r.id, className: "ecx-pipe-card", "data-row": r.id },
+        var usd = PIPE_amountUsd(r), upd = updatedFor(r), ss = setStageBtn(r);
+        var fund = [r.fundingDate, r.fundingMonth !== r.fundingDate ? r.fundingMonth : ""].filter(Boolean).join(" \u00B7 ");
+        return h("div", { key: r.id, className: "ecx-pipe-card" + (isOpen ? " is-open" : ""), "data-row": r.id },
           h("div", Object.assign({ className: "ecx-pipe-cardhead", role: "button", "aria-expanded": isOpen ? "true" : "false", onClick: toggle }, ECXD_rowKeys(toggle)),
             h("div", { className: "ecx-pipe-cardtop" },
-              h("div", { className: "ecx-pipe-cardname" }, r.project || "Untitled deal", changedMark(r)),
+              h("div", { className: "ecx-pipe-cardname" }, r.project || "Untitled deal", changedMark(r), draftTag(r)),
               r.amount ? h("div", { className: "ecx-pipe-cardamt ecx-tnum" }, PIPE_amountLabel(r)) : null),
             r.site && r.site !== "-" ? h("div", { className: "ecx-pipe-cardline is-muted" }, r.site + (usd ? " \u00B7 USD " + usd : "")) : usd ? h("div", { className: "ecx-pipe-cardline is-muted" }, "USD " + usd) : null,
-            r.status ? h("div", { className: "ecx-pipe-cardline", style: { color: PIPE_statusColor(r.status) } }, r.status) : null,
-            r.fundingDate || r.fundingMonth ? h("div", { className: "ecx-pipe-cardline is-muted" }, "Funding " + [r.fundingDate, r.fundingMonth !== r.fundingDate ? r.fundingMonth : ""].filter(Boolean).join(" \u00B7 ")) : null),
+            h("div", { className: "ecx-pipe-cardstage" }, h(PIPE_Track, { row: r }), statusLine(r)),
+            previewFor(r, false),
+            fund || r.ecxLead ? h("div", { className: "ecx-pipe-cardline is-muted" }, [fund ? "Funding " + fund : "", r.ecxLead ? "ECX " + r.ecxLead : ""].filter(Boolean).join(" \u00B7 ")) : null),
+          editable || upd ? h("div", { className: "ecx-pipe-cardfoot" }, h("div", { className: "ecx-pipe-cardfootl" }, upd, ss), editable ? updateBtn(r) : null) : null,
           isOpen ? h("div", { className: "ecx-pipe-carddetail" }, detailFor(r)) : null);
       }));
-      else if (open) body = h("div", { className: "ecx-pipe-box" }, h("table", { className: "ecx-pipe-table" },
+      else if (open) body = h("div", { className: "ecx-pipe-box" }, h("table", { className: "ecx-pipe-table" + (editable ? " has-update" : "") },
         h("thead", null, h("tr", null,
-          h("th", { style: Object.assign({}, S.th, { paddingLeft: 18, width: 62 }) }, "#"),
+          h("th", { style: Object.assign({}, S.th, { paddingLeft: 18, width: 52 }) }, "#"),
           h("th", { style: S.th }, "Deal"),
-          h("th", { style: Object.assign({}, S.th, { width: "13%" }) }, "Region \u00B7 Sponsor"),
-          h("th", { style: Object.assign({}, S.th, { textAlign: "right", width: "11%" }) }, "Amount"),
-          h("th", { style: Object.assign({}, S.th, { width: "11%" }) }, "Funding"),
-          h("th", { style: Object.assign({}, S.th, { width: "14%" }) }, "Status"),
-          h("th", { style: Object.assign({}, S.th, { width: "12%" }) }, "ECX"),
-          h("th", { style: Object.assign({}, S.th, { width: "16%" }) }, "Lenders"))),
+          h("th", { className: "ecx-pipe-col-rs", style: Object.assign({}, S.th, { width: "10%" }) }, "Region \u00B7 Sponsor"),
+          h("th", { className: "ecx-pipe-col-amt", style: Object.assign({}, S.th, { textAlign: "right", width: "8%" }) }, "Amount"),
+          h("th", { className: "ecx-pipe-col-fund", style: Object.assign({}, S.th, { width: "9.5%" }) }, "Funding"),
+          h("th", { className: "ecx-pipe-col-stage", style: Object.assign({}, S.th, { width: "19%" }) }, "Stage"),
+          h("th", { className: "ecx-pipe-col-ecx", style: Object.assign({}, S.th, { width: "8.5%" }) }, "ECX"),
+          h("th", { className: "ecx-pipe-col-ld", style: Object.assign({}, S.th, { width: "9%" }) }, "Lenders"),
+          editable ? h("th", { style: Object.assign({}, S.th, { width: 104 }) }, h("span", { className: "ecx-pipe-sr" }, "Update")) : null)),
         h("tbody", null, list.map(function (r) {
           var isOpen = expanded === r.id, bg = isOpen ? "var(--surface-2)" : "transparent";
           var toggle = function () { setExpanded(isOpen ? null : r.id); };
@@ -16987,50 +17720,55 @@ function PIPE_Tab(props) {
           var rs = [r.region, r.sponsor].filter(function (x) { return x && x !== "-"; }).join(" \u00B7 ");
           var main = h("tr", Object.assign({ key: r.id, "data-row": r.id, "aria-expanded": isOpen ? "true" : "false", onClick: toggle, style: { borderBottom: isOpen ? "none" : "1px solid var(--rule)", background: bg, cursor: "pointer" } }, ECXD_rowKeys(toggle), ECXD_hover(bg)),
             h("td", { className: "ecx-tnum", style: S.caret }, (isOpen ? "\u25BE " : "\u25B8 ") + pos),
-            h("td", { style: Object.assign({}, S.name, { minWidth: 190 }) }, h("span", { className: "ecx-pipe-dealname" }, r.project || "Untitled deal"), changedMark(r), r.site && r.site !== "-" ? h("span", { className: "ecx-pipe-sub" }, r.site) : null),
-            h("td", { style: S.td }, rs || "\u2014"),
+            h("td", { style: Object.assign({}, S.name, { minWidth: 190 }) },
+              h("span", { className: "ecx-pipe-dealname" }, r.project || "Untitled deal"), changedMark(r), draftTag(r),
+              r.site && r.site !== "-" ? h("span", { className: "ecx-pipe-sub" }, r.site) : null,
+              previewFor(r, true)),
+            h("td", { className: "ecx-pipe-col-rs", style: S.td }, rs || "\u2014"),
             h("td", { className: "ecx-tnum", style: Object.assign({}, S.td, { textAlign: "right" }) },
               r.amount ? h("span", { style: { color: "var(--ink)", fontWeight: 600 } }, PIPE_amountLabel(r)) : "\u2014",
               usd ? h("span", { className: "ecx-pipe-sub" }, "USD " + usd) : null),
             h("td", { style: S.td }, r.fundingDate || (r.fundingMonth ? "" : "\u2014"), r.fundingMonth && r.fundingMonth !== r.fundingDate ? h("span", { className: "ecx-pipe-sub", style: r.fundingDate ? null : { marginTop: 0 } }, r.fundingMonth) : null),
-            h("td", { style: Object.assign({}, S.td, { color: r.status ? PIPE_statusColor(r.status) : "var(--muted)" }) }, r.status || "\u2014"),
+            h("td", { className: "ecx-pipe-stagecell", style: S.td }, h(PIPE_Track, { row: r }), statusLine(r), setStageBtn(r)),
             h("td", { style: S.td }, r.ecxLead || r.ecxSupport ? [h("span", { key: "l", style: { color: "var(--ink-2)" } }, r.ecxLead || "\u2014"), r.ecxSupport ? h("span", { key: "s", style: { color: "var(--muted)" } }, " \u00B7 " + r.ecxSupport) : null] : "\u2014"),
-            h("td", { style: S.td }, r.lendersLead ? h("span", { className: "ecx-pipe-one", title: r.lendersLead }, r.lendersLead) : "\u2014"));
+            h("td", { className: "ecx-pipe-col-ld", style: S.td }, r.lendersLead ? h("span", { className: "ecx-pipe-one", title: r.lendersLead }, r.lendersLead) : "\u2014"),
+            editable ? h("td", { className: "ecx-pipe-updcell", style: Object.assign({}, S.td, { textAlign: "right", paddingRight: 18 }) }, updateBtn(r)) : null);
           // one keyed group per deal, open or not: the row keeps its DOM node (and keyboard focus) when it opens, closes or moves
-          return h(React.Fragment, { key: r.id }, main, isOpen ? h("tr", { key: r.id + "__d" }, h("td", { colSpan: 8, style: Object.assign({}, S.detail, { padding: "10px 28px 24px 58px" }) }, detailFor(r))) : null);
+          return h(React.Fragment, { key: r.id }, main, isOpen ? h("tr", { key: r.id + "__d" }, h("td", { colSpan: nCols, style: Object.assign({}, S.detail, { padding: "10px 28px 24px 58px" }) }, detailFor(r))) : null);
         }))));
       return h("section", { key: s.key, className: "ecx-pipe-sec", id: "pipe-sec-" + s.key, "aria-label": s.label }, headBtn, body);
     }));
   };
-  // ── Sheet view: the Excel's own grid, columns C..AC ──
+  // ── Sheet view: the Excel's own grid, columns C..AC, after a tracker-only Stage column ──
   var sheetView = function () {
     var cols = PIPE_SHEET_COLS.slice(2);
-    var head1 = [], head2 = [];
+    var head1 = [h("th", { key: "stage", rowSpan: 2, scope: "col", className: "is-stick is-stage", title: "Tracker only \u2014 not a column in the Excel sheet. Set it in the deal\u2019s panel; Export CSV writes it to column AD." }, h("span", { className: "ecx-pipe-trackeronly" }, PIPE_STAGE_CSV_LABEL))], head2 = [];
     cols.forEach(function (c, i) {
       var w = { minWidth: PIPE_SHEET_W[c.key] || (c.key === "spacerU" ? 22 : 100) };
       if (c.group) {
         if (c.span) head1.push(h("th", { key: "g" + c.col, colSpan: c.span, className: "is-group", scope: "colgroup" }, c.group));
         head2.push(h("th", { key: c.col, style: w, scope: "col" }, c.label));
-      } else head1.push(h("th", { key: c.col, rowSpan: 2, scope: "col", className: (i === 0 ? "is-stick" : "") + (c.key === "spacerU" ? " is-spacer" : ""), style: w }, c.label));
+      } else head1.push(h("th", { key: c.col, rowSpan: 2, scope: "col", className: (i === 0 ? "is-stick2" : "") + (c.key === "spacerU" ? " is-spacer" : ""), style: w }, c.label));
     });
     var body = [];
     sections.forEach(function (s) {
       var list = rows.filter(function (r) { return r.section === s.key && match(r); });
       if (filtered && !list.length) return;
-      if (s.labelInSheet) body.push(h("tr", { key: "lab-" + s.key, className: "is-label" }, h("td", { className: "is-stick" }, s.label), h("td", { colSpan: cols.length - 1 }, "")));
+      if (s.labelInSheet) body.push(h("tr", { key: "lab-" + s.key, className: "is-label" }, h("td", { className: "is-stick is-stage" }), h("td", { className: "is-stick2" }, s.label), h("td", { colSpan: cols.length - 1 }, "")));
       list.forEach(function (r) {
         var open = function () { setModalId(r.id); };
-        body.push(h("tr", Object.assign({ key: r.id, className: "is-row", "data-row": r.id, onClick: open, "aria-label": "Open " + (r.project || "deal") }, ECXD_rowKeys(open)), cols.map(function (c, i) {
-          if (c.key === "spacerU") return h("td", { key: c.col, className: "is-spacer" });
-          var v = r[c.key] || "";
-          var cls = (i === 0 ? "is-stick is-name " : "") + (PIPE_WRAP[c.key] ? "is-wrap" : "is-short") + (/^(amount|amountUsd|fundingDate|fundingAtClose|tenor|ltc|marginFee|upfrontFee|capacity)$/.test(c.key) ? " ecx-tnum" : "");
-          var content = v;
-          if (PIPE_BULLET_FIELDS[c.key] && PIPE_marker(v)) {
-            var mk = PIPE_marker(v);
-            content = PIPE_bullets(v).map(function (b, k) { return h("div", { key: k, className: "ecx-pipe-line" }, mk + " " + b); });
-          }
-          return h("td", { key: c.col, className: cls, style: { minWidth: PIPE_SHEET_W[c.key] || 100, maxWidth: PIPE_WRAP[c.key] ? Math.max(PIPE_SHEET_W[c.key] || 100, 160) + 60 : null } }, i === 0 ? [h("span", { key: "n" }, v || "Untitled deal"), changedMark(r)] : content);
-        })));
+        body.push(h("tr", Object.assign({ key: r.id, className: "is-row", "data-row": r.id, onClick: open, "aria-label": "Open " + (r.project || "deal") }, ECXD_rowKeys(open)),
+          [h("td", { key: "stage", className: "is-stick is-stage" }, h(PIPE_Track, { row: r }))].concat(cols.map(function (c, i) {
+            if (c.key === "spacerU") return h("td", { key: c.col, className: "is-spacer" });
+            var v = r[c.key] || "";
+            var cls = (i === 0 ? "is-stick2 is-name " : "") + (PIPE_WRAP[c.key] ? "is-wrap" : "is-short") + (/^(amount|amountUsd|fundingDate|fundingAtClose|tenor|ltc|marginFee|upfrontFee|capacity)$/.test(c.key) ? " ecx-tnum" : "");
+            var content = v;
+            if (PIPE_BULLET_FIELDS[c.key] && PIPE_marker(v)) {
+              var mk = PIPE_marker(v);
+              content = PIPE_bullets(v).map(function (b, k) { return h("div", { key: k, className: "ecx-pipe-line" }, mk + " " + b); });
+            }
+            return h("td", { key: c.col, className: cls, style: { minWidth: PIPE_SHEET_W[c.key] || 100, maxWidth: PIPE_WRAP[c.key] ? Math.max(PIPE_SHEET_W[c.key] || 100, 160) + 60 : null } }, i === 0 ? [h("span", { key: "n" }, v || "Untitled deal"), changedMark(r)] : content);
+          }))));
       });
     });
     return h("div", { className: "ecx-pipe-sheetbox", role: "region", "aria-label": "Sheet view", tabIndex: 0 },
@@ -17041,13 +17779,14 @@ function PIPE_Tab(props) {
   return h("div", { className: "ecx-pipe" },
     header, confirmBar,
     PIPE.metaStopped && !PIPE.stopped ? h("div", { className: "ecx-pipe-note is-warn", role: "status" }, "The call log is not updating live right now \u2014 reload the page before marking a call held.") : null,
-    toolbar, summary, noRows,
+    toolbar, strip, summary, openShown ? null : draftNote(null), noRows,
     filtered && !shown.length ? null : view === "sheet" ? sheetView() : callView(),
     ECXD_sourceNote(h,
       "Source: " + source + (meta && meta.seededAt ? " \u00B7 loaded by Claude " + PIPE_fmtDate(meta.seededAt) : "") + " \u00B7 edited live by the team",
       [h("div", { key: 1 }, "The tracker\u2019s copy of the weekly CF Pipeline sheet (" + source.replace(" \u00B7 ", " \u203A ") + "). Claude loaded it cell for cell \u2014 every value verbatim, including bracketed (indicative) amounts, mixed date formats and the sheet\u2019s own typos \u2014 into the tracker\u2019s shared store; from then on the team edits it here, live, and every change is recorded in the deal\u2019s history with the editor\u2019s initials."),
-        h("div", { key: 2 }, "Status update, key issues and the three issues columns follow the sheet\u2019s bullet convention: a cell that starts with \u201Cx \u201D holds one bullet per \u201Cx\u201D. Edits keep that convention, so Export CSV (the sheet\u2019s columns A\u2013AC and headers, with its section label rows) pastes straight back into the Excel. Lender names are linked to their tracker cards where the name resolves; brackets mark tentative names, as in the sheet."),
-        h("div", { key: 3 }, "\u201CChanges since last call\u201D lists deals with a recorded change after the last call marked held (before the first one, after the sheet was loaded). Moving a deal up or down is not counted as a change. Only people with edit access to the tracker can change the pipeline; everyone who can open the tracker sees it live.")]),
+        h("div", { key: 2 }, "Status update, key issues and the three issues columns follow the sheet\u2019s bullet convention: a cell that starts with \u201Cx \u201D holds one bullet per \u201Cx\u201D. The bullet editor (Update on a row, or Edit on the field) writes one bullet per row and saves back in that convention, so Export CSV (the sheet\u2019s columns A\u2013AC and headers, with its section label rows) pastes straight back into the Excel. Lender names are linked to their tracker cards where the name resolves; brackets mark tentative names, as in the sheet."),
+        h("div", { key: 4 }, "Stage and Paused are the tracker\u2019s own fields, not columns in the sheet: where each deal is in the process (" + stages.map(function (s) { return s.label; }).join(" \u203A ") + "). " + (rows.some(function (r) { return !!PIPE_stageOf(r); }) ? "Claude set a first stage for each deal from its status and latest update; the team corrects it in the deal\u2019s panel. " : "Set it in each deal\u2019s panel. ") + "Export CSV adds it as column AD, \u201C" + PIPE_STAGE_CSV_LABEL + "\u201D."),
+        h("div", { key: 3 }, "\u201CChanges since last call\u201D lists deals with a recorded change after the last call marked held (before the first one, after the sheet was loaded); a stage change counts. Moving a deal up or down is not counted as a change. Only people with edit access to the tracker can change the pipeline; everyone who can open the tracker sees it live.")]),
     adding ? h(PIPE_AddDeal, { onClose: function () { setAdding(false); }, onDone: function (id, sec) { setAdding(false); if (view === "call") { setExpanded(id); var n = Object.assign({}, secOpen); n[sec] = true; setSecOpen(n); setScrollId(id); } else setModalId(id); } }) : null,
     modalRow ? h(Modal, { title: modalRow.project || "Untitled deal", kicker: "CF Pipeline \u00B7 " + PIPE_sectionLabel(modalRow.section) + (modalRow.sheetRow ? " \u00B7 sheet row " + modalRow.sheetRow : ""), subtitle: [modalRow.site !== "-" ? modalRow.site : "", modalRow.region, modalRow.sponsor !== "-" ? modalRow.sponsor : ""].filter(Boolean).join(" \u00B7 ") || null, width: 1040, onClose: function () { setModalId(null); } },
       h("div", { style: { padding: "4px var(--ecx-modal-px) 0" } }, detailFor(modalRow))) : null);
