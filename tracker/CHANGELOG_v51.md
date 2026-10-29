@@ -1052,3 +1052,34 @@ QA:
 - All 5 script blocks pass `node --check`. Smoke test PASS: all 9 tabs, the LBBW, CaixaBank and SMBC modals, zero console errors, no external requests.
 - Behaviour matches v100: search, filters and sort order, deep links, keyboard, Escape, Ask, Inputs, Save fallback, mascot, theme states and print.
 - Stamp `10/20/26, 2:49 PM ET (v101)`. Archived as `tracker/versions/ECX_Tracker_v101.html`.
+
+## v102 Changelog (10/29/26) — New CF Pipeline tab (replaces the weekly Excel)
+
+Aditya: "I want to create a new tab … that matches the pipeline tab on the CF pipeline_NEW sheet that we use for our weekly pipeline calls … so we can use that instead of the clunky excel."
+
+**New tab "CF Pipeline"** (after Active Projects). It mirrors **Corporate Finance Pipeline_NEW.xlsx › Pipeline (transactions)** from Eelco's *Corporate Finance_Team/03. Finance Process/CF Pipeline* folder, sheet loaded 10/29/26: 36 deals in the sheet's six groups (Pipeline 22, JVs 3, Corporate 3, Miscellaneous 3, Closed 4, Removed 1).
+
+- **Data.** Rows live in the tracker's shared store (collection `pipeline`, plus `pipelineMeta/config`), seeded by Claude after publish. None are hard-coded in the page. Anyone with edit access to the tracker can edit, and everyone who can open it sees changes live. Each change records initials, time and old → new value (last 40 changes per deal).
+- **Call view:** one calm table per group. Opening a deal shows:
+  - description, status update and key issues as bullets, and issues (technical, legal, other);
+  - lenders, with links to lender cards;
+  - terms;
+  - "Open project card";
+  - history.
+
+  Editors can edit any field, move a deal between groups, reorder, remove, or delete it from Removed.
+- **Sheet view:** every column in the sheet's order and headings, with the Lenders and Issues super-headers and the group label rows.
+- **Weekly-call tools:** Mark call held, and a "Changes since last call" filter that marks the changed fields.
+- **Export CSV:** sheet layout, rows A6:AC54, so it pastes straight back into the Excel at A6. "Copy for Excel" is the fallback.
+- **Edit access** comes from the viewer's edit permission. If that can't be read, a write probe decides instead. Without access, the tab is view only.
+- **Separation from Inputs.** The pipeline uses its own two listeners, separate from the Inputs & Review sync; a pipeline error never affects the Inputs sync or the header status.
+- **Outside the viewer** (file opened directly, archived versions) the tab shows a note that the pipeline lives in the shared store.
+
+**Guide** documents the tab and its source, and no longer says nothing in the tracker is live-connected. **Tab strip** spacing tightened so all ten tabs fit at desktop widths. Existing data is unchanged: the content diff against v101 shows only new PIPE_* globals and LAST_REFRESH.
+
+QA:
+- The sheet was normalised losslessly: every non-empty cell checked, bullets split and re-joined identically.
+- The tab was built and tested against an in-memory replica of the shared store: 149 checks covering render, edit, two-page live sync, conflicts, add/move/remove/delete, mark call held, CSV round-trip, view-only, empty/outside/terminal states, phone and dark mode.
+- An adversarial review (data fidelity, sync and edit safety, meeting usability) followed; its fixes are applied. 57/58 adversarial checks pass; the remaining one is a near-simultaneous same-name add race, left as is.
+- All 5 script blocks pass `node --check`. Smoke test PASS, zero console errors, no external requests.
+- Stamp `10/29/26, 3:14 PM ET (v102)`. Archived as `tracker/versions/ECX_Tracker_v102.html`.
