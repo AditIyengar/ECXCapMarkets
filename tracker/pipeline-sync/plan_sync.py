@@ -7,8 +7,9 @@
 
 Inputs (all local files; this script never talks to the store):
   --sheet      the new sheet, as written by parse_sheet.py
-  --baseline   the last-synced sheet: the body of pipelineMeta/sheetSync
-               ({syncedAt, readAt, sheetDate, sections, rows, aliases, warnings})
+  --baseline   the last-synced sheet: the body of pipelineMeta/sheetSync ({syncedAt, readAt, sheetDate,
+               sections, rows, aliases, collisions, warnings, orderHeld}); it is always rewritten
+               with a pinned set, never an update (update merges nested objects)
   --bootstrap  use this parsed sheet as the baseline instead (pipelineMeta/sheetSync missing).
                The plan aborts if the store has any text difference against it, unless
                --accept-store-diffs is given (only after a human confirmed the baseline).
@@ -55,7 +56,8 @@ BY = "Excel"
 MAX_BATCH_ENTRIES = 40
 MAX_BATCH_BYTES = 512 * 1024        # well under ArtifactData's 1 MiB batch body
 MAX_ENTRY_BYTES = 900 * 1024
-LIMIT_TOUCHED = 25                  # existing rows with applied field / section changes
+MAX_DOC_BYTES = 200 * 1024          # the store refuses a document over 256 KiB serialized; keep a margin
+LIMIT_TOUCHED = 25                 # existing rows with applied field / section changes
 LIMIT_CREATED = 6
 LIMIT_MISSING = 4
 RENAME_SHARE = 0.6
@@ -207,6 +209,16 @@ def cmp_key(r):
     return (1e9 if r["order"] is None else r["order"], 1e9 if r["sheetRow"] is None else r["sheetRow"], r["id"])
 
 
+def slug(name):
+    """parse_sheet.slugify (copied: `python3 -I` keeps this script's folder off sys.path). Rows whose
+    names share a slug get order-dependent ids from the parser ("mirai", then "mirai-removed")."""
+    s = re.sub(r"\[[^\]]*\]", " ", name)
+    s = re.sub(r"\(ACX\)", " acx ", s)
+    s = re.sub(r"^\s*(acx\s+)?Project\s+", r"\1", s.strip())
+    s = s.lower().replace(".", "-")
+    return re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+
+
 # ---------------------------------------------------------------- time
 
 _NOW_RE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:\d{2})$")
@@ -283,6 +295,15 @@ def check_sheet(doc, label):
     for s in doc["sections"]:
         if not isinstance(s, dict) or s.get("key") not in SECTION_KEYS:
             raise InputError("%s: bad section entry %r" % (label, s))
+    oh = doc.get("orderHeld") or []
+    if not isinstance(oh, list) or not all(k in SECTION_KEYS for k in oh):
+        raise InputError("%s: 'orderHeld' must list section keys" % label)
+    co = doc.get("collisions") or []
+    if not isinstance(co, list) or not all(isinstance(k, str) for k in co):
+        raise InputError("%s: 'collisions' must list sheet ids" % label)
+    wa = doc.get("warnings") or []
+    if not isinstance(wa, list):
+        raise InputError("%s: 'warnings' must be a list" % label)
     al = doc.get("aliases", {})
     if al is None:
         al = {}
@@ -307,7 +328,9 @@ def _ints(doc):
 
 
 def sheet_content(doc):
-    return {"rows": doc.get("rows"), "sections": doc.get("sections"), "aliases": doc.get("aliases") or {}}
+    """What decides whether the baseline doc must be rewritten (not syncedAt / readAt / sheetDate)."""
+    return {"rows": doc.get("rows"), "sections": doc.get("sections"), "aliases": doc.get("aliases") or {},
+            "collisions": doc.get("collisions") or [], "warnings": [pipe_str(w) for w in doc.get("warnings") or []]}
 
 
 # ---------------------------------------------------------------- the plan
@@ -355,39 +378,12 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
     if sk != bk:
         abort.append("the sheet's sections changed (baseline %s, now %s): looks like a sheet restructure"
                      % ("/".join(bk), "/".join(sk)))
+    # A warning is reported once; the baseline remembers it (a bootstrap has no memory yet).
+    old_warnings = set() if bootstrap else set(pipe_str(w) for w in baseline.get("warnings") or [])
     for w in sheet.get("warnings") or []:
-        flag("parse-warning", pipe_str(w))
+        if pipe_str(w) not in old_warnings:
+            flag("parse-warning", pipe_str(w))
 
-    # ---- match sheet rows to baseline rows
-    match = {}          # sheet id -> (baseline row, kind)
-    taken = set()
-    fam = {}
-    for b in base_rows:
-        fam.setdefault(b["project"], []).append(b)
-    sheet_fam = {}
-    for s in sheet_rows:
-        sheet_fam.setdefault((s["project"], s["section"]), []).append(s)
-    # Duplicate project names (Mirai / mirai-removed): their ids depend on sheet order, so match
-    # them by (name, section) when that is unique on both sides; otherwise by id.
-    for s in sheet_rows:
-        f = fam.get(s["project"], [])
-        if len(f) < 2:
-            continue
-        cands = [o for o in f if o["section"] == s["section"]]
-        if len(cands) == 1 and len(sheet_fam[(s["project"], s["section"])]) == 1 and cands[0]["id"] not in taken:
-            match[s["id"]] = (cands[0], "name")
-            taken.add(cands[0]["id"])
-    for s in sheet_rows:
-        if s["id"] in match:
-            continue
-        b = base_by_id.get(s["id"])
-        if b is not None and b["id"] not in taken:
-            match[s["id"]] = (b, "id")
-            taken.add(b["id"])
-    new_rows = [s for s in sheet_rows if s["id"] not in match]
-    gone = [b for b in base_rows if b["id"] not in taken]
-
-    # ---- renames: a baseline row gone + a new row in the same section, one-to-one
     def nonempty_share(b, n):
         fields = [f for f in TEXT_FIELDS if f != "project" and js_trim(b[f])]
         if not fields:
@@ -395,11 +391,66 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
         return sum(1 for f in fields if same(f, b[f], n[f])) / float(len(fields))
 
     def qualifies(b, n):
+        """The same deal by content: site and sponsor equal and non-empty, or >= 60% of the baseline
+        row's non-empty fields (the name aside) equal."""
         if b["site"] and b["sponsor"] and b["site"] == n["site"] and b["sponsor"] == n["sponsor"]:
             return True
         return nonempty_share(b, n) >= RENAME_SHARE
 
-    pure_new = [n for n in new_rows if n["id"] not in store and n["id"] not in claimed]
+    # ---- match sheet rows to baseline rows
+    match = {}          # sheet id -> (baseline row, kind)
+    taken = set()
+    # Rows whose names share a slug (Mirai in Pipeline and in Removed; a new deal that reuses an old
+    # deal's name) get ids from the parser that depend on sheet order and section ("mirai", then
+    # "mirai-removed"), so an id can move from one deal to another. Pair those rows by section and
+    # content instead: the strongest pair that is the unique best for both of its rows, repeatedly.
+    base_fam, sheet_fam = {}, {}
+    for b in base_rows:
+        base_fam.setdefault(slug(b["project"]), []).append(b)
+    for s in sheet_rows:
+        sheet_fam.setdefault(slug(s["project"]), []).append(s)
+    dup = set(k for k in set(base_fam) | set(sheet_fam)
+              if len(base_fam.get(k, [])) > 1 or len(sheet_fam.get(k, [])) > 1)
+
+    def score(b, s):
+        return 2 * (b["section"] == s["section"]) + 2 * qualifies(b, s) + (b["id"] == s["id"])
+
+    for k in sorted(dup):
+        bs, ss = list(base_fam.get(k, [])), list(sheet_fam.get(k, []))
+        while bs and ss:
+            best = None
+            for b in bs:
+                for s in ss:
+                    sc = score(b, s)
+                    if sc < 2 or any(score(b, o) >= sc for o in ss if o is not s) \
+                            or any(score(o, s) >= sc for o in bs if o is not b):
+                        continue
+                    if best is None or (sc, -s["sheetRow"]) > (best[0], -best[2]["sheetRow"]):
+                        best = (sc, b, s)
+            if best is None:
+                break
+            _, b, s = best
+            match[s["id"]] = (b, "name")
+            taken.add(b["id"])
+            bs.remove(b)
+            ss.remove(s)
+    for s in sheet_rows:
+        if s["id"] in match:
+            continue
+        b = base_by_id.get(s["id"])
+        if b is None or b["id"] in taken:
+            continue
+        if (slug(b["project"]) in dup or slug(s["project"]) in dup) and score(b, s) < 3:
+            continue        # a shared name and the same id, but not the same section or content
+        match[s["id"]] = (b, "id")
+        taken.add(b["id"])
+    new_rows = [s for s in sheet_rows if s["id"] not in match]
+    gone = [b for b in base_rows if b["id"] not in taken]
+
+    # ---- renames: a baseline row gone + a new row in the same section, one-to-one
+    # Candidates: new ids the store does not have, and ids that are the doc of a baseline row (a
+    # rename reverted in the Excel comes back under its doc's own id).
+    pure_new = [n for n in new_rows if n["id"] not in store or n["id"] in claimed]
     gone_live = [b for b in gone if docid(b) in store]
     qual = {b["id"]: [n["id"] for n in pure_new if n["section"] == b["section"] and qualifies(b, n)]
             for b in gone_live}
@@ -428,25 +479,73 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
 
     # ---- new rows, collisions
     creates = []
+    create_as = {}          # sheet id -> the doc id it is created under, when that is not the sheet id
+    adopt_as = {}           # sheet id -> the existing doc an "adopt" match links it to
+    collided = []           # Excel rows not written and kept out of the baseline (flagged once)
+    known_collisions = set(baseline.get("collisions") or [])
+
+    def created_by_this_sync(doc_id, n):
+        """A doc an earlier run of the same plan created (its later batches failed): created by
+        "Excel" and still equal to the Excel row on all 26 fields."""
+        raw = store_docs.get(doc_id)
+        hist = raw.get("history") if isinstance(raw, dict) else None
+        by_excel = any(isinstance(x, dict) and x.get("field") == "created" and x.get("by") == BY
+                       for x in (hist if isinstance(hist, list) else []))
+        return by_excel and all(same(f, store[doc_id][f], n[f]) for f in TEXT_FIELDS)
+
     for n in new_rows:
         if n["id"] in renamed_n:
             continue
         if n["id"] in claimed:
-            flag("collision", "new Excel row %r has id %r, which already belongs to another Excel row's doc; "
-                 "not written" % (n["project"], n["id"]), n["id"])
+            # The id is the doc of another Excel row: a second deal with the same name, or the old
+            # name of a renamed deal. It is a new deal; create it under the next free id, the way
+            # PIPE_create picks one (<id>-2, <id>-3, ...), unless an earlier run already did.
+            picked = None
+            for k in range(2, 200):
+                alt = "%s-%d" % (n["id"], k)
+                if alt in claimed or alt in sheet_by_id or not ID_RE.match(alt):
+                    continue
+                if alt in store:
+                    if created_by_this_sync(alt, n):
+                        picked = ("adopt", alt)
+                        break
+                    continue
+                if alt not in versions:
+                    picked = ("create", alt)
+                    break
+            if picked is None:
+                collided.append(n["id"])
+                flag("collision", "new Excel row %r has id %r, which belongs to another Excel row's doc, and no "
+                     "free id was found; not written" % (n["project"], n["id"]), n["id"])
+                continue
+            claimed.add(picked[1])
+            if picked[0] == "adopt":
+                adopt_as[n["id"]] = picked[1]
+                match[n["id"]] = (n, "adopt")
+                notes.append("%s: already created as %s by an earlier Excel sync with the same values; linked"
+                             % (n["id"], picked[1]))
+            else:
+                create_as[n["id"]] = picked[1]
+                notes.append("%s: that id belongs to another Excel row's doc; the new deal is created as %s"
+                             % (n["id"], picked[1]))
+                creates.append(n)
             continue
         if n["id"] in store:
-            d = store[n["id"]]
-            raw_hist = store_docs[n["id"]].get("history") if isinstance(store_docs[n["id"]], dict) else None
-            by_excel = any(isinstance(x, dict) and x.get("field") == "created" and x.get("by") == BY
-                           for x in (raw_hist if isinstance(raw_hist, list) else []))
-            if by_excel and all(same(f, d[f], n[f]) for f in TEXT_FIELDS):
+            if created_by_this_sync(n["id"], n):
+                adopt_as[n["id"]] = n["id"]
                 match[n["id"]] = (n, "adopt")
                 notes.append("%s: already created by an earlier Excel sync with the same values; linked" % n["id"])
                 continue
-            flag("collision", "new Excel row %r maps to id %r, but the tracker already has a deal with that id "
-                 "(created in the tracker); not written - check whether they are the same deal"
-                 % (n["project"], n["id"]), n["id"])
+            # Never linked: the Excel row stays out of the baseline, so the team's doc is not written
+            # now or later; it is created normally once that doc is gone.
+            collided.append(n["id"])
+            if n["id"] in known_collisions:
+                notes.append("%s: still collides with a deal in the tracker (flagged earlier); not written" % n["id"])
+                continue
+            origin = ("that came from the Excel but is no longer linked to an Excel row (removed from the Excel "
+                      "earlier)" if store[n["id"]]["sheetRow"] is not None else "that was added in the tracker")
+            flag("collision", "new Excel row %r maps to id %r, but the tracker already has a deal with that id %s; "
+                 "not written - check whether they are the same deal" % (n["project"], n["id"], origin), n["id"])
             continue
         creates.append(n)
 
@@ -465,20 +564,51 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
 
     pairs = sorted(((sheet_by_id[sid], b, kind) for sid, (b, kind) in match.items()), key=lambda p: p[0]["sheetRow"])
 
-    # ---- reorder analysis per section
+    # ---- order ownership per section
+    # The Excel's order is applied to a section unless the tracker has reordered it since the
+    # baseline (the store's relative order of the baseline rows differs from the baseline's).
+    # A section the tracker reordered stays tracker-ordered ("orderHeld" in the baseline doc)
+    # until the store and the Excel agree on its relative order again; without that memory the
+    # check could flip once the baseline advances, and a re-plan would re-impose the Excel order.
+    def target(sid, b, kind):
+        return adopt_as[sid] if kind == "adopt" else docid(b)
+
     sheet_doc = {}
     for s, b, kind in pairs:
-        sheet_doc[s["id"]] = s["id"] if kind == "adopt" else docid(b)
-    reordered, excel_moved = {}, {}
+        sheet_doc[s["id"]] = target(s["id"], b, kind)
+    held_before = set(baseline.get("orderHeld") or [])
+    # The store's order as it will be after this plan's sheetRow updates (sheetRow breaks ties
+    # between equal orders in PIPE_cmp, so the updates themselves can change the tracker's order).
+    post_row = {did: s["sheetRow"] for s, did in ((sheet_by_id[sid], d) for sid, d in sheet_doc.items())
+                if did in store}
+
+    def post_key(i):
+        r = store[i]
+        return cmp_key({"order": r["order"], "sheetRow": post_row.get(i, r["sheetRow"]), "id": i})
+
+    hold, excel_moved = {}, {}
     for key in SECTION_KEYS:
         seq = [docid(b) for b in sorted((b for b in base_rows if b["section"] == key),
                                         key=lambda b: (b["order"], b["sheetRow"]))]
         live = [i for i in seq if i in store and store[i]["section"] == key]
-        reordered[key] = live != [r["id"] for r in sorted((store[i] for i in live), key=cmp_key)]
-        now_seq = [(sheet_doc.get(s["id"], s["id"]), s["order"]) for s in sheet_rows if s["section"] == key]
+        tracker_reordered = live != sorted(live, key=post_key)
+        if tracker_reordered and key not in held_before:
+            # An earlier run of this same plan landed its first batch but not a later one (a section
+            # with more writes than one batch holds): every row still has either its baseline order or
+            # the sheet's. That is the Excel's renumbering half applied, not a tracker reorder; finish it.
+            b_ord = {docid(b): b["order"] for b in base_rows if b["section"] == key}
+            s_ord = {sheet_doc[s["id"]]: s["order"] for s in sheet_rows if s["section"] == key and s["id"] in sheet_doc}
+            if all(store[i]["order"] in (b_ord.get(i), s_ord.get(i)) for i in live):
+                tracker_reordered = False
+        live_sheet = [sheet_doc[s["id"]] for s in sheet_rows if s["section"] == key and s["id"] in sheet_doc
+                      and sheet_doc[s["id"]] in store and store[sheet_doc[s["id"]]]["section"] == key]
+        agrees = live_sheet == sorted(live_sheet, key=post_key)
+        hold[key] = (tracker_reordered or key in held_before) and not agrees
+        now_seq = [(sheet_doc.get(s["id"], s["id"]), s["order"]) for s in sheet_rows
+                   if s["section"] == key and s["id"] not in collided]      # as the next baseline will hold it
         was_seq = [(docid(b), b["order"]) for b in base_rows if b["section"] == key]
         excel_moved[key] = now_seq != was_seq
-        if reordered[key] and excel_moved[key]:
+        if hold[key] and excel_moved[key]:
             flag("reordered", "section %s reordered in the tracker; Excel order not applied" % SECTION_LABELS[key],
                  section=key)
 
@@ -486,7 +616,7 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
     out = []            # (sheetRow, entry)
     touched = 0
     for s, b, kind in pairs:
-        did = s["id"] if kind == "adopt" else docid(b)
+        did = target(s["id"], b, kind)
         if did not in store:
             diff = [f for f in TEXT_FIELDS if not same(f, s[f], b[f])] + (["section"] if s["section"] != b["section"] else [])
             if diff:
@@ -521,7 +651,11 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
         if moved:
             patch["section"] = s["section"]
         pos = {}
-        if moved or (d["section"] == s["section"] and not reordered[s["section"]]):
+        # order: only for rows the Excel moved (or a doc with no order). Rows the Excel left in place
+        # keep the tracker's number, so a deal added in the tracker and moved up there stays put.
+        excel_moved_row = s["order"] != b["order"] or s["section"] != b["section"]
+        if moved or (d["section"] == s["section"] and not hold[s["section"]]
+                     and (excel_moved_row or d["order"] is None)):
             if d["order"] != s["order"]:
                 pos["order"] = s["order"]
         if d["sheetRow"] != s["sheetRow"]:
@@ -541,8 +675,8 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
             patch["updatedBy"] = BY
             patch["history"] = merge_history(hist, raw.get("history"))
         if patch:
-            out.append((s["sheetRow"], {"op": "update", "collection": "pipeline", "doc_id": did, "data": patch,
-                                        "if_version": versions.get(did)}))
+            out.append((s["sheetRow"], s["section"], {"op": "update", "collection": "pipeline", "doc_id": did,
+                                                      "data": patch, "if_version": versions.get(did)}))
 
     for n in creates:
         body = {f: n[f] for f in TEXT_FIELDS}
@@ -551,10 +685,19 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
                      "marker": n.get("marker", ""), "stage": "launch" if st == "kick-off" else "",
                      "paused": st == "paused", "updatedAt": now_s, "updatedBy": BY,
                      "history": [{"at": now_s, "by": BY, "field": "created", "from": "", "to": cap(n["project"])}]})
-        out.append((n["sheetRow"], {"op": "set", "collection": "pipeline", "doc_id": n["id"], "data": body}))
-        new_rows_out.append(n["id"])
+        cid = create_as.get(n["id"], n["id"])
+        out.append((n["sheetRow"], n["section"], {"op": "set", "collection": "pipeline", "doc_id": cid,
+                                                  "data": body}))
+        new_rows_out.append(cid)
     out.sort(key=lambda x: x[0])
-    entries = [e for _, e in out]
+    entries = [e for _, _, e in out]
+    # one group per sheet section, so a batch never holds half of a section's renumbering
+    groups = []
+    for _, sec, e in out:
+        if groups and groups[-1][0] == sec:
+            groups[-1][1].append(e)
+        else:
+            groups.append((sec, [e]))
 
     # ---- safety limits and versions
     if touched > LIMIT_TOUCHED:
@@ -579,17 +722,30 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
                 if not same(f, store[did][f], b[f]):
                     bootstrap_diffs.append({"docId": did, "field": f, "sheet": b[f], "store": store[did][f]})
         if bootstrap_diffs and not accept_store_diffs:
-            abort.append("bootstrap: the store has %d text difference(s) against the bootstrap sheet; report them "
-                         "and ask before adopting it as the baseline" % len(bootstrap_diffs))
+            abort.append("bootstrap: the store has %d text difference(s) against the bootstrap sheet; report them - "
+                         "a human must confirm the baseline (RUNBOOK.md, one-time setup) before it is adopted"
+                         % len(bootstrap_diffs))
 
     # ---- config and baseline
+    collided_set = set(collided)
     next_baseline = {"syncedAt": now_s, "readAt": sheet.get("readAt"), "sheetDate": sheet.get("sheetDate"),
-                     "sections": sheet["sections"], "rows": sheet["rows"], "aliases": {},
-                     "warnings": list(sheet.get("warnings") or [])}
+                     "sections": sheet["sections"], "rows": [r for r in sheet["rows"] if r["id"] not in collided_set],
+                     "aliases": {}, "collisions": sorted(collided_set),
+                     "warnings": list(sheet.get("warnings") or []),
+                     "orderHeld": [k for k in SECTION_KEYS if hold[k]]}
     for s, b, kind in pairs:
-        did = s["id"] if kind == "adopt" else docid(b)
+        did = target(s["id"], b, kind)
         if did != s["id"]:
             next_baseline["aliases"][s["id"]] = did
+    next_baseline["aliases"].update(create_as)
+    # Every Excel row in the new baseline must have a doc of its own, or every later run would refuse it.
+    owners = {}
+    for r in next_baseline["rows"]:
+        owners.setdefault(next_baseline["aliases"].get(r["id"], r["id"]), []).append(r["id"])
+    shared = sorted((d, ids) for d, ids in owners.items() if len(ids) > 1)
+    if shared:
+        abort.append("the new baseline would link more than one Excel row to one doc (%s); a planner bug - "
+                     "nothing written" % "; ".join("%s: %s" % (d, ", ".join(ids)) for d, ids in shared))
     advanced = sheet_content(next_baseline) != sheet_content(baseline)
     tail = []
     as_of = None
@@ -607,14 +763,26 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
         if base_exists:
             if not _is_version(versions.get("pipelineMeta/sheetSync")):
                 abort.append("versions.json has a bad version for pipelineMeta/sheetSync")
-            tail.append({"op": "update", "collection": "pipelineMeta", "doc_id": "sheetSync", "data": next_baseline,
+            # A pinned set (a full replace), not an update: the store's update merges nested objects,
+            # so a shrinking `aliases` map would keep its stale keys and wedge later runs.
+            tail.append({"op": "set", "collection": "pipelineMeta", "doc_id": "sheetSync", "data": next_baseline,
                          "if_version": versions.get("pipelineMeta/sheetSync")})
         else:
             tail.append({"op": "set", "collection": "pipelineMeta", "doc_id": "sheetSync", "data": next_baseline})
 
-    groups = [[e] for e in entries] + ([tail] if tail else [])
+    groups = [g for _, g in groups] + ([tail] if tail else [])
     for g in groups:
         for e in g:
+            if e["op"] == "set":
+                body = e["data"]
+            elif e["collection"] == "pipeline":
+                body = merge_update(store_docs.get(e["doc_id"]), e["data"])
+            else:
+                body = merge_update(config, e["data"])
+            n = _json_bytes(body)
+            if n > MAX_DOC_BYTES:
+                abort.append("%s/%s would be %d bytes after this write (limit %d; the store refuses documents over "
+                             "256 KiB)" % (e["collection"], e["doc_id"], n, MAX_DOC_BYTES))
             if _size(e) > MAX_ENTRY_BYTES:
                 abort.append("the write to %s/%s is %d bytes (limit %d)" % (e["collection"], e["doc_id"], _size(e),
                                                                            MAX_ENTRY_BYTES))
@@ -623,7 +791,9 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
     batches = pack(groups)
     all_entries = [e for b in batches for e in b]
     summary = {
-        "now": now_s, "asOfDate": today, "changes": changes, "newRows": new_rows_out, "conflicts": conflicts,
+        "now": now_s, "asOfDate": today, "changes": changes, "newRows": new_rows_out,
+        "createdAs": dict((v, k) for k, v in create_as.items()), "collisions": sorted(collided_set),
+        "conflicts": conflicts,
         "flags": flags, "renames": renames, "positions": positions, "notes": notes,
         "touched": touched, "created": len(creates), "missing": len(missing),
         "writes": len(all_entries), "batches": len(batches),
@@ -638,21 +808,51 @@ def _is_version(v):
     return isinstance(v, int) and not isinstance(v, bool) and v >= 1
 
 
+def _json_bytes(obj):
+    return len(json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+
+
 def _size(e):
-    return len(json.dumps(e, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+    return _json_bytes(e)
+
+
+def merge_update(doc, patch):
+    """The doc as the store keeps it after an `update`: nested objects merge recursively, anything
+    else (arrays included) replaces the field."""
+    out = copy.deepcopy(doc) if isinstance(doc, dict) else {}
+    for k, v in patch.items():
+        if isinstance(v, dict) and isinstance(out.get(k), dict):
+            out[k] = merge_update(out[k], v)
+        else:
+            out[k] = copy.deepcopy(v)
+    return out
 
 
 def pack(groups):
-    """Split into batches of <= 40 entries and <= 512 KiB; a group (config + baseline) stays together,
-    so the baseline doc is always the last entry of the last batch."""
+    """Split into batches of <= 40 entries and <= 512 KiB. A group (one sheet section's writes; the
+    config + baseline pair) goes into one batch whenever it fits in one, so an atomic batch never
+    leaves a section half renumbered; the baseline doc is always the last entry of the last batch."""
     batches, cur, size = [], [], 2
+
+    def fits(n, extra):
+        return len(cur) + n <= MAX_BATCH_ENTRIES and size + extra <= MAX_BATCH_BYTES
+
     for g in groups:
         gs = sum(_size(e) + 1 for e in g)
-        if cur and (len(cur) + len(g) > MAX_BATCH_ENTRIES or size + gs > MAX_BATCH_BYTES):
-            batches.append(cur)
-            cur, size = [], 2
-        cur.extend(g)
-        size += gs
+        if len(g) <= MAX_BATCH_ENTRIES and 2 + gs <= MAX_BATCH_BYTES:
+            if cur and not fits(len(g), gs):
+                batches.append(cur)
+                cur, size = [], 2
+            cur.extend(g)
+            size += gs
+            continue
+        for e in g:                      # a group too big for one batch: split it
+            es = _size(e) + 1
+            if cur and not fits(1, es):
+                batches.append(cur)
+                cur, size = [], 2
+            cur.append(e)
+            size += es
     if cur:
         batches.append(cur)
     return batches
@@ -683,9 +883,11 @@ def render_report(summary, sheet, baseline_label):
          "conflicts: %d; flags: %d" % (len(s["changes"]), s["touched"], len(s["newRows"]), len(s["renames"]),
                                        len(s["positions"]), len(s["conflicts"]), len(s["flags"])), ""]
     if s["abort"]:
-        L += ["## Aborted", "", s["abort"], "",
-              "No batches were written. This usually means a sheet restructure or a parse problem; a human "
-              "needs to look before anything is synced.", ""]
+        why = ("The store differs from the bootstrap sheet (see \"Bootstrap differences\"); a human must confirm "
+               "the baseline before anything is synced." if s["bootstrap"] and s["bootstrapDiffs"] else
+               "This usually means a sheet restructure, a parse problem, or more changes than a sync should make on "
+               "its own; a human needs to look before anything is synced.")
+        L += ["## Aborted", "", s["abort"], "", "No batches were written. " + why, ""]
     if s["changes"]:
         L += ["## Changes from the Excel" + (" (not written: aborted)" if s["abort"] else ""), ""]
         for c in s["changes"]:
@@ -700,10 +902,12 @@ def render_report(summary, sheet, baseline_label):
     if s["newRows"]:
         by_id = {r.get("id"): r for r in sheet.get("rows") or []}
         L += ["## New rows", ""]
+        created_as = s.get("createdAs") or {}
         for i in s["newRows"]:
-            r = by_id.get(i, {})
-            L.append("- `%s`: %s (%s, Excel row %s; status %s)" % (i, _md(r.get("project")), SECTION_LABELS.get(
-                r.get("section"), r.get("section")), r.get("sheetRow"), _md(r.get("status"))))
+            r = by_id.get(created_as.get(i, i), {})
+            L.append("- `%s`: %s (%s, Excel row %s; status %s)%s" % (i, _md(r.get("project")), SECTION_LABELS.get(
+                r.get("section"), r.get("section")), r.get("sheetRow"), _md(r.get("status")),
+                "; Excel id `%s` is taken by another deal" % created_as[i] if i in created_as else ""))
         L.append("")
     if s["conflicts"]:
         L += ["## Conflicts (the tracker wins; not written)", ""]
@@ -769,6 +973,22 @@ def load_store(d):
                 raise InputError("config %s is not a JSON object" % p)
             break
     return docs, config
+
+
+def check_versions(versions, docs, config, store_dir):
+    """versions.json is transcribed by the run from the ArtifactData results, so refuse it (exit 2:
+    bad input, not a safety abort) unless it names exactly the docs in the store, each with a version."""
+    meta = ("pipelineMeta/config", "pipelineMeta/sheetSync")
+    bad = sorted(k for k, v in versions.items() if not _is_version(v))
+    if bad:
+        raise InputError("versions.json: not a positive integer version for %s" % ", ".join(bad))
+    ids = set(k for k in versions if k not in meta)
+    missing, extra = sorted(set(docs) - ids), sorted(ids - set(docs))
+    if missing or extra:
+        raise InputError("versions.json does not match %s/pipeline: no version for [%s]; no file for [%s]"
+                         % (store_dir, ", ".join(missing), ", ".join(extra)))
+    if (config is not None) != ("pipelineMeta/config" in versions):
+        raise InputError("versions.json and %s disagree on whether pipelineMeta/config exists" % store_dir)
 
 
 def parse_args(argv):
@@ -841,6 +1061,7 @@ def main(argv):
         versions = load_json(o["versions"], "versions")
         if not isinstance(versions, dict):
             raise InputError("versions.json must be an object")
+        check_versions(versions, docs, config, o["store"])
         plan = build_plan(sheet, baseline, docs, versions, config, o["now"],
                           bootstrap="bootstrap" in o, accept_store_diffs=o["accept"])
     except InputError as e:

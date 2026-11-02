@@ -77,6 +77,17 @@ def doc_from_row(r, **over):
     return d
 
 
+def merge_update(dst, patch):
+    """An ArtifactData update (db.d.ts): nested objects merge recursively; anything else (arrays
+    included) replaces the field wholesale."""
+    for k, v in patch.items():
+        if isinstance(v, dict) and isinstance(dst.get(k), dict):
+            merge_update(dst[k], v)
+        else:
+            dst[k] = copy.deepcopy(v)
+    return dst
+
+
 class Store(object):
     """A local copy of the store: pipeline docs, config, sheetSync and versions."""
 
@@ -108,7 +119,7 @@ class Store(object):
 
     def apply(self, batches):
         """Apply like ArtifactData batch: a pinned entry must match the current version; set without
-        a pin must create; update merges top-level fields. Raises on any pin mismatch."""
+        a pin must create; update merges like the real store. Raises on any pin mismatch."""
         for batch in batches:
             assert len(batch) <= 50
             ids = [(e["collection"], e["doc_id"]) for e in batch]
@@ -129,17 +140,17 @@ class Store(object):
                     if e["op"] == "set":
                         target[e["doc_id"]] = data
                     else:
-                        target[e["doc_id"]].update(data)
+                        merge_update(target[e["doc_id"]], data)
                 elif e["doc_id"] == "config":
                     if e["op"] == "set":
                         self.config = data
                     else:
-                        self.config.update(data)
+                        merge_update(self.config, data)
                 elif e["doc_id"] == "sheetSync":
                     if e["op"] == "set" or self.sheet_sync is None:
                         self.sheet_sync = data
                     else:
-                        self.sheet_sync.update(data)
+                        merge_update(self.sheet_sync, data)
                 else:
                     raise AssertionError("unexpected doc " + key)
                 self.versions[key] = self.versions.get(key, 0) + 1

@@ -92,7 +92,7 @@ class FieldChanges(Base):
             {"at": NOW, "by": "Excel", "field": "status", "from": "Live", "to": "Signed"}])
         self.assertEqual(entry(p, "config", "pipelineMeta")["data"], {"asOf": "2026-11-03"})
         last = p["batches"][-1][-1]
-        self.assertEqual((last["op"], last["doc_id"], last["if_version"]), ("update", "sheetSync", 1))
+        self.assertEqual((last["op"], last["doc_id"], last["if_version"]), ("set", "sheetSync", 1))   # pinned replace
         self.assertEqual(last["data"]["rows"], s1["rows"])
         self.assertEqual(last["data"]["syncedAt"], NOW)
         self.assertEqual(len(pipeline_entries(p)), 1)
@@ -210,10 +210,34 @@ class NewRows(Base):
                                                                           "from": "", "to": "Project Newco"}])
         self.store.versions["newco"] = 1
         s1 = sheet(self.rows + [row("newco", project="Project Newco")])
+        team = copy.deepcopy(self.store.docs["newco"])
         p = self.store.plan(s1)
         self.assertIsNone(entry(p, "newco"))
         self.assertEqual([f["kind"] for f in p["summary"]["flags"]], ["collision"])
+        self.assertIn("added in the tracker", p["summary"]["flags"][0]["message"])
         self.assertEqual(p["summary"]["newRows"], [])
+        self.assertNotIn("newco", [r["id"] for r in p["next_baseline"]["rows"]])     # never linked
+        self.assertEqual(p["next_baseline"]["collisions"], ["newco"])
+        self.store.apply(p["batches"])
+        again = self.assertIdempotent(s1)               # used to link the row and write newco.sheetRow
+        self.assertEqual(again["summary"]["flags"], [])                              # reported once
+        self.assertEqual(self.store.docs["newco"], team)
+        # once the team's doc is gone, the Excel row is created normally
+        del self.store.docs["newco"], self.store.versions["newco"]
+        p = self.run_and_apply(s1, now=NOW2)
+        self.assertEqual(p["summary"]["newRows"], ["newco"])
+        self.assertEqual(self.store.sheet_sync["collisions"], [])
+
+    def test_collision_in_a_held_section_is_reported_once(self):
+        self.store.docs["newco"] = doc_from_row(row("newco"), order=5, sheetRow=None, updatedBy="AI")
+        self.store.versions["newco"] = 1
+        st = self.store
+        st.docs["alpha"]["order"], st.docs["bravo"]["order"] = 2, 1        # the team reordered Pipeline
+        s1 = sheet([row("newco")] + self.rows)                              # the Excel adds Newco on top
+        p = self.run_and_apply(s1)
+        self.assertEqual(sorted(f["kind"] for f in p["summary"]["flags"]), ["collision", "reordered"])
+        again = self.assertIdempotent(s1)
+        self.assertEqual(again["summary"]["flags"], [])     # "reordered" used to repeat every hour
 
     def test_row_created_by_an_earlier_partial_sync_is_linked(self):
         s1 = sheet(self.rows + [row("newco")])
@@ -227,6 +251,48 @@ class NewRows(Base):
         self.store.apply(p["batches"])
         self.assertIdempotent(s1)
 
+
+    def test_old_name_reused_after_a_rename_is_created_under_the_next_id(self):
+        # Foo is renamed Bar (alias bar -> foo); then a new deal named Foo is added. Its id "foo" is
+        # the renamed deal's doc: it is created as foo-2 (PIPE_create's rule), and later runs plan
+        # normally (this used to flag it, keep it in the baseline and make every later run exit 2).
+        rows = edit(self.rows, "alpha", project="Project Foo")
+        rows[0]["id"] = "foo"
+        st = Store.from_sheet(sheet(rows))
+        renamed = edit(rows, "foo", project="Project Bar")
+        renamed[0]["id"] = "bar"
+        self.run_and_apply(sheet(renamed), store=st)
+        self.assertEqual(st.sheet_sync["aliases"], {"bar": "foo"})
+        s2 = sheet(renamed + [row("foo", project="Project Foo", site="Elsewhere", sponsor="McN")])
+        p = self.run_and_apply(s2, store=st, now=NOW2)
+        self.assertEqual(p["summary"]["newRows"], ["foo-2"])
+        self.assertEqual(p["summary"]["flags"], [])
+        self.assertEqual((st.docs["foo-2"]["site"], st.docs["foo"]["project"]), ("Elsewhere", "Project Bar"))
+        self.assertEqual(st.sheet_sync["aliases"], {"bar": "foo", "foo": "foo-2"})
+        again = st.plan(s2, now="2026-11-03T17:00:00.000Z")
+        self.assertEqual(entries(again), [])
+        s3 = sheet(edit(renamed, "bar", amount="7") + [row("foo", project="Project Foo", site="Elsewhere",
+                                                           sponsor="McN", amount="8")])
+        p3 = st.plan(s3, now="2026-11-03T18:00:00.000Z")
+        self.assertEqual(sorted((e["doc_id"], e["data"].get("amount")) for e in pipeline_entries(p3)),
+                         [("foo", "7"), ("foo-2", "8")])
+
+    def test_next_id_created_by_an_earlier_partial_sync_is_linked(self):
+        rows = edit(self.rows, "alpha", project="Project Foo")
+        rows[0]["id"] = "foo"
+        st = Store.from_sheet(sheet(rows))
+        renamed = edit(rows, "foo", project="Project Bar")
+        renamed[0]["id"] = "bar"
+        self.run_and_apply(sheet(renamed), store=st)
+        s2 = sheet(renamed + [row("foo", project="Project Foo", site="Elsewhere", sponsor="McN")])
+        first = st.plan(s2, now=NOW2)
+        st.docs["foo-2"] = copy.deepcopy(entry(first, "foo-2")["data"])   # only the create landed
+        st.versions["foo-2"] = 1
+        p = st.plan(s2, now=NOW2)
+        self.assertEqual(p["summary"]["newRows"], [])                  # not created a second time as foo-3
+        self.assertEqual(p["next_baseline"]["aliases"], {"bar": "foo", "foo": "foo-2"})
+        st.apply(p["batches"])
+        self.assertEqual(entries(st.plan(s2, now="2026-11-03T17:00:00.000Z")), [])
 
 class Renames(Base):
     def test_rename_same_site_and_sponsor(self):
@@ -288,6 +354,17 @@ class Renames(Base):
         self.assertEqual(p["summary"]["renames"], [])
         self.assertEqual(p["summary"]["newRows"], ["bravo-ii"])
 
+
+    def test_rename_reverted_in_the_excel_is_applied(self):
+        renamed = edit(self.rows, "bravo", project="Project Bravo II")
+        renamed[1]["id"] = "bravo-ii"
+        self.run_and_apply(sheet(renamed))
+        self.assertEqual(self.store.docs["bravo"]["project"], "Project Bravo II")
+        p = self.run_and_apply(sheet(self.rows), now=NOW2)          # the typo is fixed in the Excel
+        self.assertEqual(p["summary"]["flags"], [])                 # used to flag a collision and "missing"
+        self.assertEqual(entry(p, "bravo")["data"]["project"], "Project Bravo")
+        self.assertEqual(self.store.sheet_sync["aliases"], {})
+        self.assertEqual(entries(self.store.plan(sheet(self.rows), now="2026-11-03T17:00:00.000Z")), [])
 
 class MissingRows(Base):
     def test_row_missing_from_sheet(self):
@@ -373,12 +450,56 @@ class Reorders(Base):
         self.assertFalse(any("history" in e["data"] or "updatedAt" in e["data"] for e in pipeline_entries(p)))
         self.assertIdempotent(s1)
 
+    def test_hold_persists_after_the_baseline_advances(self):
+        self.store.docs["bravo"]["order"] = 10                    # team moved bravo to the end
+        rows = copy.deepcopy(self.rows)
+        rows.insert(4, row("newco"))                              # Excel adds a row at the end of Pipeline
+        s1 = sheet(rows)
+        p = self.run_and_apply(s1)
+        self.assertEqual([f["kind"] for f in p["summary"]["flags"]], ["reordered"])
+        self.assertEqual(self.store.sheet_sync["orderHeld"], ["pipeline"])
+        self.assertIdempotent(s1)
+        s2 = sheet([r for r in rows if r["id"] != "delta"])        # later the Excel drops delta
+        p2 = self.run_and_apply(s2)
+        self.assertFalse(any("order" in e["data"] for e in pipeline_entries(p2)))
+        self.assertEqual(self.store.docs["bravo"]["order"], 10)
+        self.assertEqual(self.store.sheet_sync["orderHeld"], ["pipeline"])
+        self.assertIdempotent(s2)
+
+    def test_hold_released_when_excel_and_tracker_agree(self):
+        self.store.docs["bravo"]["order"] = 10                    # team moved bravo to the end
+        rows = copy.deepcopy(self.rows)
+        rows.insert(3, rows.pop(1))                               # the Excel does the same
+        s1 = sheet(rows)
+        p = self.run_and_apply(s1)
+        self.assertEqual(p["summary"]["flags"], [])
+        self.assertEqual(entry(p, "bravo")["data"], {"order": 4, "sheetRow": 11})
+        self.assertEqual(self.store.sheet_sync["orderHeld"], [])
+        self.assertIdempotent(s1)
+
     def test_tracker_reorder_alone_is_not_flagged(self):
         self.store.docs["bravo"]["order"], self.store.docs["charlie"]["order"] = 3, 2
         p = self.store.plan(sheet(edit(self.rows, "alpha", tenor="3")))
         self.assertEqual(p["summary"]["flags"], [])
         self.assertIsNone(entry(p, "bravo"))
 
+
+    def test_tracker_created_deal_moved_up_is_not_undone(self):
+        st = self.store
+        st.docs["tango"] = doc_from_row(row("tango"), order=5, sheetRow=None, updatedBy="AI")
+        st.versions["tango"] = 1
+        # PIPE_reorder's strict swaps: tango up past delta, charlie and bravo
+        for other in ("delta", "charlie", "bravo"):
+            st.docs["tango"]["order"], st.docs[other]["order"] = st.docs[other]["order"], st.docs["tango"]["order"]
+        p = st.plan(sheet(self.rows))                               # the Excel did not change
+        self.assertEqual(entries(p), [])                            # used to write bravo/charlie/delta back
+        # an Excel insertion above still renumbers the rows the Excel moved, and only those
+        rows = [row("zulu")] + self.rows
+        p = self.run_and_apply(sheet(rows))
+        self.assertEqual(sorted(e["doc_id"] for e in pipeline_entries(p) if "order" in e["data"]),
+                         ["alpha", "zulu"])
+        self.assertIsNone(entry(p, "tango"))
+        self.assertIdempotent(sheet(rows))
 
 class DuplicateNames(Base):
     def setUp(self):
@@ -419,6 +540,55 @@ class DuplicateNames(Base):
         self.assertIsNone(entry(p, "mirai-removed"))
         self.assertIdempotent(s1)
 
+
+    def test_new_deal_reusing_a_closed_deals_name(self):
+        old = row("gotham", "closed", project="Project Gotham", site="NY01", sponsor="McN", amount="$400m")
+        st = Store.from_sheet(sheet([row("salar"), old]))
+        st.docs["gotham"]["stage"] = "closed"
+        new = row("gotham", project="Project Gotham", site="NY02", sponsor="Herndon", amount="$250m")
+        s1 = sheet([row("salar"), new, dict(old, id="gotham-closed")])     # the parser renames the old row
+        p = self.run_and_apply(s1, store=st)
+        d = st.docs["gotham"]
+        self.assertEqual((d["section"], d["site"], d["amount"], d["stage"]), ("closed", "NY01", "$400m", "closed"))
+        self.assertEqual(p["summary"]["newRows"], ["gotham-2"])
+        self.assertEqual((st.docs["gotham-2"]["site"], st.docs["gotham-2"]["section"]), ("NY02", "pipeline"))
+        self.assertEqual(p["summary"]["changes"], [])
+        self.assertIdempotent(s1, store=st)
+
+    def test_names_sharing_a_slug_are_paired_by_content(self):
+        old = row("gotham", "closed", project="Project Gotham", site="NY01", sponsor="McN")
+        st = Store.from_sheet(sheet([row("salar"), old]))
+        new = row("gotham", project="Gotham [new]", site="NY02", sponsor="Herndon")   # same slug, other name
+        s1 = sheet([row("salar"), new, dict(old, id="gotham-closed")])
+        p = self.run_and_apply(s1, store=st)
+        self.assertEqual(st.docs["gotham"]["site"], "NY01")
+        self.assertEqual(p["summary"]["newRows"], ["gotham-2"])
+        self.assertIdempotent(s1, store=st)
+
+    def test_duplicate_name_inserted_above_in_the_same_section(self):
+        self.store.docs["mirai"].update(stage="terms", trackerProject="Mirai JV")
+        third = row("mirai", project="Project Mirai", site="Osaka Phase 2", sponsor="McN", amount="[10]bn",
+                    status="Kick-off", statusUpdate="x a different deal")
+        s1 = sheet([third, dict(self.rows[0], id="mirai-pipeline"), self.rows[1], self.rows[2]])
+        p = self.run_and_apply(s1)
+        d = self.store.docs["mirai"]
+        self.assertEqual((d["site"], d["stage"], d["trackerProject"]), ("Kyotonabe + Yawata", "terms", "Mirai JV"))
+        self.assertEqual(p["summary"]["newRows"], ["mirai-2"])
+        self.assertEqual(self.store.docs["mirai-2"]["site"], "Osaka Phase 2")
+        self.assertEqual(p["summary"]["changes"], [])
+        self.assertIdempotent(s1)
+
+    def test_deleted_duplicate_restored(self):
+        rows = [row("salar"), dict(self.rows[2], id="mirai")]           # the Pipeline Mirai row is deleted
+        self.run_and_apply(sheet(rows))
+        p = self.run_and_apply(self.s0, now=NOW2)                       # ...and restored (undo)
+        d = self.store.docs["mirai-removed"]
+        self.assertEqual((d["section"], d["site"]), ("removed", "Kyotonabe"))   # not pulled into Pipeline
+        self.assertEqual(p["summary"]["changes"], [])
+        self.assertEqual([f["kind"] for f in p["summary"]["flags"]], ["collision"])   # doc mirai is unlinked
+        self.assertIn("no longer linked to an Excel row", p["summary"]["flags"][0]["message"])
+        again = self.assertIdempotent(self.s0)                          # used to exit 2 from here on
+        self.assertEqual(again["summary"]["flags"], [])
 
 class History(Base):
     def test_prepend_cap_and_dedupe(self):
@@ -470,11 +640,67 @@ class Batching(unittest.TestCase):
         st.apply(p["batches"])
         self.assertEqual(entries(st.plan(s1, now=NOW2)), [])
 
-    def test_split_by_size(self):
-        rows = [row("r%02d" % i) for i in range(12)]
+    def test_recovery_after_a_failed_batch(self):
+        """Batch 2 fails (e.g. a version conflict): re-reading and re-planning finishes the job with
+        the same end state as a clean run, and a section is never left half renumbered."""
+        rows = [row("p%d" % i) for i in range(4)] + [row("j%d" % i, "jvs") for i in range(4)] + \
+               [row("c%d" % i, "closed") for i in range(4)]
         st = Store.from_sheet(sheet(rows))
-        big = [dict(r, description=("%s " % r["id"]) * 15000) for r in rows]     # ~90 KB per doc
-        p = st.plan(sheet(big))
+        new = copy.deepcopy(rows)
+        new.insert(0, row("p-new"))
+        new.insert(5, row("j-new", "jvs"))
+        new[9]["amount"] = "1bn"
+        s1 = sheet(new)
+        saved = plan_sync.MAX_BATCH_ENTRIES
+        plan_sync.MAX_BATCH_ENTRIES = 6
+        try:
+            clean = copy.deepcopy(st)
+            p = clean.plan(s1)
+            self.assertGreaterEqual(len(p["batches"]), 2)
+            sec_of = {r["id"]: r["section"] for r in s1["rows"]}
+            where = {}
+            for bi, b in enumerate(p["batches"]):
+                for e in b:
+                    if e["collection"] == "pipeline":
+                        where.setdefault(sec_of[e["doc_id"]], set()).add(bi)
+            self.assertTrue(all(len(v) == 1 for v in where.values()), where)   # no section split
+            clean.apply(p["batches"])
+            part = copy.deepcopy(st)
+            part.apply(p["batches"][:1])
+            p2 = part.plan(s1, now=NOW2)
+            self.assertIsNone(p2["summary"]["abort"])
+            self.assertEqual(p2["summary"]["flags"], [])
+            part.apply(p2["batches"])
+        finally:
+            plan_sync.MAX_BATCH_ENTRIES = saved
+
+        def strip(docs):
+            return {i: dict((k, v) for k, v in d.items() if k not in ("updatedAt", "history")) for i, d in docs.items()}
+        self.assertEqual(strip(part.docs), strip(clean.docs))
+        self.assertEqual(part.config, clean.config)
+        self.assertEqual(entries(part.plan(s1, now=NOW2)), [])
+
+    def test_half_applied_renumbering_is_finished_not_held(self):
+        rows = [row("p%02d" % i) for i in range(45)]
+        st = Store.from_sheet(sheet(rows))
+        s1 = sheet(list(reversed(rows)))                 # 45 position updates in one section: 2 batches
+        p = st.plan(s1)
+        self.assertGreater(len(p["batches"]), 1)
+        st.apply(p["batches"][:1])                       # batch 2 failed (e.g. a version conflict)
+        p2 = st.plan(s1, now=NOW2)
+        self.assertEqual(p2["summary"]["flags"], [])     # used to hold the section, scrambled
+        st.apply(p2["batches"])
+        got = sorted(st.docs, key=lambda i: (st.docs[i]["order"], st.docs[i]["sheetRow"], i))
+        self.assertEqual(got, [r["id"] for r in s1["rows"]])
+        self.assertEqual(entries(st.plan(s1, now="2026-11-03T17:00:00.000Z")), [])
+
+    def test_split_by_size(self):
+        rows = [row("r%02d" % i) for i in range(8)]
+        st = Store.from_sheet(sheet(rows))
+        for d in st.docs.values():      # long histories (40 lines x 2 cells x 1800 chars): ~145 KB per doc
+            d["history"] = [{"at": "2026-11-0%dT10:00:00.000Z" % (1 + k % 2), "by": "AI", "field": "f%d" % k,
+                             "from": "a" * 1800, "to": "b" * 1800} for k in range(40)]
+        p = st.plan(sheet([dict(r, amount="9bn") for r in rows]))
         self.assertIsNone(p["summary"]["abort"])
         self.assertGreater(len(p["batches"]), 2)
         for b in p["batches"]:
@@ -487,6 +713,22 @@ class SafetyAbort(unittest.TestCase):
         self.assertEqual(plan["batches"], [])
         self.assertIn(fragment, plan["summary"]["abort"] or "")
         self.assertEqual(plan["summary"]["writes"], 0)
+
+    def test_doc_over_the_store_limit_aborts(self):
+        rows = [row("r%02d" % i) for i in range(12)]
+        st = Store.from_sheet(sheet(rows))
+        p = st.plan(sheet([dict(r, description=("%s " % r["id"]) * 15000) for r in rows]))   # baseline ~730 KB
+        self.assertAborts(p, "pipelineMeta/sheetSync would be")
+        self.assertIn("256 KiB", p["summary"]["abort"])
+
+    def test_updated_doc_size_counts_the_whole_doc(self):
+        rows = [row("a")]
+        st = Store.from_sheet(sheet(rows))
+        st.docs["a"]["description"] = "y" * 120000
+        st.docs["a"]["history"] = [{"at": NOW, "by": "AI", "field": "f%d" % k, "from": "z" * 1900, "to": "z" * 1900}
+                                   for k in range(30)]
+        p = st.plan(sheet([dict(rows[0], amount="1")]))  # a small patch to a doc that ends up ~240 KB
+        self.assertAborts(p, "pipeline/a would be")
 
     def test_too_many_touched(self):
         rows = [row("r%02d" % i) for i in range(30)]
@@ -553,6 +795,42 @@ class Bootstrap(unittest.TestCase):
             st.plan(sheet(rows))
 
 
+class BaselineDoc(Base):
+    def test_baseline_is_a_pinned_set_and_aliases_do_not_go_stale(self):
+        # The store's update merges nested objects, so an update could never drop an alias.
+        foo = row("foo", project="Project Foo", site="Site F")
+        st = Store.from_sheet(sheet([foo, row("other")]))
+        self.run_and_apply(sheet([dict(foo, id="bar", project="Project Bar"), row("other")]), store=st)
+        s2 = sheet([dict(foo, id="baz", project="Project Baz"), row("other")])
+        p = self.run_and_apply(s2, store=st, now=NOW2)
+        last = p["batches"][-1][-1]
+        self.assertEqual((last["op"], last["doc_id"], last["if_version"]), ("set", "sheetSync", 2))
+        self.assertEqual(st.sheet_sync["aliases"], {"baz": "foo"})
+        self.assertEqual(entries(st.plan(s2, now="2026-11-03T17:00:00.000Z")), [])
+        s3 = sheet([dict(foo, id="baz", project="Project Baz"), row("other"), row("bar", site="New")])
+        self.run_and_apply(s3, store=st, now="2026-11-03T18:00:00.000Z")       # the old name is reused
+        self.assertEqual(entries(st.plan(s3, now="2026-11-03T19:00:00.000Z")), [])
+
+    def test_parse_warning_is_reported_once(self):
+        w = "row 9: column B (leadB) holds 'JJ'; the tracker has no field for it, so it is not synced"
+        s1 = sheet(self.rows, warnings=[w])
+        p = self.run_and_apply(s1)
+        self.assertEqual([f["kind"] for f in p["summary"]["flags"]], ["parse-warning"])
+        self.assertIn("sheetSync", [e["doc_id"] for e in entries(p)])    # so the run reports it (was 0 writes)
+        again = self.assertIdempotent(s1)
+        self.assertEqual(again["summary"]["flags"], [])
+        p = self.run_and_apply(sheet(self.rows), now="2026-11-03T17:00:00.000Z")     # the cell is cleared
+        self.assertEqual(self.store.sheet_sync["warnings"], [])
+
+    def test_slug_is_parse_sheets_slugify(self):
+        from synth import parse_sheet, fixture_text
+        names = [r["project"] for name in ("sheet_2026-10-29.txt", "sheet_2026-11-02.txt")
+                 for r in parse_sheet.parse_text(fixture_text(name), "x")["rows"]]
+        names += ["(ACX) Project Nova", "Project Gotham [ needs new naming ]", " Project  A.B ", "Gotham [new]"]
+        for n in names:
+            self.assertEqual(plan_sync.slug(n), parse_sheet.slugify(n), n)
+
+
 class Time(unittest.TestCase):
     def test_now_is_normalised(self):
         self.assertEqual(plan_sync.parse_now("2026-11-02T15:27:54-05:00")[1], "2026-11-02T20:27:54.000Z")
@@ -587,10 +865,10 @@ class Cli(unittest.TestCase):
         st = Store.from_sheet(s0)
         with tempfile.TemporaryDirectory() as d:
             st.write(os.path.join(d, "store"))
-            plan_sync_json = os.path.join(d, "sheet.json")
+            sheet_json = os.path.join(d, "sheet.json")
             from synth import dump
-            dump(plan_sync_json, sheet(edit(rows, "b", amount="9")))
-            args = ["--sheet", plan_sync_json, "--baseline", os.path.join(d, "store", "pipelineMeta", "sheetSync.json"),
+            dump(sheet_json, sheet(edit(rows, "b", amount="9")))
+            args = ["--sheet", sheet_json, "--baseline", os.path.join(d, "store", "pipelineMeta", "sheetSync.json"),
                     "--store", os.path.join(d, "store"), "--versions", os.path.join(d, "store", "versions.json"),
                     "--now", NOW]
             code, so, se = run_tool("plan_sync.py", *(args + ["--out", os.path.join(d, "out")]))
@@ -603,13 +881,26 @@ class Cli(unittest.TestCase):
                 self.assertEqual(load(r["file_path"]), e["data"])
                 self.assertEqual(r.get("if_version"), e.get("if_version"))
                 self.assertNotIn("data", r)
-            self.assertEqual(load(os.path.join(out, "sheetSync_next.json"))["rows"], load(plan_sync_json)["rows"])
+            self.assertEqual(load(os.path.join(out, "sheetSync_next.json"))["rows"], load(sheet_json)["rows"])
             summ = load(os.path.join(out, "summary.json"))
             self.assertEqual((summ["writes"], summ["abort"]), (3, None))
             for k in ("changes", "newRows", "conflicts", "flags", "writes", "abort"):
                 self.assertIn(k, summ)
             with open(os.path.join(out, "report.md"), encoding="utf-8") as fh:
                 self.assertIn("amount", fh.read())
+            # versions.json slips are bad input (exit 2: re-check step 4), not a safety abort (exit 3)
+            vfile = os.path.join(d, "store", "versions.json")
+            good = load(vfile)
+            slips = {"missing": {k: v for k, v in good.items() if k != "b"},                 # b has a planned write
+                     "typo": {("aa" if k == "a" else k): v for k, v in good.items()},       # a has none
+                     "string": dict(good, b=str(good["b"]))}
+            for name, bad in sorted(slips.items()):
+                vpath = os.path.join(d, "versions_%s.json" % name)
+                dump(vpath, bad)
+                argv = [vpath if x == vfile else x for x in args] + ["--out", os.path.join(d, "out_" + name)]
+                code, so, se = run_tool("plan_sync.py", *argv)
+                self.assertEqual(code, 2, (name, so, se))
+                self.assertIn("PLAN ERROR: versions.json", se)
             # deterministic
             code, so, se = run_tool("plan_sync.py", *(args + ["--out", os.path.join(d, "out2")]))
             self.assertEqual(load(os.path.join(d, "out2", "batches", "batch_01.json")), b1)
@@ -618,10 +909,10 @@ class Cli(unittest.TestCase):
             self.assertEqual(code, 2)
             self.assertIn("new or empty", se)
             # abort exit code
-            dump(plan_sync_json, sheet([]))
+            dump(sheet_json, sheet([]))
             code, so, se = run_tool("plan_sync.py", *(args + ["--out", os.path.join(d, "out3")]))
             self.assertEqual(code, 0, so + se)       # 2 missing rows: under the limit
-            dump(plan_sync_json, dict(sheet(rows), sections=[]))
+            dump(sheet_json, dict(sheet(rows), sections=[]))
             code, so, se = run_tool("plan_sync.py", *(args + ["--out", os.path.join(d, "out4")]))
             self.assertEqual(code, 3, so + se)
             self.assertEqual(os.listdir(os.path.join(d, "out4", "batches")), ["data"])
