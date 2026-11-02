@@ -1178,3 +1178,26 @@ QA:
 - **Content diff vs v103:** only LENDERS, PROJECTS, BOND_MARKET_NOTES and SWEEP_THROUGH changed, plus LAST_REFRESH.
 - **Checks:** all 5 script blocks pass `node --check`. Smoke test PASS, with zero console errors and no external requests.
 - Stamp `11/2/26, 1:17 PM ET (v104)`. Archived as `tracker/versions/ECX_Tracker_v104.html`.
+
+## CF Pipeline Excel sync (11/2/26) — no tracker release
+
+Aditya: "on the hourly refreshes - can you also pickup the CF pipeline and to check if theres any updates to the live excel and make those". Aditya then chose one weekday-nightly scheduled run for both the Excel check and the Outlook sweep.
+
+- **First sync (by hand, 11/2/26):** the live Excel had one change since the 10/29 load, a new row "Project Gotham Refi" (GTN JKT01/2, Herndon, APAC, USD, Kick-off).
+  - It was added to the CF Pipeline store at Pipeline position 9, stage Kick-off & sounding, with a "created" history line by "Excel".
+  - The 14 deals below it moved down one position, and 15 more had their sheet-row numbers updated. These were housekeeping writes with no history.
+  - The header now reads "sheet loaded 11/2/26".
+- **New tool `tracker/pipeline-sync/`:**
+  - `parse_sheet.py` parses the Excel dump; any structural change stops the run.
+  - `plan_sync.py` is a three-way merge of the last-synced sheet, today's sheet and the tracker's store. The rules:
+    - the Excel's changes are applied only where the tracker still holds the old value;
+    - edits the team made in the tracker always win, and a conflict is reported once;
+    - new Excel rows are added, and renames are detected;
+    - rows that disappear from the Excel are only flagged, never deleted;
+    - the tracker-only fields (stage, paused) are never touched;
+    - a run that finds nothing writes nothing;
+    - a large change stops the run for a human to look at.
+  - `RUNBOOK.md` gives the steps for the scheduled run, and `README.md` explains the design.
+  - Tests: 100 unit, random and real-data replay tests. The replay reproduces the hand-made first sync exactly.
+- **One-time setup done:** the baseline `pipelineMeta/sheetSync` (version 1) was recorded from the 11/2 sheet, and a re-plan gives zero writes. The only differences between the store and the sheet were Salar's status update and other-lenders list (the v104 update); the tracker's values are kept.
+- The tracker page is unchanged; the CF Pipeline tab reads the store live.

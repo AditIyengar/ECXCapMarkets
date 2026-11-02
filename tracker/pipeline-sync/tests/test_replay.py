@@ -136,6 +136,12 @@ class Replay(unittest.TestCase):
         st2 = copy.deepcopy(st)
         st2.sheet_sync = None
         del st2.versions["pipelineMeta/sheetSync"]
+        # RUNBOOK one-time setup, step 3: the plain bootstrap stops on exactly Salar's two tracker edits
+        strict = st2.plan(self.s1102, now="2026-11-02T21:30:00.000Z", bootstrap=self.s1102)
+        self.assertEqual(strict["batches"], [])
+        self.assertIn("one-time setup", strict["summary"]["abort"])
+        self.assertEqual([(x["docId"], x["field"]) for x in strict["summary"]["bootstrapDiffs"]],
+                         [("salar", "statusUpdate"), ("salar", "lendersOther")])
         boot = st2.plan(self.s1102, now="2026-11-02T21:30:00.000Z", bootstrap=self.s1102, accept=True)
         self.assertEqual([(e["op"], e["doc_id"]) for e in entries(boot)], [("set", "sheetSync")])
 
@@ -167,6 +173,61 @@ class Replay(unittest.TestCase):
             self.assertEqual(code, 0, so + se)
             self.assertEqual(load(os.path.join(d, "plan2", "summary.json"))["writes"], 0)
             self.assertEqual(os.listdir(os.path.join(d, "plan2", "batches", "data")), [])
+
+
+class RealMiraiMoves(unittest.TestCase):
+    """The two real "Project Mirai" rows share most of their cells (the Removed one shares 62% of the
+    live one's), and their ids depend on which comes first in the sheet. Moving one past the other
+    must move that deal only, and undoing the move must undo only that."""
+    KY, K = "\tProject Mirai\tKyotonabe + Yawata\t", "\tProject Mirai\tKyotonabe\t"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.text = fixture_text("sheet_2026-11-02.txt")
+        cls.s1102 = parse_sheet.parse_text(cls.text, "2026-11-02T20:20:00.000Z")
+        docs, config, versions = read_store(os.path.join(REPLAY, "store_pre"))
+        st = Store(docs, config=config, versions=versions)
+        s1029 = parse_sheet.parse_text(fixture_text("sheet_2026-10-29.txt"), "2026-10-29T17:00:00.000Z")
+        st.apply(st.plan(cls.s1102, now=MANUAL_NOW, bootstrap=s1029, accept=True)["batches"])
+        cls.post = st
+
+    def moved(self, src, dst, below):
+        lines = self.text.split("\n")
+        line = lines.pop(next(i for i, x in enumerate(lines) if src in x))
+        j = next(i for i, x in enumerate(lines) if dst in x)
+        lines.insert(j + 1 if below else j, line)
+        return parse_sheet.parse_text("\n".join(lines), "2026-11-03T15:00:00.000Z")
+
+    def check(self, sh, moved_doc, now):
+        st = self.post
+        before = copy.deepcopy(st.docs)
+        p = st.plan(sh, now=now)
+        s = p["summary"]
+        self.assertEqual((s["newRows"], s["flags"], s["conflicts"]), ([], [], []))
+        self.assertEqual([(c["docId"], c["field"]) for c in s["changes"]], [(moved_doc, "section")])
+        st.apply(p["batches"])
+        for did in ("mirai", "mirai-removed"):
+            for f in TF:
+                self.assertEqual(st.docs[did][f], before[did][f], (did, f))     # no deal written into the other
+        self.assertEqual(entries(st.plan(sh, now=now.replace("T15:", "T16:"))), [])
+
+    def test_removed_mirai_revived_above_the_live_one(self):
+        self.post = copy.deepcopy(self.post)
+        sh = self.moved(self.K, self.KY, below=False)      # its id is now "mirai", the live one's "mirai-pipeline"
+        self.assertEqual([(r["id"], r["site"]) for r in sh["rows"] if r["project"] == "Project Mirai"],
+                         [("mirai", "Kyotonabe"), ("mirai-pipeline", "Kyotonabe + Yawata")])
+        self.check(sh, "mirai-removed", "2026-11-03T15:05:00.000Z")
+        self.assertEqual(self.post.docs["mirai-removed"]["section"], "pipeline")
+        self.check(self.s1102, "mirai-removed", "2026-11-04T15:05:00.000Z")       # and back
+
+    def test_live_mirai_moved_below_the_removed_one_and_back(self):
+        self.post = copy.deepcopy(self.post)
+        sh = self.moved(self.KY, self.K, below=True)       # the ids of the two rows swap
+        self.check(sh, "mirai", "2026-11-03T15:05:00.000Z")
+        self.assertEqual(self.post.sheet_sync["aliases"], {"mirai": "mirai-removed", "mirai-removed": "mirai"})
+        self.check(self.s1102, "mirai", "2026-11-04T15:05:00.000Z")               # the undo used to overwrite doc mirai
+        self.assertEqual(self.post.docs["mirai"]["section"], "pipeline")
+        self.assertEqual(self.post.sheet_sync["aliases"], {})
 
 
 class FixtureProvenance(unittest.TestCase):

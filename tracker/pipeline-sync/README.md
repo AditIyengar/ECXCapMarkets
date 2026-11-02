@@ -18,11 +18,11 @@ The sync remembers the Excel as it was at the last sync. This is the "baseline",
 - **New Excel rows** become new deals. "Kick-off" maps to the stage Kick-off & sounding, and "Paused" sets paused.
 - **Renamed rows** (same section, same site and sponsor, or mostly the same cells) keep their tracker deal; only the name changes. Renaming back works the same way.
 - **Rows deleted from the Excel are never deleted from the tracker.** They are flagged once so someone can remove them by hand.
-- **The same name twice** (Mirai in Pipeline and in Removed, or a new deal that reuses an old deal's name) is matched by section and content, not by the row's id, so one deal can never be written into another. A new deal whose name is already taken is created as `<name>-2`, the way the tracker names a second deal with the same name.
+- **The same name twice** (Mirai in Pipeline and in Removed, or a new deal that reuses an old deal's name) is matched by its cells and section, not by the row's id (the id of a repeated name depends on which row comes first), so moving one of them past the other, or adding a second deal with the same name, never writes one deal into the other. A new deal whose name is already taken is created as `<name>-2`, the way the tracker names a second deal with the same name.
 - **Tracker-only fields and deals** are never touched: stage, paused, the tracker project link, and deals added in the tracker. If a new Excel row would take the id of a deal added in the tracker, it is flagged once and not written (it is added later if that tracker deal is removed).
 - **When a sync must stop.** If the sheet's layout changes (headers, columns, section labels), nothing is written and Aditya gets the error. The same happens if one run would change too much at once (field changes on more than 25 rows, more than 6 new rows, or more than 4 rows gone), or if a deal would grow past the store's 256 KiB document limit.
-- **Every flag is raised once**, in the run that first sees it, so the hourly report does not repeat itself.
-- **Hourly runs that find nothing write nothing.**
+- **Every flag is raised once**, in the run that first sees it, so the scheduled report does not repeat itself.
+- **Runs that find nothing write nothing.**
 - **Before the first scheduled run**, the baseline has to be set up once with Aditya (see `RUNBOOK.md`), because the tracker already holds edits that differ from the Excel.
 
 ## Files

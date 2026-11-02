@@ -35,6 +35,7 @@ import math
 import os
 import re
 import sys
+from fractions import Fraction
 
 # ---------------------------------------------------------------- the page's rules (ecx-tracker.html PIPE_*)
 
@@ -402,8 +403,12 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
     taken = set()
     # Rows whose names share a slug (Mirai in Pipeline and in Removed; a new deal that reuses an old
     # deal's name) get ids from the parser that depend on sheet order and section ("mirai", then
-    # "mirai-removed"), so an id can move from one deal to another. Pair those rows by section and
-    # content instead: the strongest pair that is the unique best for both of its rows, repeatedly.
+    # "mirai-removed"), so an id can move from one deal to another. Pair those rows by content
+    # instead. Two such deals can share most of their cells (the two real Mirai rows share 62% of
+    # the baseline row's), so "qualifies" alone cannot tell them apart: each family is paired by the
+    # assignment with the highest total weight, where the weight is the graded cell similarity plus
+    # a little for the same section and less for the same id. Only "eligible" pairs count: the same
+    # deal by content, or the same id in the same section (one row edited a lot in place).
     base_fam, sheet_fam = {}, {}
     for b in base_rows:
         base_fam.setdefault(slug(b["project"]), []).append(b)
@@ -412,36 +417,31 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
     dup = set(k for k in set(base_fam) | set(sheet_fam)
               if len(base_fam.get(k, [])) > 1 or len(sheet_fam.get(k, [])) > 1)
 
-    def score(b, s):
-        return 2 * (b["section"] == s["section"]) + 2 * qualifies(b, s) + (b["id"] == s["id"])
+    def similarity(b, s):
+        """The share of the cells (the name aside) filled on either side that are equal; exact."""
+        fields = [f for f in TEXT_FIELDS if f != "project" and (js_trim(b[f]) or js_trim(s[f]))]
+        if not fields:
+            return Fraction(1)
+        return Fraction(sum(1 for f in fields if same(f, b[f], s[f])), len(fields))
+
+    def eligible(b, s):
+        return qualifies(b, s) or (b["section"] == s["section"] and b["id"] == s["id"])
+
+    def weight(b, s):
+        return similarity(b, s) + Fraction(3, 10) * (b["section"] == s["section"]) + Fraction(1, 10) * (b["id"] == s["id"])
 
     for k in sorted(dup):
-        bs, ss = list(base_fam.get(k, [])), list(sheet_fam.get(k, []))
-        while bs and ss:
-            best = None
-            for b in bs:
-                for s in ss:
-                    sc = score(b, s)
-                    if sc < 2 or any(score(b, o) >= sc for o in ss if o is not s) \
-                            or any(score(o, s) >= sc for o in bs if o is not b):
-                        continue
-                    if best is None or (sc, -s["sheetRow"]) > (best[0], -best[2]["sheetRow"]):
-                        best = (sc, b, s)
-            if best is None:
-                break
-            _, b, s = best
+        for b, s in pair_family(base_fam.get(k, []), sheet_fam.get(k, []), eligible, weight):
             match[s["id"]] = (b, "name")
             taken.add(b["id"])
-            bs.remove(b)
-            ss.remove(s)
     for s in sheet_rows:
         if s["id"] in match:
             continue
         b = base_by_id.get(s["id"])
         if b is None or b["id"] in taken:
             continue
-        if (slug(b["project"]) in dup or slug(s["project"]) in dup) and score(b, s) < 3:
-            continue        # a shared name and the same id, but not the same section or content
+        if (slug(b["project"]) in dup or slug(s["project"]) in dup) and not eligible(b, s):
+            continue        # a shared name and the same id, but not the same deal by section or content
         match[s["id"]] = (b, "id")
         taken.add(b["id"])
     new_rows = [s for s in sheet_rows if s["id"] not in match]
@@ -802,6 +802,41 @@ def build_plan(sheet, baseline, store_docs, versions, config, now, bootstrap=Fal
         "abort": "; ".join(abort) if abort else None,
     }
     return {"batches": batches, "next_baseline": next_baseline, "summary": summary}
+
+
+PAIR_EXACT_MAX = 6      # families up to this size are paired exactly; larger ones (never seen) greedily
+
+
+def pair_family(bs, ss, eligible, weight):
+    """Pairs (baseline row, sheet row) of one same-slug family: the set of eligible pairs, each row
+    used at most once, with the highest total weight; ties go to the first found, scanning the
+    baseline rows and then the sheet rows in their given order (deterministic)."""
+    w = {(i, j): weight(b, s) for i, b in enumerate(bs) for j, s in enumerate(ss) if eligible(b, s)}
+    if len(bs) <= PAIR_EXACT_MAX and len(ss) <= PAIR_EXACT_MAX:
+        best = [Fraction(-1), []]
+
+        def walk(i, used, total, chosen):
+            if i == len(bs):
+                if total > best[0]:
+                    best[0], best[1] = total, list(chosen)
+                return
+            for j in range(len(ss)):
+                if j not in used and (i, j) in w:
+                    chosen.append((i, j))
+                    walk(i + 1, used | {j}, total + w[(i, j)], chosen)
+                    chosen.pop()
+            walk(i + 1, used, total, chosen)
+
+        walk(0, frozenset(), Fraction(0), [])
+        picked = best[1]
+    else:
+        picked, ub, us = [], set(), set()
+        for (i, j) in sorted(w, key=lambda ij: (-w[ij], ij)):
+            if i not in ub and j not in us:
+                picked.append((i, j))
+                ub.add(i)
+                us.add(j)
+    return [(bs[i], ss[j]) for i, j in sorted(picked)]
 
 
 def _is_version(v):
