@@ -1,0 +1,77 @@
+{
+  "asOf": "2026-10-29",
+  "calls": [],
+  "lastCall": null,
+  "sections": [
+    {
+      "key": "pipeline",
+      "label": "Pipeline",
+      "order": 0
+    },
+    {
+      "key": "jvs",
+      "label": "JVs",
+      "order": 1
+    },
+    {
+      "key": "corporate",
+      "label": "Corporate",
+      "order": 2
+    },
+    {
+      "key": "misc",
+      "label": "Miscellaneous",
+      "order": 3
+    },
+    {
+      "key": "closed",
+      "label": "Closed",
+      "order": 4
+    },
+    {
+      "key": "removed",
+      "label": "Removed",
+      "order": 5
+    }
+  ],
+  "seededAt": "2026-10-29T19:17:33.000Z",
+  "source": "Corporate Finance Pipeline_NEW.xlsx · Pipeline (transactions)",
+  "stages": [
+    {
+      "hint": "Materials, model, DD, structuring",
+      "key": "prep",
+      "label": "Preparation"
+    },
+    {
+      "hint": "First bank outreach, market sounding, RFP / teaser out",
+      "key": "launch",
+      "label": "Kick-off & sounding"
+    },
+    {
+      "hint": "Term sheets in, negotiating terms, lead / club selection",
+      "key": "terms",
+      "label": "Terms"
+    },
+    {
+      "hint": "Banks in credit; commitments pending",
+      "key": "credit",
+      "label": "Credit approvals"
+    },
+    {
+      "hint": "Docs, ratings, OM, final DD",
+      "key": "docs",
+      "label": "Documentation"
+    },
+    {
+      "hint": "Signing, CPs, funding",
+      "key": "closing",
+      "label": "Signing & closing"
+    },
+    {
+      "hint": "Signed and funded",
+      "key": "closed",
+      "label": "Closed"
+    }
+  ],
+  "title": "ECX Capital Markets - Financing Activities Pipeline"
+}

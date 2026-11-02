@@ -1,0 +1,53 @@
+{
+  "amount": "5.6bn",
+  "amountUsd": "",
+  "capacity": "264MW + 192MW",
+  "currency": "EUR",
+  "description": "Financing for 192MW site in Finland + 264 MW in Norway",
+  "ecxLead": "Marjolein",
+  "ecxSupport": "JJ",
+  "fundingAtClose": "",
+  "fundingDate": "26Q4",
+  "fundingMonth": "Dec-26",
+  "history": [
+    {
+      "at": "2026-11-02T18:18:44.000Z",
+      "by": "AI",
+      "field": "statusUpdate",
+      "from": "x CLA launch 10/21; credit approvals requested by 11/24 x Finalization DD pack with TDD on critical path (pending 100% design in Norway and E&S) x Rating advice expected by end of October",
+      "to": "x CLA feedback (lead banks' deck 10/29): ABN AMRO, BBVA, BNPP, ING, SMBC positive; MS, MUFG TBD (MUFG gave feedback to ECX directly, ECX to follow up); LBBW declined (credit) x Institutional sounding (12 investors): of interest, but no investor will take the deal as presented (pricing vs IG DC bonds, tight DSCR / extension risk, preference for fixed rate with MW). Allianz, CPPIB, NYL declined; Apterra on hold x Leads recommend a fixed-rate 7Y tranche at min. 250bps flat with make-whole (~EUR 1.15bn potential liquidity), a EUR [0.75-1.0]bn cornerstone institutional tranche, and possibly broadening the CLA list x ECX current thinking (Eelco 11/2): 7yr, 250bps; initial draw + fixed conservative draw schedule, banks for flex; indicated investor interest ~EUR 1.1bn. Norway fixed-rate with 3yr non-call / MW (targets Blackstone, MEAG, IFM); Finland floating, no non-call / MW (target PIMCO) x CLA launch 10/21; credit approvals requested by 11/24 x Finalization DD pack with TDD on critical path (pending 100% design in Norway and E&S) x Rating advice expected by end of October"
+    },
+    {
+      "at": "2026-11-02T18:18:44.000Z",
+      "by": "AI",
+      "field": "lendersOther",
+      "from": "BNPP, ING, BBVA, [MUFG], SMBC, ABN AMRO and [LBBW]",
+      "to": "BNPP, ING, BBVA, SMBC, ABN AMRO, [MUFG], [MS]; LBBW declined 10/29"
+    }
+  ],
+  "issuesLegal": "",
+  "issuesOther": "FX hedging",
+  "issuesTechnical": "- Challenging timeline to meet Norway Phase 3 power connection according to external source - 20-40MVA missing for Finland, no mitigant idenfied so far - E&S issues with impact on local communities",
+  "keyIssues": "x Power in Norway will likely have to be financed in tranches x NOR restructuring w/ leases assigned to 6 separate entities x More focus on Norway because of location",
+  "lendersLead": "CACIB, Natixis, Rabobank, SG",
+  "lendersOther": "BNPP, ING, BBVA, SMBC, ABN AMRO, [MUFG], [MS]; LBBW declined 10/29",
+  "ltc": "90%",
+  "marginFee": "2.35-2.20%",
+  "marker": "",
+  "order": 14,
+  "paused": false,
+  "project": "Project Salar",
+  "region": "EMEA",
+  "section": "pipeline",
+  "sheetRow": 21,
+  "site": "Finland/Norway",
+  "sponsor": "McNair",
+  "stage": "credit",
+  "status": "",
+  "statusUpdate": "x CLA feedback (lead banks' deck 10/29): ABN AMRO, BBVA, BNPP, ING, SMBC positive; MS, MUFG TBD (MUFG gave feedback to ECX directly, ECX to follow up); LBBW declined (credit) x Institutional sounding (12 investors): of interest, but no investor will take the deal as presented (pricing vs IG DC bonds, tight DSCR / extension risk, preference for fixed rate with MW). Allianz, CPPIB, NYL declined; Apterra on hold x Leads recommend a fixed-rate 7Y tranche at min. 250bps flat with make-whole (~EUR 1.15bn potential liquidity), a EUR [0.75-1.0]bn cornerstone institutional tranche, and possibly broadening the CLA list x ECX current thinking (Eelco 11/2): 7yr, 250bps; initial draw + fixed conservative draw schedule, banks for flex; indicated investor interest ~EUR 1.1bn. Norway fixed-rate with 3yr non-call / MW (targets Blackstone, MEAG, IFM); Finland floating, no non-call / MW (target PIMCO) x CLA launch 10/21; credit approvals requested by 11/24 x Finalization DD pack with TDD on critical path (pending 100% design in Norway and E&S) x Rating advice expected by end of October",
+  "tenor": "5",
+  "trackerProject": "Project Salar — Norway & Finland",
+  "updatedAt": "2026-11-02T18:18:44.000Z",
+  "updatedBy": "AI",
+  "upfrontFee": "1.5% 0.25% UW"
+}
