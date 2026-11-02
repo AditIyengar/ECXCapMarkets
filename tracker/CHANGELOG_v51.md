@@ -1137,3 +1137,44 @@ QA:
   - the stage set-up won't overwrite a stage the team has already set.
 - All 5 script blocks pass `node --check`. Smoke test PASS, zero console errors, no external requests.
 - Stamp `10/29/26, 7:33 PM ET (v103)`. Archived as `tracker/versions/ECX_Tracker_v103.html`.
+
+## v104 Changelog (11/2/26) — Project Salar: CLA and institutional investor feedback
+
+Aditya: "use this and Eelco's email to update the tracker". The sources are:
+- the lead banks' (CACIB, Natixis, Rabobank, SG) "Project Salar — CLA & Investor Feedback" deck, 29 Oct 2026;
+- Eelco Holst's email "Guadelupe - Salar Institutional Tranche data points", 11/2/26, to Joe Harar, Aditya Iyengar and Johan Hylander (EQT).
+
+**Project Salar card**
+- **New 11/2/26 section:**
+  - **CLA round:** 5 positive (ABN AMRO, BBVA, BNPP, ING, SMBC); Morgan Stanley and MUFG TBD; LBBW declined.
+  - **Institutional sounding:** 12 investors approached. There is interest, but no investor will take the deal as presented. The reasons: pricing against IG data-centre bonds, sizing (DSCR and extension risk) and structure (fixed rate with make-whole).
+  - **Lead banks' conclusion and recommendation:** a fixed-rate 7Y tranche at min. 250bps flat with make-whole (~€1.15bn of potential liquidity); a €[0.75-1.0]bn cornerstone institutional tranche; possibly broaden the CLA list.
+  - **ECX's current thinking (Eelco):**
+    - 7yr, 250bps, with indicated investor interest of ~€1.1bn;
+    - Norway: a fixed-rate tranche with 3yr non-call / make-whole, targeting Blackstone, MEAG and IFM;
+    - Finland: floating rate, targeting PIMCO.
+- **Bank outreach** grows from 15 to 26 rows:
+  - every CLA's feedback is added, and Morgan Stanley is added as a CLA;
+  - LBBW is now declined;
+  - Apollo and PIMCO are updated;
+  - Blackstone, IFM, MEAG, PGIM, Aviva and GIP / BlackRock are added as in dialogue;
+  - Allianz, CPPIB, NYL and Apterra (on hold) are added as declined.
+- **Unchanged:** teaser data, expected close and workstreams.
+
+**Lender cards** (16). Each gets a dated 10/29/26 note with that institution's own feedback, plus a Salar entry: BBVA, BNP, ING Bank, SMBC, Morgan Stanley, MUFG, LBBW, Blackstone, PIMCO, Apollo, Apterra, CPPIB, CACIB, Natixis, Rabobank and SocGen.
+- **Declines:** LBBW, CPPIB and Apterra are under declined.
+- **Next steps:** MUFG gains a follow-up on the feedback it gave ECX directly, and LBBW's outdated "confirm on the CLA invite list" step is removed.
+- **Unchanged:** no lastContact moved (the feedback came in writing through the lead banks), and no new cards were created. Institutions without a card appear only in Salar's outreach.
+- **Active-pipeline counts:** Blackstone 2 → 3, Morgan Stanley 3 → 4, LBBW 4 → 3. No other lender changed.
+
+**Other**
+- **Guadalupe:** a one-line pointer, since Eelco asked which Salar learnings apply to Guadalupe.
+- **Market notes:** a new 10/29/26 entry on institutional-market sentiment.
+- **SWEEP_THROUGH** now includes 11/2/26.
+
+QA:
+- **Source fidelity:** an independent review checked every new sentence against the deck and the email; its fixes are applied.
+- **Data rules:** no lastContact changes across all 69 lenders, no new cards, declines only in rejectedProjects, and no duplicate Salar entries.
+- **Content diff vs v103:** only LENDERS, PROJECTS, BOND_MARKET_NOTES and SWEEP_THROUGH changed, plus LAST_REFRESH.
+- **Checks:** all 5 script blocks pass `node --check`. Smoke test PASS, with zero console errors and no external requests.
+- Stamp `11/2/26, 1:17 PM ET (v104)`. Archived as `tracker/versions/ECX_Tracker_v104.html`.
